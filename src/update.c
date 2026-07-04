@@ -4,9 +4,8 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect);
 
 void game_Update(Game *game){
         
-   int ancho_act = game->win_w, alto_act = game->win_h;
-   int toca_xR = 1, toca_xL = 1; // flags
-   int toca_yD = 1, toca_yU = 1;
+   int ancho_act = game->win_w;
+   int alto_act = game->win_h;
 
    int i, j = 0;
 
@@ -32,70 +31,48 @@ void game_Update(Game *game){
       .w = game->w_colision,
       .h = game->h_colision
    };
+   
+   SDL_Rect temp6 = {
+       .x = w_inicial - game->x_colision,
+       .y = h_inicial - game->y_colision,
+       .w = game->w_colision,
+       .h = game->h_colision  
+   };
+   
+   float paso = (game->delta_time)*(game->velocidad);
+   temp1.x = (int)game->x;
+   temp1.y = (int)game->y;
         
    if (game->right == 1)
    {
-      temp1.x += 1*(game->velocidad);
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1)){
-         toca_xR = 0;
-      } else {
-         toca_xR = 1;
+      temp1.x = (int)(game->x + paso);
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->lado){
+         game->x += paso;
       }
-
-      if (temp1.x <= 0 || temp1.x > ancho_act - (game->lado)) { 
-         toca_xR = 1;
-      }
-   }
-
-   if (game->left == 1)
-   {
-      temp1.x -= 1*(game->velocidad);
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1))
+   } else if (game->left == 1) {
+      temp1.x = (int)(game->x - paso);
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x >= 0)
       {
-         toca_xL = 0;
-      } else {
-         toca_xL = 1;
-      }
-
-      if (temp1.x <= 0 || temp1.x > ancho_act - (game->lado)) { 
-         toca_xL = 1; 
+          game->x -= paso;
       }
    }
+   
+   temp1.x = (int)game->x;
         
    if (game->down == 1)
    {
-      temp1.y += 1*(game->velocidad);
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1))
+      temp1.y = (int)(game->y + paso);
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y <= alto_act - game->lado)
       {
-         toca_yD = 0;
-      } else {
-         toca_yD = 1;
+         game->y += paso;
       }
-      if (temp1.y <= 0 || temp1.y > alto_act - (game->lado)) { 
-         toca_yD = 1; 
-      }
-   }
-
-   if (game->up == 1)
+   } else if (game->up == 1)
    {
-      temp1.y -= 1*(game->velocidad);
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1)){
-         toca_yU = 0;
-      } else {
-         toca_yU = 1;
+      temp1.y = (int)(game->y - paso);
+      
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y >= 0){
+         game->y -= paso;
       }
-      if (temp1.y <= 0 || temp1.y > alto_act - (game->lado)) { 
-         toca_yU = 1; 
-      }
-   }
-        
-   // posiciones son int
-   if (toca_xR == 0 || toca_xL == 0){
-      game->x = temp1.x;
-   }
-
-   if (toca_yD == 0 || toca_yU == 0){
-      game->y = temp1.y;
    }
    
    // objeto cargado desde txt caera en cascada
@@ -103,7 +80,7 @@ void game_Update(Game *game){
         for(int j=0; j<tile_cols; j++){
            if(game->tiles[i][j].activo){
                if (!chequea_tiles(game, &temp1)){
-                  game->tiles[i][j].y_tiles += 1;
+                  game->tiles[i][j].y_tiles += 200 * (game->delta_time);
                }
            }
        }
@@ -139,9 +116,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect) {
                     game->tiles[i][j].h_tiles
                 };
                 if (SDL_HasIntersection(player_rect, &temp5)) {
-                    game->tiles[i][j].objeto2 = false; //desaparece
-                    return 1;
-                     
+                    game->tiles[i][j].objeto2 = false; //desaparece el objeto
                 }
             }
         }

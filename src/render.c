@@ -14,7 +14,7 @@ void game_Render(Game *game)
 
     // TEXT
     SDL_QueryTexture(game->texturaTexto, NULL, NULL, &game->wText, &game->hText);
-    SDL_Rect textoRec = { 50, 50, game->wText, game->hText }; // posicion texto, ancho y alto
+    SDL_Rect textoRec = { 200, 50, game->wText, game->hText }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
@@ -27,13 +27,22 @@ void game_Render(Game *game)
     SDL_SetRenderDrawColor(game->renderer, 237, 237, 255, 125);
     SDL_Rect Hitbox = { game->h_x, game->h_y, game->h_w, game->h_h };
     SDL_RenderFillRect(game->renderer, &Hitbox);
+    
+    // RECTANGULO hitbox2
+   /*  SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(game->renderer, 237, 237, 255, 125)
+     SDL_Rect Hitbox2 = {
+        w_inicial - game->w_colision,
+       h_inicial - game->h_colision,
+        game->w_colision,
+       game->h_colision  
+    };
+     SDL_RenderFillRect(game->renderer, &Hitbox2);*/
 
     // RECTANGULO (Movible con teclado, cargado desde txt y actualizado en cargas.c)
-   // SDL_SetRenderDrawColor(game->renderer, 0, 180, 255, 255);
-    SDL_Rect Rectang = { game->x, game->y, game->lado, game->lado };
+    SDL_Rect Rectang = { (int)game->x, (int)game->y, game->lado, game->lado };
     SDL_RenderCopy(game->renderer, game->texturaJugador, NULL, &Rectang);
-    //SDL_RenderFillRect(game->renderer, &Rectang);
-
+   
     // RECTANGULO (leible desde archivo txt)
     SDL_SetRenderDrawColor(game->renderer, 0, 60, 255, 255);
     for (int i=0; i<tile_filas; i++){

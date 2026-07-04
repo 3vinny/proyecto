@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "constants.h"
 
 typedef struct {
@@ -25,11 +26,12 @@ typedef struct {
       SDL_Surface *surfaceTexto2;
       TTF_Font *fuente;
       bool quit; // Flag
+      int wText, hText; // texto Comic Sans
+      
       int lado; // tam cuadrado
-      int wText, hText;
-      int x;
-      int y;
-
+      float x;
+      float y;
+      float delta_time;
       int velocidad; // multiplicador de velocidad en update.c (posicioens son int .'v)
 
       int x_ant; // variable que guarda la posicion anterior de mi cuadrado azul antes de entrar al evento
@@ -69,6 +71,8 @@ typedef struct {
          bool activo;
          bool activo_posJ;
          bool objeto2;
+         bool borde1;
+         bool borde2;
       } tiles[tile_filas][tile_cols];
 
 

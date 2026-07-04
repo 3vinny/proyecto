@@ -11,17 +11,17 @@ int main(int argc, char **argv)
       .texturaTexto = NULL,
       .fuente = NULL,
       .quit = false,
-      .velocidad = 1,
+      .velocidad = 450,
       .lado = 64,
       .x = 5,
       .y = 5,
       .x_ant = 208,
       .y_ant = 188,
-      .h_x = w_inicial/6, 
-      .h_y = h_inicial/6, 
-      .h_w = 300, 
-      .h_h = 300,
-      .x_colision = 300,
+      .h_x = 0, 
+      .h_y = 0, 
+      .h_w = w_inicial/4, 
+      .h_h = h_inicial,
+      .x_colision = 100,
       .y_colision = 300,
       .w_colision = 50,
       .h_colision = 25,
@@ -50,7 +50,6 @@ int main(int argc, char **argv)
 
    carga_Tiles(&game);
    
-   // arranca juego y limpia
    game_Main(&game, EXIT_SUCCESS);
    game_Limpieza(&game, EXIT_SUCCESS);
 

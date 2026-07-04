@@ -9,8 +9,8 @@
 #define delay 16
 
 // resolución
-#define w_inicial 1024
-#define h_inicial 720
+#define w_inicial 1200
+#define h_inicial 900
 
 // tiles
 // valores de referencia
