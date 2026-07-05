@@ -1,6 +1,12 @@
 #include "headers.h"
 
+#define ACELERACION 600.0f
+#define FRICCION 1000.0f
+#define REDUCE_COLISION 0.4f
+#define DELAY_ARRANQUE 0.11f
+
 int chequea_tiles(Game *game, SDL_Rect *player_rect);
+void construir_rects(Game *game);
 
 void game_Update(Game *game){
         
@@ -22,8 +28,7 @@ void game_Update(Game *game){
       .w = game->h_w,
       .h = game->h_h
    };
-
-   // x_colision, y_colision, w_colision, h_colision
+   
    // el rojo
    SDL_Rect temp3 = {
       .x = game->x_colision,
@@ -39,21 +44,110 @@ void game_Update(Game *game){
        .h = game->h_colision  
    };
    
-   float paso = (game->delta_time)*(game->velocidad);
+   /* direccion solicitada x input game->DIRECCION 
+   condiciones para las fisicas del auto
+   0=nada 1=derecha/abajo -1=izq/arriba */
+   
+   int dir_x_input = 0, dir_y_input = 0;
+   if (game->right == 1)
+   {
+       dir_x_input = 1;
+   } else if (game->left == 1)
+   {
+       dir_x_input = -1;
+   }
+   
+   if (game->down == 1)
+   {
+       dir_y_input = 1;
+   } else if (game->up == 1)
+   {
+       dir_y_input = -1;
+   }
+   
+   /*Movimiento y invertir sentido*/
+   bool movimiento = (dir_x_input != 0 || dir_y_input != 0);
+   int invirtiendo = 0;
+   
+   if (dir_x_input != 0 && game->dir_x != 0 && dir_x_input != game->dir_x) invirtiendo = 1;
+   if (dir_y_input != 0 && game->dir_y != 0 && dir_y_input != game->dir_y) invirtiendo = 1;
+   float paso;
+   
+    /* usamos sistema d pasos con el auto ahora tenemos 3 casos:
+       1. cuando se mete reversa 2. cuando ta en movimiento 3. cuando no se presiona nada */
+  
+   if (invirtiendo)
+   {
+       game->velocidad_actual -= FRICCION * game->delta_time;
+       if (game->velocidad_actual <= 0.0f)
+       {
+           // si ya freno resetea el delay y cambia direccion dir_x
+           game->velocidad_actual = 0.0f;   
+           game->dir_x = dir_x_input;
+           game->dir_y = dir_y_input;
+           game->tiempo_arranque = 0.0f;
+       }
+       paso = 0.0f;
+   } else if (movimiento)
+   {
+       game->dir_x = dir_x_input;
+       game->dir_y = dir_y_input;
+       
+       if (game->velocidad_actual <= 0.0f)
+       {
+           game->tiempo_arranque += game->delta_time;
+           if (game->tiempo_arranque >= DELAY_ARRANQUE)
+           {
+               game->velocidad_actual += ACELERACION * game->delta_time;
+           }
+       } else {
+           game->velocidad_actual += ACELERACION * game->delta_time;
+       }
+       
+       if (game->velocidad_actual > game->velocidad) game->velocidad_actual = game->velocidad;
+       paso = (game->delta_time) * (game->velocidad_actual);
+   } else {
+       game->velocidad_actual -= FRICCION * game->delta_time;
+       if (game->velocidad_actual < 0.0f) game->velocidad_actual = 0.0f;
+       if (game->velocidad_actual == 0.0f)
+       {
+           game->dir_x = 0;
+           game->dir_y = 0;
+           game->tiempo_arranque = 0.0f;
+       }
+       paso = (game->delta_time) * (game->velocidad_actual);
+   }
+   
+   // conversion flotante entero variables temporales
    temp1.x = (int)game->x;
    temp1.y = (int)game->y;
+   
+   /* gestion al presionar teclas: hitbox, velocidades, colisiones
+   casos en y, casos en x
+   */
         
    if (game->right == 1)
    {
       temp1.x = (int)(game->x + paso);
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->lado){
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->lado)
+      {
          game->x += paso;
+         game->colisionando = 0;
+      } else if (game->colisionando) 
+      {
+          game->velocidad_actual *= REDUCE_COLISION;
+          game->colisionando = 1;
       }
    } else if (game->left == 1) {
       temp1.x = (int)(game->x - paso);
       if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x >= 0)
       {
           game->x -= paso;
+          game->colisionando = 0;
+      } else if (!game->colisionando) 
+      {
+          game->velocidad_actual *= REDUCE_COLISION;
+          game->colisionando = 1;
       }
    }
    
@@ -65,21 +159,36 @@ void game_Update(Game *game){
       if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y <= alto_act - game->lado)
       {
          game->y += paso;
+         game->colisionando = 0;
+      } else if (!game->colisionando) 
+      {
+          game->velocidad_actual *= REDUCE_COLISION;
+          game->colisionando = 1;
       }
    } else if (game->up == 1)
    {
       temp1.y = (int)(game->y - paso);
       
-      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y >= 0){
+      if(!SDL_HasIntersection(&temp1, &temp2) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y >= 0)
+      {
          game->y -= paso;
+         game->colisionando = 0;
+      } else if (game->colisionando) 
+      {
+          game->velocidad_actual *= REDUCE_COLISION;
+          game->colisionando = 1;
       }
    }
    
    // objeto cargado desde txt caera en cascada
-   for(int i=0; i<tile_filas; i++){
-        for(int j=0; j<tile_cols; j++){
-           if(game->tiles[i][j].activo){
-               if (!chequea_tiles(game, &temp1)){
+   for (int i=0; i<tile_filas; i++)
+   {
+        for (int j=0; j<tile_cols; j++)
+        {
+           if(game->tiles[i][j].activo)
+           {
+               if (!chequea_tiles(game, &temp1))
+               {
                   game->tiles[i][j].y_tiles += 200 * (game->delta_time);
                }
            }
@@ -87,10 +196,14 @@ void game_Update(Game *game){
    }
 }
 
-int chequea_tiles(Game *game, SDL_Rect *player_rect) {
-    for (int i = 0; i < tile_filas; i++) {
-        for (int j = 0; j < (int)tile_cols; j++) {
-            if (game->tiles[i][j].activo) {
+int chequea_tiles(Game *game, SDL_Rect *player_rect)
+{
+    for (int i = 0; i < tile_filas; i++) 
+    {
+        for (int j = 0; j < (int)tile_cols; j++) 
+        {
+            if (game->tiles[i][j].activo) 
+            {
                 SDL_Rect temp4 = {
                     .x = game->tiles[i][j].x_tiles,
                     .y = game->tiles[i][j].y_tiles,
@@ -106,20 +219,30 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect) {
     }
     
     // RECTANGULO (interactivo objeto2 txt)
-    for(int i=0; i<tile_filas; i++){
-        for(int j=0; j<tile_cols; j++){
-            if(game->tiles[i][j].objeto2){
+    for (int i=0; i<tile_filas; i++)
+    {
+        for (int j=0; j<tile_cols; j++)
+        {
+            if (game->tiles[i][j].objeto2)
+            {
                 SDL_Rect temp5 = {
                     game->tiles[i][j].x_tiles,
                     game->tiles[i][j].y_tiles,
                     game->tiles[i][j].w_tiles,
                     game->tiles[i][j].h_tiles
                 };
-                if (SDL_HasIntersection(player_rect, &temp5)) {
+                
+                if (SDL_HasIntersection(player_rect, &temp5))
+                {
                     game->tiles[i][j].objeto2 = false; //desaparece el objeto
                 }
             }
         }
     }
     return 0; 
+}
+
+void construir_rects(Game *game)
+{
+    
 }

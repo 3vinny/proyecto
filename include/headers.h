@@ -14,7 +14,10 @@
 #include <time.h>
 #include "constants.h"
 
+// god object
+
 typedef struct {
+    // variables SDL2
       SDL_Window *ventana;
       SDL_GameController *mando;
       SDL_Renderer *renderer;
@@ -25,19 +28,36 @@ typedef struct {
       SDL_Surface *surfaceTexto;
       SDL_Surface *surfaceTexto2;
       TTF_Font *fuente;
-      bool quit; // Flag
-      int wText, hText; // texto Comic Sans
       
-      int lado; // tam cuadrado
+      // Flags: si el juego esta corriendo ,fullscreen
+      bool quit;
+      bool Fullscreen;
+      
+      // texto
+      int wText, hText;
+      
+      // tam cuadrado, posiciones game->x,y
+      int lado;
       float x;
       float y;
+      
+      // delta time y velocidades
       float delta_time;
-      int velocidad; // multiplicador de velocidad en update.c (posicioens son int .'v)
+      int velocidad; 
+      float velocidad_actual;
+      
+      // direccion auto
+      int dir_x;
+      int dir_y;
+      float tiempo_arranque;
+      int colisionando;
 
-      int x_ant; // variable que guarda la posicion anterior de mi cuadrado azul antes de entrar al evento
+      // variables que guarda la posicion anterior de mi cuadrado azul antes de entrar al evento
+      int x_ant; 
       int y_ant;
 
-      int h_x; // hitbox
+      // hitbox
+      int h_x;
       int h_y; 
       int h_w;
       int h_h;
@@ -47,6 +67,7 @@ typedef struct {
       int w_colision;
       int h_colision;
 
+      // para el INPUT game->up,down,left,right
       int up;
       int down;
       int left;
@@ -58,25 +79,32 @@ typedef struct {
       int win_w;
       int win_h;
       
+      // Estructura de los tiles
       struct
       {
-         int x_tiles; // posicion mi rectangulo
+         // posicion, alto,ancho mi rectangulo
+         int x_tiles;
          int y_tiles;
-         int w_tiles; // alto y ancho mi rectangulo
+         int w_tiles;
          int h_tiles;
          
          int jugador_x;
          int jugador_y;
          
+         // booleanos: objetos presentes que se cargan por txt
          bool activo;
          bool activo_posJ;
          bool objeto2;
          bool borde1;
          bool borde2;
       } tiles[tile_filas][tile_cols];
-
-
-      bool Fullscreen;
+      
+      // rectangulos update.c
+      SDL_Rect rect_jugador;
+      SDL_Rect rect_hitbox;
+      SDL_Rect rect_colision;
+      SDL_Rect rect_colision2;
+      
 
 }Game;
 
