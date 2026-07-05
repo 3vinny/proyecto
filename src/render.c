@@ -22,11 +22,11 @@ void game_Render(Game *game)
     SDL_Rect textoRec2 = { 500, 600, game->wText, game->hText };
     SDL_RenderCopy(game->renderer, game->texturaTexto2, NULL, &textoRec2);
 
-    // RECTANGULO (hitbox)
+    /* RECTANGULO (hitbox)
     SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(game->renderer, 237, 237, 255, 125);
     SDL_Rect Hitbox = { game->h_x, game->h_y, game->h_w, game->h_h };
-    SDL_RenderFillRect(game->renderer, &Hitbox);
+    SDL_RenderFillRect(game->renderer, &Hitbox);*/
     
     // RECTANGULO hitbox2
    /*  SDL_SetRenderDrawBlendMode(game->renderer, SDL_BLENDMODE_BLEND);
@@ -41,7 +41,7 @@ void game_Render(Game *game)
 
     // RECTANGULO (Movible con teclado, cargado desde txt y actualizado en cargas.c)
     SDL_Rect Rectang = { (int)game->x, (int)game->y, game->lado, game->lado };
-    SDL_RenderCopy(game->renderer, game->texturaJugador, NULL, &Rectang);
+    SDL_RenderCopyEx(game->renderer, game->texturaJugador, NULL, &Rectang, game->angulo, NULL, SDL_FLIP_NONE);
    
     // RECTANGULO (leible desde archivo txt)
     SDL_SetRenderDrawColor(game->renderer, 0, 60, 255, 255);
@@ -52,7 +52,7 @@ void game_Render(Game *game)
                 game->tiles[i][j].x_tiles,
                 game->tiles[i][j].y_tiles,
                 game->tiles[i][j].w_tiles,
-                game->tiles[i][j].h_tiles
+                h_inicial
              };
              SDL_RenderFillRect(game->renderer, &r);
           }

@@ -1,7 +1,7 @@
 // archivo inputstate, tendra opcion de gamepad
-#include "SDL_events.h"
-#include "SDL_gamecontroller.h"
 #include "headers.h"
+// rango range: -32768 to 32767 | zona muerta es el valor maximo
+int zona_muerta = 20000;
 
 void game_Input(Game *game)
 {
@@ -17,9 +17,7 @@ void game_Input(Game *game)
          switch(evento.cbutton.button)
          {
             case SDL_CONTROLLER_BUTTON_DPAD_UP: 
-               printf("game up");
                game->up = 1;
-               printf("abajo de game up");
                break;
             case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 
                game->right = 1; 
@@ -35,7 +33,6 @@ void game_Input(Game *game)
       }
 
       if (evento.type == SDL_CONTROLLERBUTTONUP){
-         printf("se detecto levantamiento de mando: \n");
          switch(evento.cbutton.button)
          {
             case SDL_CONTROLLER_BUTTON_DPAD_UP: 
@@ -55,33 +52,36 @@ void game_Input(Game *game)
       }
 
       // CASO PALANCAS GAMEPAD
-      if(evento.type == SDL_CONTROLLERAXISMOTION){
-         switch(evento.caxis.axis){
-            case SDL_CONTROLLER_AXIS_LEFTX:
-               printf("Izquierda x\n");
-               break;
-            case SDL_CONTROLLER_AXIS_LEFTY:
-               printf("Izquierda y\n");
-               break;
-            case SDL_CONTROLLER_AXIS_RIGHTX:
-               printf("Derecha x\n");
-               break;
-            case SDL_CONTROLLER_AXIS_RIGHTY:
-               printf("Derecha y\n");
-               break;
-            case SDL_CONTROLLER_AXIS_MAX:
-               printf("Maximo\n");
-               break;
-            case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-               printf("Trigger left\n");
-               break;
-            case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-               printf("Trigger right\n");
-               break;
-            default:
-               printf("Invalido o default\n");
-               break;
-         }
+      // rango: -32768 to 32767 | AXIS_LEFTX : palanca izquierda
+      if (evento.type == SDL_CONTROLLERAXISMOTION){
+          
+          if (evento.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
+          {
+              if (evento.caxis.value < -zona_muerta) {
+                  game->left = 1; 
+                  game->right = 0;
+              } else if (evento.caxis.value > zona_muerta) {
+                  game->right = 1; 
+                  game->left = 0;
+              } else {
+                  game->left = 0;
+                  game->left = 0;
+              }
+          }
+          
+          if (evento.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
+          {
+              if (evento.caxis.value < -zona_muerta) {
+                  game->up = 1; 
+                  game->down = 0;
+              } else if (evento.caxis.value > zona_muerta) {
+                  game->down = 1; 
+                  game->up = 0;
+              } else {
+                  game->up = 0; 
+                  game->down = 0;
+              }
+          }
       }
 
       if(evento.type == SDL_KEYDOWN){

@@ -20,6 +20,7 @@ int main(int argc, char **argv)
       .lado = 64,
       .x = 5,
       .y = 5,
+      .angulo = 0.0,
       .x_ant = 208,
       .y_ant = 188,
       .h_x = 0, 
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
       exit(1);
    }
    
-   SDL_Delay(delay);
+   SDL_Delay(16);
 
    if (cargarMedia(&game))
    {

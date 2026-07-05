@@ -3,10 +3,9 @@
 
 /* Header CONSTANTES.h: Aqui iran las constantes*/
 
-#define titulo "Prototipo Juego Carreras: SDL2"
+#define titulo "Prototipo Juego Carreras SDL2"
 
 #define FLAGS_IMAGEN IMG_INIT_PNG
-#define delay 16
 
 // resolución
 #define w_inicial 1200
