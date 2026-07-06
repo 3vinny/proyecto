@@ -19,7 +19,6 @@ void game_Update(Game *game)
 
    SDL_Rect temp1 = game->rect_jugador;
    SDL_Rect temp2 = game->rect_hitbox;
-   // el rojo
    SDL_Rect temp3 = game->rect_colision;
    SDL_Rect temp6 = game->rect_colision2;
    
@@ -72,6 +71,7 @@ void game_Update(Game *game)
        game->dir_x = dir_x_input;
        game->dir_y = dir_y_input;
        
+       // ANGULOS: 0, 45, 90, 135, etc
        if (dir_x_input == 0 && dir_y_input == -1) game->angulo = 0.0;
        else if (dir_x_input == 1 && dir_y_input == -1) game->angulo = 45.0;
        else if (dir_x_input == 1 && dir_y_input == 0) game->angulo = 90.0;
@@ -95,8 +95,10 @@ void game_Update(Game *game)
        
        if (game->velocidad_actual > game->velocidad) game->velocidad_actual = game->velocidad;
        paso = (game->delta_time) * (game->velocidad_actual);
+       
    } else {
        game->velocidad_actual -= FRICCION * game->delta_time;
+       
        if (game->velocidad_actual < 0.0f) game->velocidad_actual = 0.0f;
        if (game->velocidad_actual == 0.0f)
        {
@@ -182,7 +184,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
                     .x = game->tiles[i][j].x_tiles,
                     .y = game->tiles[i][j].y_tiles,
                     .w = game->tiles[i][j].w_tiles,
-                    .h = h_inicial
+                    .h = game->tiles[i][j].h_tiles
                 };
                 
                 if (SDL_HasIntersection(player_rect, &temp4)) {

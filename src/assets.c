@@ -5,7 +5,7 @@
 bool cargarMedia(Game *game)
 {
 //./data/hitbox.txt
-    game->texturaImg = IMG_LoadTexture(game->renderer, "./assets/bg/carretera.png");
+    game->texturaImg = IMG_LoadTexture(game->renderer, "./assets/bg/xp.png");
     if (!game->texturaImg) {
         printf("Error iniciando textura: %s\n", IMG_GetError());
         return true;
@@ -22,5 +22,8 @@ bool cargarMedia(Game *game)
         printf("Error iniciando textura jugador: %s\n", SDL_GetError());
         return true;
     }
+    
+    game->texturaPista = IMG_LoadTexture(game->renderer, "./assets/sprites/tileset.png");
+    
     return false;
 }

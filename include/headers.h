@@ -26,6 +26,7 @@ typedef struct {
   SDL_Texture *texturaTexto2;
   SDL_Texture *texturaImg;
   SDL_Texture *texturaJugador;
+  SDL_Texture *texturaPista;
   SDL_Surface *surfaceTexto;
   SDL_Surface *surfaceTexto2;
 
@@ -98,7 +99,10 @@ typedef struct {
     bool objeto2;
     bool borde1;
     bool borde2;
+    // guarda caracter txt pista
+    char tipo;
   } tiles[tile_filas][tile_cols];
+  
 
   // rectangulos update.c
   SDL_Rect rect_jugador;

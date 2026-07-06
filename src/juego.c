@@ -19,6 +19,6 @@ void game_Main(Game *game, int exitStatus)
         game_Update(game);
         game_Render(game);
         
-       // SDL_Delay(16); //60FPS
+        SDL_Delay(16); //60FPS
     }
 }
