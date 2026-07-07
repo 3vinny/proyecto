@@ -21,8 +21,8 @@ void game_Render(Game *game)
             bool dibuja_pista = true;
             
             SDL_Rect destino = {
-                game->tiles[i][j].x_tiles,
-                game->tiles[i][j].y_tiles,
+                game->tiles[i][j].x_tiles - game->camara.x,
+                game->tiles[i][j].y_tiles - game->camara.y,
                 game->tiles[i][j].w_tiles,
                 game->tiles[i][j].h_tiles
             }; 
@@ -71,8 +71,8 @@ void game_Render(Game *game)
         }
     }
 
-    // RECTANGULO (Movible con teclado, cargado desde txt y actualizado en cargas.c)
-    SDL_Rect Rectang = { (int)game->x, (int)game->y, game->lado, game->lado };
+    // RECTANGULO DEL JUGADOR !!! acaaa
+    SDL_Rect Rectang = { (int)game->x - game->camara.x, (int)game->y - game->camara.y, game->lado, game->lado };
     SDL_RenderCopyEx(game->renderer, game->texturaJugador, NULL, &Rectang, game->angulo, NULL, SDL_FLIP_NONE);
    
     // TEXT
@@ -81,9 +81,7 @@ void game_Render(Game *game)
     SDL_RenderCopy(game->renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
-    SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &game->wText, &game->hText);
-    SDL_Rect textoRec2 = { 500, 600, game->wText, game->hText };
-    SDL_RenderCopy(game->renderer, game->texturaTexto2, NULL, &textoRec2);
+    render_Cronometro(game);
 
     // RECTANGULO (Colision)
     SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
@@ -96,8 +94,8 @@ void game_Render(Game *game)
         for (int j=0; j<tile_cols; j++) {
             if (game->tiles[i][j].objeto2) {
                 SDL_Rect Rectang_Obj2 = {
-                    game->tiles[i][j].x_tiles,
-                    game->tiles[i][j].y_tiles,
+                    game->tiles[i][j].x_tiles - game->camara.x,
+                    game->tiles[i][j].y_tiles - game->camara.y,
                     game->tiles[i][j].w_tiles,
                     game->tiles[i][j].h_tiles/2
                 };
@@ -107,4 +105,27 @@ void game_Render(Game *game)
     }
     // TOdo al renderr
     SDL_RenderPresent(game->renderer);
+}
+
+void render_Cronometro(Game *game)
+{
+    // PREVIENE FUGAS DE MEMORIA (ya paso :v)
+    if (game->texturaTexto2 != NULL) {
+        SDL_DestroyTexture(game->texturaTexto2);
+        game->texturaTexto2 = NULL;
+    }
+    
+    SDL_Color colorBlanco = {255,255,255,255}; //rgb y transparencia
+    SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->texto_cronometro, colorBlanco);
+    
+    if (surfaceTemporal != NULL){
+        game->texturaTexto2 = SDL_CreateTextureFromSurface(game->renderer, surfaceTemporal);
+        SDL_FreeSurface(surfaceTemporal);
+    }
+    
+    if (game->texturaTexto2 != NULL){
+        SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &game->wText, &game->hText);
+        SDL_Rect textoRec2 = { w_inicial - game->wText, h_inicial - game->hText, game->wText, game->hText };
+        SDL_RenderCopy(game->renderer, game->texturaTexto2, NULL, &textoRec2);
+    }
 }

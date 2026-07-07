@@ -58,6 +58,10 @@ typedef struct {
   float delta_time;
   int velocidad;
   float velocidad_actual;
+  
+  // cronometro
+  Uint32 tiempo_inicio; // tiempo no es -
+  char texto_cronometro[64];
 
   // direccion automovil
   int dir_x;
@@ -141,5 +145,6 @@ void carga_Tiles(Game *game);  // cargas.c
 void ajusta_Tiles(Game *game); // cargas.c
 void game_Update(Game *game);  // update.c
 void game_Render(Game *game);  // render.c
+void render_Cronometro(Game *game); // render.c
 
 #endif

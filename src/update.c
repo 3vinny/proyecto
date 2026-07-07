@@ -182,7 +182,33 @@ void game_Update(Game *game)
       }
    }
    
-   // CAMARA
+   // - CAMARA
+   //  definiendo el centro
+   game->camara.x = (int)game->x + (game->lado/2) - (game->win_w/2);
+   game->camara.y = (int)game->y + (game->lado/2) - (game->win_h/2);
+   
+   //  clamping o limites para que no se "escape del centro"
+   if (game->camara.x < 0) game->camara.x = 0;
+   if (game->camara.y < 0) game->camara.y = 0;
+   
+   if (game->camara.x > game->mapa_w - game->camara.w) {
+       game->camara.x = game->mapa_w - game->camara.w;
+   }
+   
+   if (game->camara.y > game->mapa_h - game->camara.h) {
+       game->camara.y = game->mapa_h - game->camara.h;
+   }
+   
+   // cronometro
+   Uint32 tiempo_actual = SDL_GetTicks();
+   Uint32 transcurrido = tiempo_actual - game->tiempo_inicio;
+   
+   int minutos = (transcurrido / 60000); // ms a min
+   int segundos = (transcurrido / 1000)%60;
+   int centesimas = (transcurrido % 1000)/10;
+   
+   // esto le pedi ayuda a la ia: esto formatea mi string (01:23:40) como en js
+   sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
 }
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect)

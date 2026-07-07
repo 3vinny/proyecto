@@ -6,6 +6,7 @@ void game_Main(Game *game, int exitStatus)
 {
     interfaz_Inicia(game);
     
+    game->tiempo_inicio = SDL_GetTicks();
     Uint32 tiempo_anterior = SDL_GetTicks();
 
     while (!game->quit)
@@ -15,6 +16,7 @@ void game_Main(Game *game, int exitStatus)
         game->delta_time = (tiempo_actual - tiempo_anterior) / 1000.0f;
         tiempo_anterior = tiempo_actual;
         
+        // funciones juego
         game_Input(game);
         game_Update(game);
         game_Render(game);
