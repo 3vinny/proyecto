@@ -6,6 +6,7 @@
 #define titulo "Prototipo Juego Carreras SDL2"
 
 #define FLAGS_IMAGEN IMG_INIT_PNG
+#define FLAGS_AUDIO MIX_INIT_MP3
 
 // resolución
 #define w_inicial 1200

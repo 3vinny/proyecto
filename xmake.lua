@@ -12,6 +12,7 @@ if is_plat("linux") then
     add_requires("sdl2",       {system = true, configs = {sysconfig = {pc = "sdl2"}}})
     add_requires("sdl2_ttf",   {system = true, configs = {sysconfig = {pc = "sdl2_ttf"}}})
     add_requires("sdl2_image", {system = true, configs = {sysconfig = {pc = "sdl2_image"}}})
+    add_requires("sdl2_mixer", {system = true, configs = {sysconfig = {pc = "sdl2_mixer"}}})
 end
 
 -- 2. SCOPE DEL TARGET:
@@ -23,7 +24,7 @@ target("game")
 
     if is_plat("linux") then
         -- Adentro del target SOLO se enlazan con add_packages
-        add_packages("sdl2", "sdl2_ttf", "sdl2_image")
+        add_packages("sdl2", "sdl2_ttf", "sdl2_image", "sdl2_mixer")
         set_targetdir("linux")
     end
 

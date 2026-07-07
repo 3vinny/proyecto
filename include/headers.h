@@ -9,6 +9,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +23,8 @@ typedef struct {
   SDL_GameController *mando;
   SDL_Renderer *renderer;
   TTF_Font *fuente;
+  
+  // texturas
   SDL_Texture *texturaTexto;
   SDL_Texture *texturaTexto2;
   SDL_Texture *texturaImg;
@@ -29,6 +32,14 @@ typedef struct {
   SDL_Texture *texturaPista;
   SDL_Surface *surfaceTexto;
   SDL_Surface *surfaceTexto2;
+  
+  // audio
+  Mix_Chunk *vozinha;
+  
+  // camara
+  SDL_Rect camara;
+  int mapa_w;
+  int mapa_h;
 
   // Flags: si el juego esta corriendo ,fullscreen
   bool quit;
@@ -48,17 +59,20 @@ typedef struct {
   int velocidad;
   float velocidad_actual;
 
-  // direccion auto
+  // direccion automovil
   int dir_x;
   int dir_y;
   float tiempo_arranque;
   int colisionando;
+  int ultimo_tiempo_vozinha;
 
   // input auto
   int up;
   int down;
   int left;
   int right;
+  int freno;
+  int bocina; //vozinha
 
   // variables que guarda la posicion anterior de mi cuadrado azul antes de
   // entrar al evento
@@ -82,7 +96,7 @@ typedef struct {
   int win_w;
   int win_h;
 
-  // Estructura de los tiles
+  /* Estructura tiles */
   struct {
     // posicion, alto,ancho mi rectangulo
     int x_tiles;
@@ -99,6 +113,7 @@ typedef struct {
     bool objeto2;
     bool borde1;
     bool borde2;
+    
     // guarda caracter txt pista
     char tipo;
   } tiles[tile_filas][tile_cols];

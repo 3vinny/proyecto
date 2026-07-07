@@ -47,11 +47,27 @@ bool SDL_Inicia(Game *game)
 
    // Carga de fuente ttf
    // ./data/hitbox.txt
-   game->fuente = TTF_OpenFont("./assets/ttf/comicsans.ttf", 30);
+   game->fuente = TTF_OpenFont("./assets/ttf/helvetica.ttf", 30);
    if (!(game->fuente))
    {
       printf("Error al cargar fuente .ttf: %s\n", TTF_GetError());
       return true;
+   }
+   
+   // carga audio
+   if((Mix_Init(FLAGS_AUDIO) & FLAGS_AUDIO) != FLAGS_AUDIO) {
+       printf("Error al iniciar SDL_MIXER mp3:%s", SDL_GetError());
+       return true;
+   }
+   
+   if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+       printf("Error al abrir dispositivo audio mp3: %s", SDL_GetError());
+       return true;
+   }
+   
+   game->vozinha = Mix_LoadWAV("./assets/sfx/bocina2.wav");
+   if (game->vozinha == NULL) {
+       printf("Error cargando sonido vozinha.wav: %s", Mix_GetError());
    }
 
    return false;
@@ -65,8 +81,12 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->texturaJugador);
    SDL_DestroyWindow(game->ventana);
 
+   Mix_FreeChunk(game->vozinha);
+   //Mix_CloseAudio(game->musica);
+   Mix_Quit();
    IMG_Quit();
    TTF_Quit();
    SDL_Quit();
+  
    exit(exitStatus);
 }

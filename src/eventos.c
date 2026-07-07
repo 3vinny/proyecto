@@ -91,6 +91,21 @@ void game_Input(Game *game)
             case SDLK_DOWN: case SDLK_s: game->down = 1; break;
             case SDLK_LEFT: case SDLK_a: game->left = 1; break;
             case SDLK_RIGHT: case SDLK_d: game->right = 1; break;
+            case SDLK_SPACE: game->freno = 1; break;
+            case SDLK_h:
+                int tiempo_actual = SDL_GetTicks();
+                int cooldown = 200;
+                if (tiempo_actual - game->ultimo_tiempo_vozinha >= cooldown){
+                    if (game->bocina == 0){
+                        printf("vozinha bip bipppppppppppppppppppppppp\n");
+                        if (game->vozinha != NULL){
+                            Mix_PlayChannel(-1, game->vozinha, 0);
+                        }
+                    }
+                    game->ultimo_tiempo_vozinha = tiempo_actual;
+                }
+                game->bocina = 1;
+                break;
             case SDLK_F11:
                game->Fullscreen = !(game->Fullscreen); // se alterna
                if (game->Fullscreen){
@@ -114,6 +129,10 @@ void game_Input(Game *game)
             case SDLK_DOWN: case SDLK_s: game->down = 0; break;
             case SDLK_LEFT: case SDLK_a: game->left = 0; break;
             case SDLK_RIGHT: case SDLK_d: game->right = 0; break;
+            case SDLK_SPACE: game->freno = 0; break;
+            case SDLK_h: game->bocina = 0; break;
+            default:
+                break;
          }
       }
    }

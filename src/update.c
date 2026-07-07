@@ -1,9 +1,10 @@
 #include "headers.h"
 
-#define ACELERACION 600.0f
+#define ACELERACION 300.0f
 #define FRICCION 1000.0f
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
+#define POTENCIA_FRENO 2500.0f //debe ser mas potente que friccion soltar tecla
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect);
 void construir_rects(Game *game);
@@ -52,9 +53,19 @@ void game_Update(Game *game)
    float paso;
    
     /* usamos sistema d pasos con el auto ahora tenemos 3 casos:
-       1. cuando se mete reversa 2. cuando ta en movimiento 3. cuando no se presiona nada */
-  
-   if (invirtiendo)
+   0. freno 1. cuando se mete reversa 2. cuando ta en movimiento 3. cuando no se presiona nada */
+   if (game->freno == 1){
+       game->velocidad_actual -= POTENCIA_FRENO * game->delta_time;
+       if (game->velocidad_actual <= 0.0f)
+       {
+           // resetea direccion y velocidad en 0
+           game->velocidad_actual = 0.0f;
+           game->dir_x = 0;
+           game->dir_y = 0;
+           game->tiempo_arranque = 0.0f;
+       }
+       paso = (game->delta_time) * (game->velocidad_actual);
+   } else if (invirtiendo)
    {
        game->velocidad_actual -= FRICCION * game->delta_time;
        if (game->velocidad_actual <= 0.0f)
@@ -170,10 +181,13 @@ void game_Update(Game *game)
           game->colisionando = 1;
       }
    }
+   
+   // CAMARA
 }
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect)
 {
+    // LO MISMO Q EN RENDER.C
     for (int i = 0; i < tile_filas; i++) 
     {
         for (int j = 0; j < (int)tile_cols; j++) 

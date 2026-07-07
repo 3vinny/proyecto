@@ -11,8 +11,6 @@ void game_Render(Game *game)
 
     // BACKGROUND
     SDL_RenderCopy(game->renderer, game->texturaImg, NULL, NULL);
-
-   
     
      // Tilemap dibuja pista desde la textura y sdlrect
     for (int i=0; i < tile_filas; i++)
@@ -79,7 +77,7 @@ void game_Render(Game *game)
    
     // TEXT
     SDL_QueryTexture(game->texturaTexto, NULL, NULL, &game->wText, &game->hText);
-    SDL_Rect textoRec = { 200, 50, game->wText, game->hText }; // posicion texto, ancho y alto
+    SDL_Rect textoRec = { 200, 10, game->wText, game->hText }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
@@ -89,7 +87,7 @@ void game_Render(Game *game)
 
     // RECTANGULO (Colision)
     SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
-    SDL_Rect Rectang_Colision = { game->y_colision, game->y_colision, game->w_colision, game->h_colision };
+    SDL_Rect Rectang_Colision = { game->x_colision, game->y_colision, game->w_colision, game->h_colision };
     SDL_RenderFillRect(game->renderer, &Rectang_Colision);
     
     // RECTANGULO (interactivo objeto2 txt)
@@ -101,12 +99,12 @@ void game_Render(Game *game)
                     game->tiles[i][j].x_tiles,
                     game->tiles[i][j].y_tiles,
                     game->tiles[i][j].w_tiles,
-                    game->tiles[i][j].w_tiles
+                    game->tiles[i][j].h_tiles/2
                 };
                 SDL_RenderFillRect(game->renderer, &Rectang_Obj2);
             }
         }
     }
-
+    // TOdo al renderr
     SDL_RenderPresent(game->renderer);
 }
