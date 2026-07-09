@@ -11,192 +11,184 @@ void construir_rects(Game *game);
 
 void game_Update(Game *game)
 {
-   int ancho_act = game->win_w;
-   int alto_act = game->win_h;
+   int ancho_act = game->pantalla.win_w;
+   int alto_act = game->pantalla.win_h;
 
    int i, j = 0;
    
    construir_rects(game);
 
-   SDL_Rect temp1 = game->rect_jugador;
-   SDL_Rect temp2 = game->rect_hitbox;
-   SDL_Rect temp3 = game->rect_colision;
-   SDL_Rect temp6 = game->rect_colision2;
+   SDL_Rect temp1 = game->jugador.rect;
+   SDL_Rect temp2 = game->jugador.rect_colision;
+   //borrarrrrrr
    
-   /* direccion solicitada x input game->DIRECCION 
-   condiciones para las fisicas del auto
+   /* direccion solicitada x input
    0=nada 1=derecha/abajo -1=izq/arriba */
    
    int dir_x_input = 0, dir_y_input = 0;
-   if (game->right == 1)
+   if (game->jugador.right == 1)
    {
        dir_x_input = 1;
-   } else if (game->left == 1)
+   } else if (game->jugador.left == 1)
    {
        dir_x_input = -1;
    }
    
-   if (game->down == 1)
+   if (game->jugador.down == 1)
    {
        dir_y_input = 1;
-   } else if (game->up == 1)
+   } else if (game->jugador.up == 1)
    {
        dir_y_input = -1;
    }
    
    /*Movimiento y invertir sentido*/
+   
    bool movimiento = (dir_x_input != 0 || dir_y_input != 0);
    int invirtiendo = 0;
    
-   if (dir_x_input != 0 && game->dir_x != 0 && dir_x_input != game->dir_x) invirtiendo = 1;
-   if (dir_y_input != 0 && game->dir_y != 0 && dir_y_input != game->dir_y) invirtiendo = 1;
+   if (dir_x_input != 0 && game->jugador.dir_x != 0 && dir_x_input != game->jugador.dir_x) invirtiendo = 1;
+   if (dir_y_input != 0 && game->jugador.dir_y != 0 && dir_y_input != game->jugador.dir_y) invirtiendo = 1;
    float paso;
    
     /* usamos sistema d pasos con el auto ahora tenemos 3 casos:
    0. freno 1. cuando se mete reversa 2. cuando ta en movimiento 3. cuando no se presiona nada */
-   if (game->freno == 1){
-       game->velocidad_actual -= POTENCIA_FRENO * game->delta_time;
-       if (game->velocidad_actual <= 0.0f)
-       {
+   if (game->jugador.freno == 1) {
+       game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
+       if (game->jugador.velocidad_actual <= 0.0f) {
            // resetea direccion y velocidad en 0
-           game->velocidad_actual = 0.0f;
-           game->dir_x = 0;
-           game->dir_y = 0;
-           game->tiempo_arranque = 0.0f;
+           game->jugador.velocidad_actual = 0.0f;
+           game->jugador.dir_x = 0;
+           game->jugador.dir_y = 0;
+           game->jugador.tiempo_arranque = 0.0f;
        }
-       paso = (game->delta_time) * (game->velocidad_actual);
-   } else if (invirtiendo)
-   {
-       game->velocidad_actual -= FRICCION * game->delta_time;
-       if (game->velocidad_actual <= 0.0f)
+       paso = (game->delta_time) * (game->jugador.velocidad_actual);
+       
+   } else if (invirtiendo) {
+       game->jugador.velocidad_actual -= FRICCION * game->delta_time;
+       if (game->jugador.velocidad_actual <= 0.0f)
        {
            // si ya freno resetea el delay y cambia direccion dir_x
-           game->velocidad_actual = 0.0f;   
-           game->dir_x = dir_x_input;
-           game->dir_y = dir_y_input;
-           game->tiempo_arranque = 0.0f;
+           game->jugador.velocidad_actual = 0.0f;   
+           game->jugador.dir_x = dir_x_input;
+           game->jugador.dir_y = dir_y_input;
+           game->jugador.tiempo_arranque = 0.0f;
        }
        paso = 0.0f;
-   } else if (movimiento)
-   {
-       game->dir_x = dir_x_input;
-       game->dir_y = dir_y_input;
+       
+   } else if (movimiento) {
+       game->jugador.dir_x = dir_x_input;
+       game->jugador.dir_y = dir_y_input;
        
        // ANGULOS: 0, 45, 90, 135, etc
-       if (dir_x_input == 0 && dir_y_input == -1) game->angulo = 0.0;
-       else if (dir_x_input == 1 && dir_y_input == -1) game->angulo = 45.0;
-       else if (dir_x_input == 1 && dir_y_input == 0) game->angulo = 90.0;
-       else if (dir_x_input == 1 && dir_y_input == 1) game->angulo = 135.0;
-       else if (dir_x_input == 0 && dir_y_input == 1) game->angulo = 180.0;
-       else if (dir_x_input == -1 && dir_y_input == 1) game->angulo = 225.0; 
-       else if (dir_x_input == -1 && dir_y_input == 0) game->angulo = 270.0;
-       else if (dir_x_input == -1 && dir_y_input == -1) game->angulo = 315.0;
+       if (dir_x_input == 0 && dir_y_input == -1) game->jugador.angulo = 0.0;
+       else if (dir_x_input == 1 && dir_y_input == -1) game->jugador.angulo = 45.0;
+       else if (dir_x_input == 1 && dir_y_input == 0) game->jugador.angulo = 90.0;
+       else if (dir_x_input == 1 && dir_y_input == 1) game->jugador.angulo = 135.0;
+       else if (dir_x_input == 0 && dir_y_input == 1) game->jugador.angulo = 180.0;
+       else if (dir_x_input == -1 && dir_y_input == 1) game->jugador.angulo = 225.0; 
+       else if (dir_x_input == -1 && dir_y_input == 0) game->jugador.angulo = 270.0;
+       else if (dir_x_input == -1 && dir_y_input == -1) game->jugador.angulo = 315.0;
        
        // aceleracion
-       if (game->velocidad_actual <= 0.0f)
-       {
-           game->tiempo_arranque += game->delta_time;
-           if (game->tiempo_arranque >= DELAY_ARRANQUE)
-           {
-               game->velocidad_actual += ACELERACION * game->delta_time;
+       if (game->jugador.velocidad_actual <= 0.0f) {
+           game->jugador.tiempo_arranque += game->delta_time;
+           if (game->jugador.tiempo_arranque >= DELAY_ARRANQUE) {
+               game->jugador.velocidad_actual += ACELERACION * game->delta_time;
            }
        } else {
-           game->velocidad_actual += ACELERACION * game->delta_time;
+           game->jugador.velocidad_actual += ACELERACION * game->delta_time;
        }
        
-       if (game->velocidad_actual > game->velocidad) game->velocidad_actual = game->velocidad;
-       paso = (game->delta_time) * (game->velocidad_actual);
+       if (game->jugador.velocidad_actual > game->jugador.velocidad) game->jugador.velocidad_actual = game->jugador.velocidad;
+       paso = (game->delta_time) * (game->jugador.velocidad_actual);
        
    } else {
-       game->velocidad_actual -= FRICCION * game->delta_time;
+       game->jugador.velocidad_actual -= FRICCION * game->delta_time;
        
-       if (game->velocidad_actual < 0.0f) game->velocidad_actual = 0.0f;
-       if (game->velocidad_actual == 0.0f)
+       if (game->jugador.velocidad_actual < 0.0f) game->jugador.velocidad_actual = 0.0f;
+       if (game->jugador.velocidad_actual == 0.0f)
        {
-           game->dir_x = 0;
-           game->dir_y = 0;
-           game->tiempo_arranque = 0.0f;
+           game->jugador.dir_x = 0;
+           game->jugador.dir_y = 0;
+           game->jugador.tiempo_arranque = 0.0f;
        }
-       paso = (game->delta_time) * (game->velocidad_actual);
+       paso = (game->delta_time) * (game->jugador.velocidad_actual);
    }
    
    // conversion flotante entero variables temporales
-   temp1.x = (int)game->x;
-   temp1.y = (int)game->y;
+   temp1.x = (int)game->jugador.x;
+   temp1.y = (int)game->jugador.y;
    
    /* gestion al presionar teclas: hitbox, velocidades, colisiones
    casos en y, casos en x
    */
         
-   if (game->right == 1)
-   {
-      temp1.x = (int)(game->x + paso);
-      if(!SDL_HasIntersection(&temp1, &temp3) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->lado)
+   if (game->jugador.right == 1) {
+      temp1.x = (int)(game->jugador.x + paso);
+      if(!chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) {
+         game->jugador.x += paso;
+         game->jugador.colisionando = 0;
+      } else if (!game->jugador.colisionando) 
       {
-         game->x += paso;
-         game->colisionando = 0;
-      } else if (!game->colisionando) 
-      {
-          game->velocidad_actual *= REDUCE_COLISION;
-          game->colisionando = 1;
+          game->jugador.velocidad_actual *= REDUCE_COLISION;
+          game->jugador.colisionando = 1;
       }
-   } else if (game->left == 1) {
-      temp1.x = (int)(game->x - paso);
-      if(!SDL_HasIntersection(&temp1, &temp3) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.x >= 0)
+      
+   } else if (game->jugador.left == 1) {
+      temp1.x = (int)(game->jugador.x - paso);
+      if(!chequea_tiles(game, &temp1) && temp1.x >= 0) {
+          game->jugador.x -= paso;
+          game->jugador.colisionando = 0;
+      } else if (!game->jugador.colisionando) 
       {
-          game->x -= paso;
-          game->colisionando = 0;
-      } else if (!game->colisionando) 
-      {
-          game->velocidad_actual *= REDUCE_COLISION;
-          game->colisionando = 1;
+          game->jugador.velocidad_actual *= REDUCE_COLISION;
+          game->jugador.colisionando = 1;
       }
    }
    
-   temp1.x = (int)game->x;
+   // reinicio temp x
+   temp1.x = (int)game->jugador.x;
         
-   if (game->down == 1)
+   if (game->jugador.down == 1)
    {
-      temp1.y = (int)(game->y + paso);
-      if(!SDL_HasIntersection(&temp1, &temp3) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y <= alto_act - game->lado)
+      temp1.y = (int)(game->jugador.y + paso);
+      if(!chequea_tiles(game, &temp1) && temp1.y <= alto_act - game->jugador.lado) {
+         game->jugador.y += paso;
+         game->jugador.colisionando = 0;
+      } else if (!game->jugador.colisionando) 
       {
-         game->y += paso;
-         game->colisionando = 0;
-      } else if (!game->colisionando) 
-      {
-          game->velocidad_actual *= REDUCE_COLISION;
-          game->colisionando = 1;
+          game->jugador.velocidad_actual *= REDUCE_COLISION;
+          game->jugador.colisionando = 1;
       }
-   } else if (game->up == 1)
+   } else if (game->jugador.up == 1)
    {
-      temp1.y = (int)(game->y - paso);
-      
-      if(!SDL_HasIntersection(&temp1, &temp3) && !SDL_HasIntersection(&temp1, &temp3) && !chequea_tiles(game, &temp1) && temp1.y >= 0)
+      temp1.y = (int)(game->jugador.y - paso);
+      if(!chequea_tiles(game, &temp1) && temp1.y >= 0) {
+         game->jugador.y -= paso;
+         game->jugador.colisionando = 0;
+      } else if (!game->jugador.colisionando) 
       {
-         game->y -= paso;
-         game->colisionando = 0;
-      } else if (!game->colisionando) 
-      {
-          game->velocidad_actual *= REDUCE_COLISION;
-          game->colisionando = 1;
+          game->jugador.velocidad_actual *= REDUCE_COLISION;
+          game->jugador.colisionando = 1;
       }
    }
    
    // - CAMARA
    //  definiendo el centro
-   game->camara.x = (int)game->x + (game->lado/2) - (game->win_w/2);
-   game->camara.y = (int)game->y + (game->lado/2) - (game->win_h/2);
+   game->pantalla.camara.x = (int)game->jugador.x + (game->jugador.lado/2) - (game->pantalla.win_w/2);
+   game->pantalla.camara.y = (int)game->jugador.y + (game->jugador.lado/2) - (game->pantalla.win_h/2);
    
    //  clamping o limites para que no se "escape del centro"
-   if (game->camara.x < 0) game->camara.x = 0;
-   if (game->camara.y < 0) game->camara.y = 0;
+   if (game->pantalla.camara.x < 0) game->pantalla.camara.x = 0;
+   if (game->pantalla.camara.y < 0) game->pantalla.camara.y = 0;
    
-   if (game->camara.x > game->mapa_w - game->camara.w) {
-       game->camara.x = game->mapa_w - game->camara.w;
+   if (game->pantalla.camara.x > game->pantalla.nivel_w - game->pantalla.camara.w) {
+       game->pantalla.camara.x = game->pantalla.nivel_w - game->pantalla.camara.w;
    }
    
-   if (game->camara.y > game->mapa_h - game->camara.h) {
-       game->camara.y = game->mapa_h - game->camara.h;
+   if (game->pantalla.camara.y > game->pantalla.nivel_h - game->pantalla.camara.h) {
+       game->pantalla.camara.y = game->pantalla.nivel_h - game->pantalla.camara.h;
    }
    
    // cronometro
@@ -260,28 +252,16 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
 
 void construir_rects(Game *game)
 {
-    game->rect_jugador = (SDL_Rect) {
-        .x = (int)game->x,
-        .y = (int)game->y,
-        .w = game->lado,
-        .h = game->lado
+    game->jugador.rect = (SDL_Rect) {
+        .x = (int)game->jugador.x,
+        .y = (int)game->jugador.y,
+        .w = game->jugador.lado,
+        .h = game->jugador.lado
     };
-    game->rect_hitbox = (SDL_Rect) {
-        .x = game->h_x,
-        .y = game->h_y,
-        .w = game->h_w,
-        .h = game->h_h
-    };
-    game->rect_colision = (SDL_Rect) {
-        .x = game->x_colision,
-        .y = game->y_colision,
-        .w = game->w_colision,
-        .h = game->h_colision
-    };
-    game->rect_colision2 = (SDL_Rect) {
-        .x = w_inicial - game->x_colision,
-        .y = h_inicial - game->y_colision,
-        .w = game->w_colision,
-        .h = game->h_colision
+    game->jugador.rect_colision = (SDL_Rect) {
+        .x = game->jugador.x_colision,
+        .y = game->jugador.y_colision,
+        .w = game->jugador.w_colision,
+        .h = game->jugador.h_colision
     };
 }

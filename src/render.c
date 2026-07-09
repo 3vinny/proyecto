@@ -3,14 +3,11 @@
 
 void game_Render(Game *game)
 {
-    int x = 0, y = 0;
-    
-    SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-
-    SDL_RenderClear(game->renderer);
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
+    SDL_RenderClear(game->pantalla.renderer);
 
     // BACKGROUND
-    SDL_RenderCopy(game->renderer, game->texturaImg, NULL, NULL);
+    SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
     
      // Tilemap dibuja pista desde la textura y sdlrect
     for (int i=0; i < tile_filas; i++)
@@ -21,14 +18,13 @@ void game_Render(Game *game)
             bool dibuja_pista = true;
             
             SDL_Rect destino = {
-                game->tiles[i][j].x_tiles - game->camara.x,
-                game->tiles[i][j].y_tiles - game->camara.y,
+                game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                game->tiles[i][j].y_tiles - game->pantalla.camara.y,
                 game->tiles[i][j].w_tiles,
                 game->tiles[i][j].h_tiles
             }; 
             
             // POSICIONES A RECORTAR:
-            
             int tam = 32; // estandar pixel art 32x32
             SDL_Rect origen = { 0,0,tam,tam };
             switch(tipo) {
@@ -66,45 +62,56 @@ void game_Render(Game *game)
             
             if (dibuja_pista && game->texturaPista != NULL)
             {
-                SDL_RenderCopy(game->renderer, game->texturaPista, &origen, &destino);    
+                SDL_RenderCopy(game->pantalla.renderer, game->texturaPista, &origen, &destino);    
             }
         }
     }
 
     // RECTANGULO DEL JUGADOR !!! acaaa
-    SDL_Rect Rectang = { (int)game->x - game->camara.x, (int)game->y - game->camara.y, game->lado, game->lado };
-    SDL_RenderCopyEx(game->renderer, game->texturaJugador, NULL, &Rectang, game->angulo, NULL, SDL_FLIP_NONE);
+    SDL_Rect Rectang = { 
+        (int)game->jugador.x - game->pantalla.camara.x, 
+        (int)game->jugador.y - game->pantalla.camara.y, 
+        game->jugador.lado, 
+        game->jugador.lado 
+    };
+    SDL_RenderCopyEx(game->pantalla.renderer, game->jugador.textura, NULL, &Rectang, game->jugador.angulo, NULL, SDL_FLIP_NONE);
    
     // TEXT
     SDL_QueryTexture(game->texturaTexto, NULL, NULL, &game->wText, &game->hText);
     SDL_Rect textoRec = { 200, 10, game->wText, game->hText }; // posicion texto, ancho y alto
-    SDL_RenderCopy(game->renderer, game->texturaTexto, NULL, &textoRec);
+    SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
     render_Cronometro(game);
 
-    // RECTANGULO (Colision)
-    SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
-    SDL_Rect Rectang_Colision = { game->x_colision, game->y_colision, game->w_colision, game->h_colision };
-    SDL_RenderFillRect(game->renderer, &Rectang_Colision);
+    /* RECTANGULO (Colision)
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 255);
+    SDL_Rect Rectang_Colision = { 
+        game->jugador.x_colision, 
+        game->jugador.y_colision, 
+        game->jugador.w_colision, 
+        game->jugador.h_colision 
+    };
+    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Colision);*/
     
-    // RECTANGULO (interactivo objeto2 txt)
-    SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
+    // RECTANGULO (interactivo objeto2 txt) destruible
+    SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
     for (int i=0; i<tile_filas; i++) {
         for (int j=0; j<tile_cols; j++) {
             if (game->tiles[i][j].objeto2) {
                 SDL_Rect Rectang_Obj2 = {
-                    game->tiles[i][j].x_tiles - game->camara.x,
-                    game->tiles[i][j].y_tiles - game->camara.y,
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
                     game->tiles[i][j].w_tiles,
-                    game->tiles[i][j].h_tiles/2
+                    game->tiles[i][j].h_tiles
                 };
-                SDL_RenderFillRect(game->renderer, &Rectang_Obj2);
+                SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
             }
         }
     }
-    // TOdo al renderr
-    SDL_RenderPresent(game->renderer);
+    // Todo al render
+    SDL_RenderPresent(game->pantalla.renderer);
 }
 
 void render_Cronometro(Game *game)
@@ -119,13 +126,13 @@ void render_Cronometro(Game *game)
     SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->texto_cronometro, colorBlanco);
     
     if (surfaceTemporal != NULL){
-        game->texturaTexto2 = SDL_CreateTextureFromSurface(game->renderer, surfaceTemporal);
+        game->texturaTexto2 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
         SDL_FreeSurface(surfaceTemporal);
     }
     
     if (game->texturaTexto2 != NULL){
         SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &game->wText, &game->hText);
         SDL_Rect textoRec2 = { w_inicial - game->wText, h_inicial - game->hText, game->wText, game->hText };
-        SDL_RenderCopy(game->renderer, game->texturaTexto2, NULL, &textoRec2);
+        SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto2, NULL, &textoRec2);
     }
 }

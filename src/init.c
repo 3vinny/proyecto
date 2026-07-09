@@ -23,18 +23,18 @@ bool SDL_Inicia(Game *game)
    }
 
    // carga ventana
-   game->ventana = SDL_CreateWindow(titulo, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w_inicial, h_inicial, 0);
-   if (!game->ventana) {
+   game->pantalla.ventana = SDL_CreateWindow(titulo, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w_inicial, h_inicial, 0);
+   if (!game->pantalla.ventana) {
       printf("Error al crear ventana: %s\n", SDL_GetError());
       return true;
    }
    
    //manda la resolución actual a punteros win_w y win_h
-   SDL_GetWindowSize(game->ventana, &game->win_w, &game->win_h);
+   SDL_GetWindowSize(game->pantalla.ventana, &game->pantalla.win_w, &game->pantalla.win_h);
 
    // carga render
-   game->renderer = SDL_CreateRenderer(game->ventana, -1, 0);
-   if (!game->renderer) {
+   game->pantalla.renderer = SDL_CreateRenderer(game->pantalla.ventana, -1, 0);
+   if (!game->pantalla.renderer) {
       printf("Error al crear renderer: %s\n", SDL_GetError());
       return true;
    }
@@ -75,14 +75,17 @@ bool SDL_Inicia(Game *game)
 
 void game_Limpieza(Game *game, int exitStatus)
 {
-   SDL_DestroyRenderer(game->renderer);
+   SDL_DestroyRenderer(game->pantalla.renderer);
    SDL_DestroyTexture(game->texturaTexto);
+   SDL_DestroyTexture(game->texturaTexto2);
    SDL_DestroyTexture(game->texturaImg);
-   SDL_DestroyTexture(game->texturaJugador);
-   SDL_DestroyWindow(game->ventana);
+   SDL_DestroyTexture(game->texturaPista);
+   SDL_DestroyTexture(game->jugador.textura);
+   SDL_DestroyWindow(game->pantalla.ventana);
 
    Mix_FreeChunk(game->vozinha);
-   //Mix_CloseAudio(game->musica);
+   Mix_CloseAudio();
+   
    Mix_Quit();
    IMG_Quit();
    TTF_Quit();

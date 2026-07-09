@@ -4,24 +4,22 @@
 void ajusta_Tiles(Game *game)
 {
     // tamaño tile pixeles = resolucion ventana / num tiles o filas
-    game->tile_w_px = game->win_w / tile_cols;
-    game->tile_h_px = game->win_h / tile_filas;
+    int tile_w_px = game->pantalla.win_w / tile_cols;
+    int tile_h_px = game->pantalla.win_h / tile_filas;
+    
     for (int i=0; i<tile_filas;i++)
     {
         for(int j=0; j<tile_cols; j++)
         {
-            game->tiles[i][j].x_tiles = j * game->tile_w_px;
-            game->tiles[i][j].y_tiles = i * game->tile_h_px;
-            game->tiles[i][j].w_tiles = game->tile_w_px;
-            game->tiles[i][j].h_tiles = game->tile_h_px;
-            
-            game->tiles[i][j].jugador_x = j*game->tile_w_px;
-            game->tiles[i][j].jugador_y = i*game->tile_h_px;
+            game->tiles[i][j].x_tiles = j * tile_w_px;
+            game->tiles[i][j].y_tiles = i * tile_h_px;
+            game->tiles[i][j].w_tiles = tile_w_px;
+            game->tiles[i][j].h_tiles = tile_h_px;
             
             if (game->tiles[i][j].activo_posJ)
             {
-                game->x = j*game->tile_w_px;
-                game->y = i*game->tile_h_px;
+                game->jugador.x = j*tile_w_px;
+                game->jugador.y = i*tile_h_px;
             }
         }
     }
@@ -35,13 +33,13 @@ void carga_Tiles(Game *game)
       return;
    }
 
-   char linea[256]; // buffer grande x seguridad
+   char linea[256]; // arreglo grande
    
-   if (game->win_w == 0) game->win_w = w_inicial;
-   if (game->win_h == 0) game->win_h = h_inicial;
+   if (game->pantalla.win_w == 0) game->pantalla.win_w = w_inicial;
+   if (game->pantalla.win_h == 0) game->pantalla.win_h = h_inicial;
 
    /*booleanos:
-   #: cuadrado colision
+   .(textura) y #: cuadrado colision
    P: posicion jugador
    X: item destruible/powerup
    */

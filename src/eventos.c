@@ -17,21 +17,27 @@ void game_Input(Game *game)
          switch(evento.cbutton.button)
          {
              case SDL_CONTROLLER_BUTTON_DPAD_UP: 
-                 game->up = 1;
+                 game->jugador.up = 1;
                  break;
              case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 
-                 game->right = 1;
+                 game->jugador.right = 1;
                  break;
              case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-                 game->down = 1;
+                 game->jugador.down = 1;
                  break;
              case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-                 game->left = 1;
+                 game->jugador.left = 1;
                  break;
              case SDL_CONTROLLER_BUTTON_B:
-                 game->freno = 1;
+                 game->jugador.freno = 1;
                  break;
-             default: game->up, game->down, game->left, game->right = 0; game->freno = 0; break;
+             default:
+                 game->jugador.up = 0;
+                 game->jugador.down = 0;
+                 game->jugador.left = 0;
+                 game->jugador.right = 0;
+                 game->jugador.freno = 0;
+                 break;
          }
       }
 
@@ -39,53 +45,58 @@ void game_Input(Game *game)
          switch(evento.cbutton.button)
          {
             case SDL_CONTROLLER_BUTTON_DPAD_UP: 
-               game->up = 0;
+               game->jugador.up = 0;
                break;
             case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 
-               game->right = 0; 
+               game->jugador.right = 0; 
                break;
             case SDL_CONTROLLER_BUTTON_DPAD_DOWN: 
-               game->down = 0; 
+               game->jugador.down = 0; 
                break;
             case SDL_CONTROLLER_BUTTON_DPAD_LEFT: 
-               game->left = 0; 
+               game->jugador.left = 0; 
                break;
            case SDL_CONTROLLER_BUTTON_B:
-               game->freno = 0;
+               game->jugador.freno = 0;
                break;
-            default: game->up, game->down, game->left, game->right = 0; game->freno = 0; break;
+            default: 
+                game->jugador.up = 0;
+                game->jugador.down = 0;
+                game->jugador.left = 0;
+                game->jugador.right = 0;
+                game->jugador.freno = 0;
+                break;
          }
       }
 
-      // CASO PALANCAS GAMEPAD
-      // rango: -32768 to 32767 | AXIS_LEFTX : palanca izquierda
+      // CASO PALANCAS GAMEPAD  rango: -32768 to 32767 | AXIS_LEFTX : palanca izquierda
       if (evento.type == SDL_CONTROLLERAXISMOTION){
           
           if (evento.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX)
           {
               if (evento.caxis.value < -zona_muerta) {
-                  game->left = 1; 
-                  game->right = 0;
+                  game->jugador.left = 1; 
+                  game->jugador.right = 0;
               } else if (evento.caxis.value > zona_muerta) {
-                  game->right = 1; 
-                  game->left = 0;
+                  game->jugador.right = 1; 
+                  game->jugador.left = 0;
               } else {
-                  game->left = 0;
-                  game->left = 0;
+                  game->jugador.left = 0;
+                  game->jugador.left = 0;
               }
           }
           
           if (evento.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
           {
               if (evento.caxis.value < -zona_muerta) {
-                  game->up = 1; 
-                  game->down = 0;
+                  game->jugador.up = 1; 
+                  game->jugador.down = 0;
               } else if (evento.caxis.value > zona_muerta) {
-                  game->down = 1; 
-                  game->up = 0;
+                  game->jugador.down = 1; 
+                  game->jugador.up = 0;
               } else {
-                  game->up = 0; 
-                  game->down = 0;
+                  game->jugador.up = 0; 
+                  game->jugador.down = 0;
               }
           }
       }
@@ -93,16 +104,22 @@ void game_Input(Game *game)
       if(evento.type == SDL_KEYDOWN){
          switch(evento.key.keysym.sym)
          {
-            case SDLK_UP: case SDLK_w: game->up = 1; break;
-            case SDLK_DOWN: case SDLK_s: game->down = 1; break;
-            case SDLK_LEFT: case SDLK_a: game->left = 1; break;
-            case SDLK_RIGHT: case SDLK_d: game->right = 1; break;
-            case SDLK_SPACE: game->freno = 1; break;
+            case SDLK_UP: case SDLK_w: 
+                game->jugador.up = 1; break;
+            case SDLK_DOWN: case SDLK_s: 
+                game->jugador.down = 1; break;
+            case SDLK_LEFT: case SDLK_a: 
+                game->jugador.left = 1; break;
+            case SDLK_RIGHT: case SDLK_d: 
+                game->jugador.right = 1; break;
+            case SDLK_SPACE: 
+                game->jugador.freno = 1; break;
+
             case SDLK_h:
                 int tiempo_actual = SDL_GetTicks();
                 int cooldown = 200;
                 if (tiempo_actual - game->ultimo_tiempo_vozinha >= cooldown){
-                    if (game->bocina == 0){
+                    if (game->jugador.bocina == 0){
                         printf("vozinha bip bipppppppppppppppppppppppp\n");
                         if (game->vozinha != NULL){
                             Mix_PlayChannel(-1, game->vozinha, 0);
@@ -110,14 +127,14 @@ void game_Input(Game *game)
                     }
                     game->ultimo_tiempo_vozinha = tiempo_actual;
                 }
-                game->bocina = 1;
+                game->jugador.bocina = 1;
                 break;
             case SDLK_F11:
-               game->Fullscreen = !(game->Fullscreen); // se alterna
-               if (game->Fullscreen){
-                  SDL_SetWindowFullscreen(game->ventana, SDL_WINDOW_FULLSCREEN_DESKTOP);
+               game->pantalla.Fullscreen = !(game->pantalla.Fullscreen); // se alterna
+               if (game->pantalla.Fullscreen){
+                  SDL_SetWindowFullscreen(game->pantalla.ventana, SDL_WINDOW_FULLSCREEN_DESKTOP);
                } else {
-                  SDL_SetWindowFullscreen(game->ventana, 0);
+                  SDL_SetWindowFullscreen(game->pantalla.ventana, 0);
                }
                break;
             case SDLK_ESCAPE:
@@ -131,12 +148,12 @@ void game_Input(Game *game)
 
       if(evento.type == SDL_KEYUP){
          switch(evento.key.keysym.sym){
-            case SDLK_UP: case SDLK_w: game->up = 0; break;
-            case SDLK_DOWN: case SDLK_s: game->down = 0; break;
-            case SDLK_LEFT: case SDLK_a: game->left = 0; break;
-            case SDLK_RIGHT: case SDLK_d: game->right = 0; break;
-            case SDLK_SPACE: game->freno = 0; break;
-            case SDLK_h: game->bocina = 0; break;
+            case SDLK_UP: case SDLK_w: game->jugador.up = 0; break;
+            case SDLK_DOWN: case SDLK_s: game->jugador.down = 0; break;
+            case SDLK_LEFT: case SDLK_a: game->jugador.left = 0; break;
+            case SDLK_RIGHT: case SDLK_d: game->jugador.right = 0; break;
+            case SDLK_SPACE: game->jugador.freno = 0; break;
+            case SDLK_h: game->jugador.bocina = 0; break;
             default:
                 break;
          }
