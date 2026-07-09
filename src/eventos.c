@@ -16,19 +16,22 @@ void game_Input(Game *game)
          printf("Se detecto presion mando: \n");
          switch(evento.cbutton.button)
          {
-            case SDL_CONTROLLER_BUTTON_DPAD_UP: 
-               game->up = 1;
-               break;
-            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 
-               game->right = 1; 
-               break;
-            case SDL_CONTROLLER_BUTTON_DPAD_DOWN: 
-               game->down = 1; 
-               break;
-            case SDL_CONTROLLER_BUTTON_DPAD_LEFT: 
-               game->left = 1; 
-               break;
-            default: game->up, game->down, game->left, game->right = 0; break;
+             case SDL_CONTROLLER_BUTTON_DPAD_UP: 
+                 game->up = 1;
+                 break;
+             case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: 
+                 game->right = 1;
+                 break;
+             case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                 game->down = 1;
+                 break;
+             case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                 game->left = 1;
+                 break;
+             case SDL_CONTROLLER_BUTTON_B:
+                 game->freno = 1;
+                 break;
+             default: game->up, game->down, game->left, game->right = 0; game->freno = 0; break;
          }
       }
 
@@ -47,7 +50,10 @@ void game_Input(Game *game)
             case SDL_CONTROLLER_BUTTON_DPAD_LEFT: 
                game->left = 0; 
                break;
-            default: game->up, game->down, game->left, game->right = 0; break;
+           case SDL_CONTROLLER_BUTTON_B:
+               game->freno = 0;
+               break;
+            default: game->up, game->down, game->left, game->right = 0; game->freno = 0; break;
          }
       }
 

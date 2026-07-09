@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-// god object -/> varios structs
-
 typedef struct {
   // variables SDL2
   SDL_Window *ventana;
