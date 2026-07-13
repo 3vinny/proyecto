@@ -1,4 +1,3 @@
-// render.c
 #include "headers.h"
 
 void game_Render(Game *game)
@@ -50,10 +49,16 @@ void game_Render(Game *game)
                     origen.x = 2*tam; origen.y = 2*tam; // (128,128) inferior derecha
                     break;
                 case '.': //ASFALTO !!!
-                    origen.x = 192; origen.y = 192; // 144, 192 COORDENADAS
+                    origen.x = 144; origen.y = 192; // 144, 192 COORDENADAS
                     break;
                 case 'P': // jugador
                     origen.x = tam; origen.y = 0;
+                    break;
+                case 'C':
+                    break;
+                case 'c':
+                    break;
+                case 'N':
                     break;
                 default: // si no es ninguno el booleano se cambia
                     dibuja_pista = false;
@@ -84,15 +89,16 @@ void game_Render(Game *game)
     // TEXTO 2
     render_Cronometro(game);
 
-    /* RECTANGULO (Colision)
+    /* RECTANGULO (Colision)*/
+    
     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 255);
     SDL_Rect Rectang_Colision = { 
-        game->jugador.x_colision, 
-        game->jugador.y_colision, 
+        game->jugador.x_colision - game->pantalla.camara.x, 
+        game->jugador.y_colision - game->pantalla.camara.y, 
         game->jugador.w_colision, 
         game->jugador.h_colision 
     };
-    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Colision);*/
+    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Colision);
     
     // RECTANGULO (interactivo objeto2 txt) destruible
     SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);

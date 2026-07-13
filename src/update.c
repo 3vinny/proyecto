@@ -1,10 +1,12 @@
+// archivo mas importante del proyecto. colisiones direccion y fisicas, etc
 #include "headers.h"
 
-#define ACELERACION 300.0f
+#define ACELERACION 200.0f
 #define FRICCION 1000.0f
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
-#define POTENCIA_FRENO 2500.0f //debe ser mas potente que friccion soltar tecla
+#define POTENCIA_FRENO 2500.0f
+#define LIMITE 0.0f
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect);
 void construir_rects(Game *game);
@@ -20,7 +22,6 @@ void game_Update(Game *game)
 
    SDL_Rect temp1 = game->jugador.rect;
    SDL_Rect temp2 = game->jugador.rect_colision;
-   //borrarrrrrr
    
    /* direccion solicitada x input
    0=nada 1=derecha/abajo -1=izq/arriba */
@@ -55,9 +56,9 @@ void game_Update(Game *game)
    0. freno 1. cuando se mete reversa 2. cuando ta en movimiento 3. cuando no se presiona nada */
    if (game->jugador.freno == 1) {
        game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
-       if (game->jugador.velocidad_actual <= 0.0f) {
-           // resetea direccion y velocidad en 0
-           game->jugador.velocidad_actual = 0.0f;
+       if (game->jugador.velocidad_actual <= LIMITE) {
+
+           game->jugador.velocidad_actual = LIMITE;
            game->jugador.dir_x = 0;
            game->jugador.dir_y = 0;
            game->jugador.tiempo_arranque = 0.0f;
@@ -123,7 +124,6 @@ void game_Update(Game *game)
    /* gestion al presionar teclas: hitbox, velocidades, colisiones
    casos en y, casos en x
    */
-        
    if (game->jugador.right == 1) {
       temp1.x = (int)(game->jugador.x + paso);
       if(!chequea_tiles(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) {

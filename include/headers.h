@@ -15,22 +15,34 @@
 #include <stdlib.h>
 #include <time.h>
 
-/*---- Estructuras & funciones -------
-PANTALLA*/
-
+/*---- Estructuras & funciones -------*/
+// --- Pantalla ---
 typedef struct {
     SDL_Window *ventana;
     SDL_Renderer *renderer;
+    SDL_Rect camara;
+    
     bool Fullscreen;
     int win_w;
     int win_h;
     
-    SDL_Rect camara;
     int nivel_w;
     int nivel_h;
  }Pantalla;
 
-// JUGADOR/PERSONAJE
+// fondo: pendiente y unused
+typedef struct {
+    bool asfalto;
+    bool pasto;
+    int agua;
+    int casa;
+    
+    // posiciones para que se mueva en conjunto
+    int x_bg;
+    int y_bg;
+}Fondo;
+
+// --- JUGADOR/PERSONAJE ---
 typedef struct {
     SDL_Texture *textura;
     int lado;
@@ -63,7 +75,7 @@ typedef struct {
     SDL_Rect rect_colision;
 } Personaje;
 
-// ENEMIGOS
+// --- ENEMIGOS ---
 typedef struct {
     float x;
     float y;
@@ -73,7 +85,7 @@ typedef struct {
     bool activo; //objeto enemigo txt
 } Enemigo;
 
-// TILES
+// --- TILES ---
 typedef struct {
     int x_tiles;
     int y_tiles;
@@ -84,9 +96,13 @@ typedef struct {
     bool activo_posJ; //P
     bool objeto2; //X
     char tipo; //- | 1 2 3 4
+    
+    char casa; // c y C
+    bool obstaculo; // N
+    bool neumatico; // o
 } Tile;
 
-// GAME GENERAL
+// --- GAME GENERAL ---
 typedef struct {
     bool quit;
     float delta_time;
@@ -98,7 +114,7 @@ typedef struct {
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     
-    // texto y cronometro
+    // texto, cronometro y bocina
     SDL_Texture *texturaTexto;
     SDL_Texture *texturaTexto2;
     Uint32 tiempo_inicio;

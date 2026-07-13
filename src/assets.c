@@ -1,5 +1,3 @@
-// archivo para los assets
-// d momento solo carga el fondo
 #include "headers.h"
 
 bool cargarMedia(Game *game)

@@ -12,3 +12,4 @@ linux/game
 *.o
 *.bin
 *.env
+*.old
