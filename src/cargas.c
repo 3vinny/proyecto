@@ -56,8 +56,7 @@ void carga_Tiles(Game *game)
    P: posicion jugador
    X: item destruible/powerup
    E: enemigo
-   C: casa | c: casa destruida
-   */
+   C: casa | c: casa destruida */
    for(int i=0; i<tile_filas; i++)
    {
        if (fgets(linea, sizeof(linea), archivo) == NULL) break;
@@ -66,11 +65,27 @@ void carga_Tiles(Game *game)
            // copia caracter txt para el render despues
            game->tiles[i][j].tipo = linea[j];
 
-           game->tiles[i][j].activo = (linea[j] == '.');
+           game->tiles[i][j].activo = (linea[j] == '.' || linea[j] == 'N');
            game->tiles[i][j].activo_posJ = (linea[j] == 'P');
            game->tiles[i][j].objeto2 = (linea[j] == 'X');
-           game->tiles[i][j].enemigo1 = (linea[j] == 'E');
-           game->tiles[i][j].casa = (linea[j] == 'C');
+           
+           if (linea[j] == 'E')
+           {
+               game->tiles[i][j].enemigo1 = 1;
+           }
+           
+           if (linea[j] == 'A')
+           {
+               game->tiles[i][j].agua = 1;
+           }
+
+           if (linea[j]=='C')
+           {
+               game->tiles[i][j].casa = 1;
+           } else if (linea[j] == 'c') 
+           {
+               //game->tiles[i][j].casa = 0;               
+           }
        }
    }
    fclose(archivo);

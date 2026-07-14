@@ -1,4 +1,3 @@
-// archivo inputstate, tendra opcion de gamepad
 #include "headers.h"
 // rango range: -32768 to 32767 | zona muerta es el valor maximo
 int zona_muerta = 20100;

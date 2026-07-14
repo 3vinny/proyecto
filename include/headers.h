@@ -93,6 +93,7 @@ typedef struct {
     bool enemigo1;
     
     int casa; // c y C
+    bool agua; // A
     bool obstaculo; // N
     bool neumatico; // o
 } Tile;

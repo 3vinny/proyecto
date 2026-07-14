@@ -51,8 +51,9 @@ int main(int argc, char **argv)
       },
       
       .enemigos = {
-          { .x=300, .y=400, .velocidad=150, .activo=true },
-          { .x=500, .y=200, .velocidad=420, .activo=true }
+          { .x=0, .y=0, .velocidad=0, .activo=true },
+          { .x=0, .y=0, .velocidad=0, .activo=true },
+          { .x=0, .y=0, .velocidad=0, .activo=true }
       }
    };
    

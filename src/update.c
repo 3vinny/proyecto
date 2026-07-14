@@ -23,7 +23,7 @@ void game_Update(Game *game)
    SDL_Rect temp2 = game->jugador.rect_colision;
    
    /* direccion solicitada x input
-   0=nada 1=derecha/abajo -1=izq/arriba */
+       0=nada 1=derecha/abajo -1=izq/arriba */
    
    int dir_x_input = 0, dir_y_input = 0;
    if (game->jugador.right == 1)
@@ -57,8 +57,8 @@ void game_Update(Game *game)
    2. cuando ta en movimiento 
    3. cuando no se presiona nada 
    */
-   
-   if (game->jugador.freno == 1) {
+   if (game->jugador.freno == 1) 
+   {
        game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
        if (game->jugador.velocidad_actual <= LIMITE) {
 
@@ -81,7 +81,8 @@ void game_Update(Game *game)
        }
        paso = 0.0f;
        
-   } else if (movimiento) {
+   } else if (movimiento) 
+   {
        game->jugador.dir_x = dir_x_input;
        game->jugador.dir_y = dir_y_input;
        
@@ -96,16 +97,21 @@ void game_Update(Game *game)
        else if (dir_x_input == -1 && dir_y_input == -1) game->jugador.angulo = 315.0;
        
        // aceleracion
-       if (game->jugador.velocidad_actual <= 0.0f) {
+       if (game->jugador.velocidad_actual <= 0.0f) 
+       {
            game->jugador.tiempo_arranque += game->delta_time;
-           if (game->jugador.tiempo_arranque >= DELAY_ARRANQUE) {
+           if (game->jugador.tiempo_arranque >= DELAY_ARRANQUE) 
+           {
                game->jugador.velocidad_actual += ACELERACION * game->delta_time;
            }
        } else {
            game->jugador.velocidad_actual += ACELERACION * game->delta_time;
        }
        
-       if (game->jugador.velocidad_actual > game->jugador.velocidad) game->jugador.velocidad_actual = game->jugador.velocidad;
+       if (game->jugador.velocidad_actual > game->jugador.velocidad)
+       {
+           game->jugador.velocidad_actual = game->jugador.velocidad;
+       }
        paso = (game->delta_time) * (game->jugador.velocidad_actual);
        
    } else {
@@ -161,7 +167,6 @@ void game_Update(Game *game)
    temp1.x = (int)game->jugador.x;
    
    // CASOS Y
-        
    if (game->jugador.down == 1)
    {
       temp1.y = (int)(game->jugador.y + paso);
@@ -190,15 +195,16 @@ void game_Update(Game *game)
    
    if (game->jugador.up == 0 && game->jugador.down == 0 && game->jugador.left == 0 && game->jugador.right == 0)
    {
-       game->jugador.x -= 0.2*(paso);
+       game->jugador.x -= 0.05*(paso);
+       game->jugador.velocidad_actual *= 0.97f;
    }
    
    // - CAMARA
-   //  definiendo el centro
+   //          definiendo el centro
    game->pantalla.camara.x = (int)game->jugador.x + (game->jugador.lado/2) - (game->pantalla.win_w/2);
    game->pantalla.camara.y = (int)game->jugador.y + (game->jugador.lado/2) - (game->pantalla.win_h/2);
    
-   //  centrando la camara
+   //          centrando camara
    if (game->pantalla.camara.x < 0) game->pantalla.camara.x = 0;
    if (game->pantalla.camara.y < 0) game->pantalla.camara.y = 0;
    
@@ -212,7 +218,7 @@ void game_Update(Game *game)
        game->pantalla.camara.y = game->pantalla.nivel_h - game->pantalla.camara.h;
    }
    
-    // MEcanica enemigosssssssssssssssssssss
+    //     Mecanica enemigossssssssss
     for (int i = 0; i < max_enemigos; i++)
     {
         if (game->enemigos[i].activo)
@@ -249,7 +255,8 @@ void game_Update(Game *game)
    int centesimas = (transcurrido % 1000)/10;
    
    // esto le pedi ayuda a la ia: esto formatea mi string (01:23:40) como en js
-   sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+   // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
+   //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
 }
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect)
@@ -259,7 +266,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
     {
         for (int j = 0; j < (int)tile_cols; j++) 
         {
-            if (game->tiles[i][j].activo) 
+            if (game->tiles[i][j].activo)
             {
                 SDL_Rect temp4 = {
                     .x = game->tiles[i][j].x_tiles,
@@ -268,8 +275,43 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
                     .h = game->tiles[i][j].h_tiles
                 };
                 
-                if (SDL_HasIntersection(player_rect, &temp4)) {
+                // comprueba si chocaste con cualquier tile
+                if (SDL_HasIntersection(player_rect, &temp4)) 
+                {
                     return 1; 
+                }
+            }
+            
+            if (game->tiles[i][j].casa)
+            {
+                SDL_Rect tempcasa = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                
+                if (SDL_HasIntersection(player_rect, &tempcasa))
+                {
+                    printf("Intersectó la casa\n");
+                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                }
+            }
+            
+            if (game->tiles[i][j].agua)
+            {
+                
+                SDL_Rect tempagua = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                
+                if (SDL_HasIntersection(player_rect, &tempagua))
+                {
+                    printf("Agua\n");
+                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
                 }
             }
         }
@@ -291,7 +333,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
                 
                 if (SDL_HasIntersection(player_rect, &temp5))
                 {
-                    game->tiles[i][j].objeto2 = false; //desaparece el objeto
+                    game->tiles[i][j].objeto2 = false;
                 }
             }
         }

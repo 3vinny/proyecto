@@ -3,13 +3,13 @@
 bool cargarMedia(Game *game)
 {
 //./data/hitbox.txt
-    game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/xp.png");
+    game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg.png");
     if (!game->texturaImg) {
         printf("Error iniciando textura: %s\n", IMG_GetError());
         return true;
     }
     
-    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/car1.png");
+    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/mclaren.png");
     if(!surfaceTemp){
         printf("Error cargando imagen car1 : %s\n", IMG_GetError());
     }

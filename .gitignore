@@ -16,3 +16,4 @@ assets/sprites/unused
 *.bin
 *.env
 *.old
+*.zip

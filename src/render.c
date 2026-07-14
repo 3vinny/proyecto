@@ -69,7 +69,11 @@ void game_Render(Game *game)
                     break;
                 case 'c':
                     break;
+                case 'A':
+                    origen.x = 384; origen.y = 112;
+                    break;
                 case 'N':
+                    origen.x = 384; origen.y = 176;
                     break;
                 default: // si no es ninguno el booleano se cambia
                     dibuja_pista = false;
@@ -147,7 +151,6 @@ void game_Render(Game *game)
         }
     }
     
-    // Todo al render
     SDL_RenderPresent(game->pantalla.renderer);
 }
 
