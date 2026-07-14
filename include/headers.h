@@ -71,11 +71,11 @@ typedef struct {
 typedef struct {
     float x;
     float y;
+    int dir_x, dir_y;
     int lado;
     int velocidad;
     SDL_Rect rect;
     bool activo;
-    //Personaje enemigo;
 } Enemigo;
 
 // --- TILES ---
@@ -90,7 +90,9 @@ typedef struct {
     bool objeto2; //X
     char tipo; //- | 1 2 3 4
     
-    char casa; // c y C
+    bool enemigo1;
+    
+    int casa; // c y C
     bool obstaculo; // N
     bool neumatico; // o
 } Tile;
@@ -119,7 +121,7 @@ typedef struct {
     Pantalla pantalla;
     Personaje jugador;
     Tile tiles[tile_filas][tile_cols];
-    Enemigo enemigos[10];
+    Enemigo enemigos[max_enemigos];
 } Game;
 
 /*---- PROTOTIPOS DE FUNCIONES -------*/

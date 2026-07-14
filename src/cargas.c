@@ -6,6 +6,7 @@ void ajusta_Tiles(Game *game)
     // tamaño tile pixeles = resolucion ventana / num tiles o filas
     int tile_w_px = game->pantalla.win_w / tile_cols;
     int tile_h_px = game->pantalla.win_h / tile_filas;
+    int contador_enemigos = 0;
     
     for (int i=0; i<tile_filas;i++)
     {
@@ -20,6 +21,18 @@ void ajusta_Tiles(Game *game)
             {
                 game->jugador.x = j*tile_w_px;
                 game->jugador.y = i*tile_h_px;
+            }
+            
+            if (game->tiles[i][j].enemigo1 && contador_enemigos < max_enemigos)
+            {
+                game->enemigos[i].x = j*tile_w_px;
+                game->enemigos[i].y = i*tile_h_px;
+                game->enemigos[i].lado = 32;
+                game->enemigos[i].velocidad = VELOCIDAD_ENEMIGO1;
+                game->enemigos[i].dir_x = 1;
+                game->enemigos[i].dir_y = 0;
+                game->enemigos[i].activo = true;
+                contador_enemigos++;
             }
         }
     }
@@ -42,6 +55,8 @@ void carga_Tiles(Game *game)
    .(textura) y #: cuadrado colision
    P: posicion jugador
    X: item destruible/powerup
+   E: enemigo
+   C: casa | c: casa destruida
    */
    for(int i=0; i<tile_filas; i++)
    {
@@ -50,10 +65,12 @@ void carga_Tiles(Game *game)
        {
            // copia caracter txt para el render despues
            game->tiles[i][j].tipo = linea[j];
-           
-           game->tiles[i][j].activo = (linea[j] == '.' || linea[j] == '#');
+
+           game->tiles[i][j].activo = (linea[j] == '.');
            game->tiles[i][j].activo_posJ = (linea[j] == 'P');
            game->tiles[i][j].objeto2 = (linea[j] == 'X');
+           game->tiles[i][j].enemigo1 = (linea[j] == 'E');
+           game->tiles[i][j].casa = (linea[j] == 'C');
        }
    }
    fclose(archivo);

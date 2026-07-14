@@ -32,7 +32,7 @@ int main(int argc, char **argv)
           .x = 5,
           .y = 5,
           .angulo = 0.0,
-          .velocidad = 300,
+          .velocidad = 200,
           .velocidad_actual = 0.0f,
           .dir_x = 0,
           .dir_y = 0,
@@ -48,6 +48,11 @@ int main(int argc, char **argv)
           .left = 0,
           .right = 0,
           .bocina = 0,
+      },
+      
+      .enemigos = {
+          { .x=300, .y=400, .velocidad=150, .activo=true },
+          { .x=500, .y=200, .velocidad=420, .activo=true }
       }
    };
    

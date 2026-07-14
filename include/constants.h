@@ -19,4 +19,7 @@
 #define tile_cols 20
 #define tile_filas 15
 
+#define max_enemigos 10
+#define VELOCIDAD_ENEMIGO1 55.0f
+
 #endif

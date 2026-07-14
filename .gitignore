@@ -4,6 +4,9 @@ build/
 linux/
 linux/game
 
+# sprites sin utilizar
+assets/sprites/unused
+
 # MacOS Cache
 .DS_Store
 

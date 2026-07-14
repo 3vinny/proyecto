@@ -37,6 +37,9 @@ void game_Render(Game *game)
                 case '-':
                     origen.x = tam; origen.y = 0; //(32,0) recta horiz 
                     break;
+                case 'E':
+                    origen.x = tam; origen.y = 0;
+                    break;
                 case 'X':
                     origen.x = tam; origen.y = 0; // objeto powerup : 'objeto2'
                     break;
@@ -127,6 +130,23 @@ void game_Render(Game *game)
             }
         }
     }
+    
+    // ENEMIGOs
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
+    for (int i = 0; i < max_enemigos; i++)
+    {
+        if (game->enemigos[i].activo)
+        {
+            SDL_Rect rect_enm = {
+                (int)game->enemigos[i].x - game->pantalla.camara.x,
+                (int)game->enemigos[i].y - game->pantalla.camara.y,
+                game->enemigos[i].lado,
+                game->enemigos[i].lado
+            };
+            SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
+        }
+    }
+    
     // Todo al render
     SDL_RenderPresent(game->pantalla.renderer);
 }
