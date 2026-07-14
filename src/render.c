@@ -1,5 +1,8 @@
 #include "headers.h"
 
+int hText = 32;
+int wText = 32;
+
 void game_Render(Game *game)
 {
     SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
@@ -26,7 +29,8 @@ void game_Render(Game *game)
             // POSICIONES A RECORTAR:
             int tam = 32; // estandar pixel art 32x32
             SDL_Rect origen = { 0,0,tam,tam };
-            switch(tipo) {
+            switch(tipo) 
+            {
                 case '1':
                     origen.x = 0; origen.y = 0; //(0,0) superior izq
                     break;
@@ -48,13 +52,17 @@ void game_Render(Game *game)
                 case '4':
                     origen.x = 2*tam; origen.y = 2*tam; // (128,128) inferior derecha
                     break;
-                case '.': //ASFALTO !!!
+                case '#': //asfalto !!!
                     origen.x = 144; origen.y = 192; // 144, 192 COORDENADAS
                     break;
                 case 'P': // jugador
                     origen.x = tam; origen.y = 0;
                     break;
+                case '.': // pasto
+                    origen.x = 224; origen.y = 192;
+                    break;
                 case 'C':
+                    origen.x = 384; origen.y = 144;
                     break;
                 case 'c':
                     break;
@@ -82,8 +90,8 @@ void game_Render(Game *game)
     SDL_RenderCopyEx(game->pantalla.renderer, game->jugador.textura, NULL, &Rectang, game->jugador.angulo, NULL, SDL_FLIP_NONE);
    
     // TEXT
-    SDL_QueryTexture(game->texturaTexto, NULL, NULL, &game->wText, &game->hText);
-    SDL_Rect textoRec = { 200, 10, game->wText, game->hText }; // posicion texto, ancho y alto
+    SDL_QueryTexture(game->texturaTexto, NULL, NULL, &wText, &hText);
+    SDL_Rect textoRec = { 200, 10, wText, hText }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
@@ -103,9 +111,12 @@ void game_Render(Game *game)
     // RECTANGULO (interactivo objeto2 txt) destruible
     SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
-    for (int i=0; i<tile_filas; i++) {
-        for (int j=0; j<tile_cols; j++) {
-            if (game->tiles[i][j].objeto2) {
+    for (int i=0; i<tile_filas; i++) 
+    {
+        for (int j=0; j<tile_cols; j++)
+        {
+            if (game->tiles[i][j].objeto2)
+            {
                 SDL_Rect Rectang_Obj2 = {
                     game->tiles[i][j].x_tiles - game->pantalla.camara.x,
                     game->tiles[i][j].y_tiles - game->pantalla.camara.y,
@@ -123,22 +134,25 @@ void game_Render(Game *game)
 void render_Cronometro(Game *game)
 {
     // PREVIENE FUGAS DE MEMORIA (ya paso :v)
-    if (game->texturaTexto2 != NULL) {
+    if (game->texturaTexto2 != NULL) 
+    {
         SDL_DestroyTexture(game->texturaTexto2);
         game->texturaTexto2 = NULL;
     }
     
-    SDL_Color colorBlanco = {255,255,255,255}; //rgb y transparencia
+    SDL_Color colorBlanco = {255,255,255,155}; //rgb y transparencia
     SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->texto_cronometro, colorBlanco);
     
-    if (surfaceTemporal != NULL){
+    if (surfaceTemporal != NULL)
+    {
         game->texturaTexto2 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
         SDL_FreeSurface(surfaceTemporal);
     }
     
-    if (game->texturaTexto2 != NULL){
-        SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &game->wText, &game->hText);
-        SDL_Rect textoRec2 = { w_inicial - game->wText, h_inicial - game->hText, game->wText, game->hText };
+    if (game->texturaTexto2 != NULL)
+    {
+        SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &wText, &hText);
+        SDL_Rect textoRec2 = { w_inicial - wText, h_inicial - hText, wText, hText };
         SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto2, NULL, &textoRec2);
     }
 }

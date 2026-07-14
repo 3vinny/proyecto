@@ -3,7 +3,7 @@
 bool cargarMedia(Game *game)
 {
 //./data/hitbox.txt
-    game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg.png");
+    game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/xp.png");
     if (!game->texturaImg) {
         printf("Error iniciando textura: %s\n", IMG_GetError());
         return true;

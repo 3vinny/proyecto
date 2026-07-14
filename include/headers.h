@@ -32,14 +32,6 @@ typedef struct {
 
 // fondo: pendiente y unused
 typedef struct {
-    bool asfalto;
-    bool pasto;
-    int agua;
-    int casa;
-    
-    // posiciones para que se mueva en conjunto
-    int x_bg;
-    int y_bg;
 }Fondo;
 
 // --- JUGADOR/PERSONAJE ---
@@ -82,7 +74,8 @@ typedef struct {
     int lado;
     int velocidad;
     SDL_Rect rect;
-    bool activo; //objeto enemigo txt
+    bool activo;
+    //Personaje enemigo;
 } Enemigo;
 
 // --- TILES ---
@@ -121,7 +114,6 @@ typedef struct {
     Uint32 ultimo_pitido;
     Uint32 ultimo_tiempo_vozinha;
     char texto_cronometro[64];
-    int wText, hText;
     
     // subestructuras
     Pantalla pantalla;

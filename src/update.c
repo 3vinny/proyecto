@@ -5,7 +5,7 @@
 #define FRICCION 1000.0f
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
-#define POTENCIA_FRENO 2500.0f
+#define POTENCIA_FRENO 1000.0f
 #define LIMITE 0.0f
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect);
