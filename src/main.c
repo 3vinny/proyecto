@@ -22,8 +22,8 @@ int main(int argc, char **argv)
           .win_w = w_inicial,
           .win_h = h_inicial,
           .camara = { 0,0,w_inicial,h_inicial },
-          .nivel_w = 3200,
-          .nivel_h = 3200
+          .nivel_w = tile_cols*tam,
+          .nivel_h = tile_cols*tam
       },
       
       .jugador = {
@@ -64,6 +64,12 @@ int main(int argc, char **argv)
       game_Limpieza(&game, EXIT_FAILURE);
       exit(1);
    }
+   
+   SDL_RenderSetLogicalSize(game.pantalla.renderer, w_inicial/ZOOM, h_inicial/ZOOM);
+   game.pantalla.win_w = w_inicial / ZOOM;
+   game.pantalla.win_h = h_inicial / ZOOM;
+   game.pantalla.camara.w = w_inicial / ZOOM;
+   game.pantalla.camara.h = h_inicial / ZOOM;
    
    SDL_Delay(16);
 

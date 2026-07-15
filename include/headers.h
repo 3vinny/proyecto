@@ -91,11 +91,13 @@ typedef struct {
     char tipo; //- | 1 2 3 4
     
     bool enemigo1;
+    bool enemigo2;
     
     int casa; // c y C
     bool agua; // A
     bool obstaculo; // N
     bool neumatico; // o
+    bool semaforo; // S
 } Tile;
 
 // --- GAME GENERAL ---
@@ -109,6 +111,8 @@ typedef struct {
     Mix_Chunk *vozinha;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
+    SDL_Texture *texturaEnemigo;
+    SDL_Texture *texturaCaja;
     
     // texto, cronometro y bocina
     SDL_Texture *texturaTexto;

@@ -1,7 +1,8 @@
 #include "headers.h"
 
-int hText = 32;
+int hText = 16;
 int wText = 32;
+// estandar pixel art 32x32
 
 void game_Render(Game *game)
 {
@@ -9,7 +10,20 @@ void game_Render(Game *game)
     SDL_RenderClear(game->pantalla.renderer);
 
     // BACKGROUND
-    SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
+    SDL_Rect origen_pasto = { 224, 192, tam, tam };
+    int desfase_x = -(game->pantalla.camara.x % tam);
+    int desfase_y = -(game->pantalla.camara.y % tam);
+    
+    int x = 0, y = 0;
+    
+    for (y = desfase_y - tam; y < game->pantalla.win_h + tam; y = y+tam)
+    {
+        for (x = desfase_x - tam; x < game->pantalla.win_w + tam; x = x+tam)
+        {
+            SDL_Rect destino_pasto = { x, y, tam, tam };
+            SDL_RenderCopy(game->pantalla.renderer, game->texturaPista, &origen_pasto, &destino_pasto);
+        }
+    }
     
      // Tilemap dibuja pista desde la textura y sdlrect
     for (int i=0; i < tile_filas; i++)
@@ -27,43 +41,69 @@ void game_Render(Game *game)
             }; 
             
             // POSICIONES A RECORTAR:
-            int tam = 32; // estandar pixel art 32x32
+            
             SDL_Rect origen = { 0,0,tam,tam };
             switch(tipo) 
             {
                 case '1':
                     origen.x = 0; origen.y = 0; //(0,0) superior izq
                     break;
-                case '-':
-                    origen.x = tam; origen.y = 0; //(32,0) recta horiz 
-                    break;
-                case 'E':
-                    origen.x = tam; origen.y = 0;
-                    break;
-                case 'X':
-                    origen.x = tam; origen.y = 0; // objeto powerup : 'objeto2'
-                    break;
                 case '2':
-                    origen.x = 2*tam; origen.y = 0; //(128,0) superior derecha
+                    origen.x = 64; origen.y = 0; //(128,0) superior derecha
                     break;
+                case '3':
+                    origen.x = 0; origen.y = 64; // (0,128) inferior izq
+                    break;
+                case '4':
+                    origen.x = 64; origen.y = 64; // (128,128) inferior derecha
+                    break;
+                    
+                case '5':
+                    origen.x = 272; origen.y = 112;
+                    break;
+                case '6':
+                    origen.x = 336; origen.y = 112;
+                    break;
+                case '7':
+                    origen.x = 272; origen.y = 176;
+                    break;
+                case '8':
+                    origen.x = 336; origen.y = 176;
+                    break;
+    
+                case 'E':
+                    origen.x = 32; origen.y = 0; //(32,0) recta horiz 
+                    break;
+                case '-':
+                    origen.x = 32; origen.y = 0; //(32,0) recta horiz 
+                    break;
+                case '+':
+                    origen.x = 32; origen.y = 64;
+                    break;
+                case '=':
+                    origen.x = 304; origen.y = 112;
+                    break;
+               
                 case '|':
                     origen.x = 0; origen.y = tam; //recta vertical (0, 64)
                     break;
-                case '3':
-                    origen.x = 0; origen.y = 2*tam; // (0,128) inferior izq
+                case 'I':
+                    origen.x = 64; origen.y = tam;
                     break;
-                case '4':
-                    origen.x = 2*tam; origen.y = 2*tam; // (128,128) inferior derecha
+                case 'i':
+                    origen.x = 272; origen.y = 144;
                     break;
+                case 'l':
+                    origen.x = 64; origen.y = 32;
+                    break;
+               
                 case '#': //asfalto !!!
                     origen.x = 144; origen.y = 192; // 144, 192 COORDENADAS
                     break;
                 case 'P': // jugador
                     origen.x = tam; origen.y = 0;
                     break;
-                case '.': // pasto
-                    origen.x = 224; origen.y = 192;
-                    break;
+                    //case '.': break; //pasto
                 case 'C':
                     origen.x = 384; origen.y = 144;
                     break;
@@ -71,6 +111,12 @@ void game_Render(Game *game)
                     break;
                 case 'A':
                     origen.x = 384; origen.y = 112;
+                    break;
+                case 'M':
+                    origen.x = 384; origen.y = 208;
+                    break;
+                case 'X':
+                    origen.x = tam; origen.y = 0; // objeto powerup : 'objeto2'
                     break;
                 case 'N':
                     origen.x = 384; origen.y = 176;
@@ -98,26 +144,15 @@ void game_Render(Game *game)
    
     // TEXT
     SDL_QueryTexture(game->texturaTexto, NULL, NULL, &wText, &hText);
-    SDL_Rect textoRec = { 200, 10, wText, hText }; // posicion texto, ancho y alto
+    SDL_Rect textoRec = { 0, 0, wText/2, hText/2 }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
     render_Cronometro(game);
-
-    /* RECTANGULO (Colision)*/
     
-    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 255);
-    SDL_Rect Rectang_Colision = { 
-        game->jugador.x_colision - game->pantalla.camara.x, 
-        game->jugador.y_colision - game->pantalla.camara.y, 
-        game->jugador.w_colision, 
-        game->jugador.h_colision 
-    };
-    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Colision);
-    
-    // RECTANGULO (interactivo objeto2 txt) destruible
+    // RECTANGULO (interactivo objeto2 txt) destruible!!!!!!
     SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+    
     for (int i=0; i<tile_filas; i++) 
     {
         for (int j=0; j<tile_cols; j++)
@@ -130,13 +165,19 @@ void game_Render(Game *game)
                     game->tiles[i][j].w_tiles,
                     game->tiles[i][j].h_tiles
                 };
-                SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
+                if (game->texturaCaja != NULL)
+                {
+                    SDL_RenderCopy(game->pantalla.renderer, game->texturaCaja, NULL, &Rectang_Obj2); 
+                } else {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
+                }
             }
         }
     }
     
     // ENEMIGOs
-    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
+    //
     for (int i = 0; i < max_enemigos; i++)
     {
         if (game->enemigos[i].activo)
@@ -147,10 +188,16 @@ void game_Render(Game *game)
                 game->enemigos[i].lado,
                 game->enemigos[i].lado
             };
-            SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
+            
+            if (game->texturaEnemigo != NULL)
+            {
+                SDL_RenderCopyEx(game->pantalla.renderer, game->texturaEnemigo, NULL, &rect_enm, 90.0, NULL, SDL_FLIP_NONE);
+            } else {
+                SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
+                SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
+            }        
         }
     }
-    
     SDL_RenderPresent(game->pantalla.renderer);
 }
 
@@ -175,7 +222,7 @@ void render_Cronometro(Game *game)
     if (game->texturaTexto2 != NULL)
     {
         SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &wText, &hText);
-        SDL_Rect textoRec2 = { w_inicial - wText, h_inicial - hText, wText, hText };
+        SDL_Rect textoRec2 = { game->pantalla.win_w - wText, game->pantalla.win_h - hText, wText/2, hText/2 };
         SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto2, NULL, &textoRec2);
     }
 }

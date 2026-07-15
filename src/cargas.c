@@ -4,8 +4,8 @@
 void ajusta_Tiles(Game *game)
 {
     // tamaño tile pixeles = resolucion ventana / num tiles o filas
-    int tile_w_px = game->pantalla.win_w / tile_cols;
-    int tile_h_px = game->pantalla.win_h / tile_filas;
+    int tile_w_px = 32;
+    int tile_h_px = 32;
     int contador_enemigos = 0;
     
     for (int i=0; i<tile_filas;i++)
@@ -25,13 +25,13 @@ void ajusta_Tiles(Game *game)
             
             if (game->tiles[i][j].enemigo1 && contador_enemigos < max_enemigos)
             {
-                game->enemigos[i].x = j*tile_w_px;
-                game->enemigos[i].y = i*tile_h_px;
-                game->enemigos[i].lado = 32;
-                game->enemigos[i].velocidad = VELOCIDAD_ENEMIGO1;
-                game->enemigos[i].dir_x = 1;
-                game->enemigos[i].dir_y = 0;
-                game->enemigos[i].activo = true;
+                game->enemigos[contador_enemigos].x = j*tile_w_px;
+                game->enemigos[contador_enemigos].y = i*tile_h_px;
+                game->enemigos[contador_enemigos].lado = 32;
+                game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO1;
+                game->enemigos[contador_enemigos].dir_x = 1;
+                game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].activo = true;
                 contador_enemigos++;
             }
         }
@@ -67,7 +67,7 @@ void carga_Tiles(Game *game)
 
            game->tiles[i][j].activo = (linea[j] == '.' || linea[j] == 'N');
            game->tiles[i][j].activo_posJ = (linea[j] == 'P');
-           game->tiles[i][j].objeto2 = (linea[j] == 'X');
+           game->tiles[i][j].objeto2 = (linea[j] == 'X'); // caja
            
            if (linea[j] == 'E')
            {
@@ -85,6 +85,12 @@ void carga_Tiles(Game *game)
            } else if (linea[j] == 'c') 
            {
                //game->tiles[i][j].casa = 0;               
+           }
+           
+           if (linea[j]=='F')
+           {
+               printf("Peaton detectado\n");
+               game->tiles[i][j].enemigo2 = 1;
            }
        }
    }

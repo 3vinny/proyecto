@@ -1,4 +1,4 @@
-// archivo mas importante del proyecto. colisiones direccion y fisicas, etc
+// colisiones direccion y fisicas, etc
 #include "headers.h"
 
 #define ACELERACION 200.0f
@@ -8,14 +8,14 @@
 #define POTENCIA_FRENO 1000.0f
 #define LIMITE 0.0f
 
-int chequea_tiles(Game *game, SDL_Rect *player_rect);
+int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
 void construir_rects(Game *game);
 
 void game_Update(Game *game)
 {
-   int ancho_act = game->pantalla.win_w;
-   int alto_act = game->pantalla.win_h;
+   int ancho_act = game->pantalla.nivel_w;
+   int alto_act = game->pantalla.nivel_h;
    
    construir_rects(game);
 
@@ -139,7 +139,7 @@ void game_Update(Game *game)
    if (game->jugador.right == 1) 
    {
       temp1.x = (int)(game->jugador.x + paso);
-      if(!chequea_tiles(game, &temp1) && !chequea_enemigos(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) 
+      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) 
       {
          game->jugador.x += paso;
          game->jugador.colisionando = 0;
@@ -152,7 +152,7 @@ void game_Update(Game *game)
    } else if (game->jugador.left == 1) 
    {
       temp1.x = (int)(game->jugador.x - paso);
-      if(!chequea_tiles(game, &temp1) && !chequea_enemigos(game, &temp1) && temp1.x >= 0) 
+      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x >= 0) 
       {
           game->jugador.x -= paso;
           game->jugador.colisionando = 0;
@@ -170,7 +170,7 @@ void game_Update(Game *game)
    if (game->jugador.down == 1)
    {
       temp1.y = (int)(game->jugador.y + paso);
-      if(!chequea_tiles(game, &temp1) && !chequea_enemigos(game, &temp1) && temp1.y <= alto_act - game->jugador.lado) 
+      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y <= alto_act - game->jugador.lado) 
       {
          game->jugador.y += paso;
          game->jugador.colisionando = 0;
@@ -182,7 +182,7 @@ void game_Update(Game *game)
    } else if (game->jugador.up == 1)
    {
       temp1.y = (int)(game->jugador.y - paso);
-      if(!chequea_tiles(game, &temp1) && !chequea_enemigos(game, &temp1) && temp1.y >= 0) 
+      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y >= 0) 
       {
          game->jugador.y -= paso;
          game->jugador.colisionando = 0;
@@ -233,7 +233,7 @@ void game_Update(Game *game)
                 game->enemigos[i].lado
             };
             
-            if (chequea_tiles(game, &rect_enm) || SDL_HasIntersection (&rect_enm, &game->jugador.rect_colision) || rect_enm.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm.x <= 0)
+            if (chequea_tiles(game, &rect_enm, 1) || SDL_HasIntersection (&rect_enm, &game->jugador.rect_colision) || rect_enm.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm.x <= 0)
             {
                 game->enemigos[i].x -= game->enemigos[i].dir_x * paso_enm;
                 game->enemigos[i].dir_x *= -1;
@@ -259,7 +259,7 @@ void game_Update(Game *game)
    //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
 }
 
-int chequea_tiles(Game *game, SDL_Rect *player_rect)
+int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
 {
     // LO MISMO Q EN RENDER.C
     for (int i = 0; i < tile_filas; i++) 
@@ -282,42 +282,46 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
                 }
             }
             
-            if (game->tiles[i][j].casa)
+            if (!es_enemigo)
             {
-                SDL_Rect tempcasa = {
-                    .x = game->tiles[i][j].x_tiles,
-                    .y = game->tiles[i][j].y_tiles,
-                    .w = game->tiles[i][j].w_tiles,
-                    .h = game->tiles[i][j].h_tiles
-                };
-                
-                if (SDL_HasIntersection(player_rect, &tempcasa))
+                if (game->tiles[i][j].casa)
                 {
-                    printf("Intersectó la casa\n");
-                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                    SDL_Rect tempcasa = {
+                        .x = game->tiles[i][j].x_tiles,
+                        .y = game->tiles[i][j].y_tiles,
+                        .w = game->tiles[i][j].w_tiles,
+                        .h = game->tiles[i][j].h_tiles
+                    };
+                
+                    if (SDL_HasIntersection(player_rect, &tempcasa))
+                    {
+                        printf("Intersectó la casa\n");
+                        game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                    }
                 }
+                
+                if (game->tiles[i][j].agua)
+                {
+                
+                    SDL_Rect tempagua = {
+                        .x = game->tiles[i][j].x_tiles,
+                        .y = game->tiles[i][j].y_tiles,
+                        .w = game->tiles[i][j].w_tiles,
+                        .h = game->tiles[i][j].h_tiles
+                    };
+                
+                    if (SDL_HasIntersection(player_rect, &tempagua))
+                    {
+                        printf("Agua\n");
+                        game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                    }
+                }      
             }
             
-            if (game->tiles[i][j].agua)
-            {
-                
-                SDL_Rect tempagua = {
-                    .x = game->tiles[i][j].x_tiles,
-                    .y = game->tiles[i][j].y_tiles,
-                    .w = game->tiles[i][j].w_tiles,
-                    .h = game->tiles[i][j].h_tiles
-                };
-                
-                if (SDL_HasIntersection(player_rect, &tempagua))
-                {
-                    printf("Agua\n");
-                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
-                }
-            }
         }
     }
     
-    // RECTANGULO (interactivo objeto2 txt)
+    // RECTANGULO DESTRUIBLE !!!
     for (int i=0; i<tile_filas; i++)
     {
         for (int j=0; j<tile_cols; j++)
@@ -333,7 +337,14 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect)
                 
                 if (SDL_HasIntersection(player_rect, &temp5))
                 {
-                    game->tiles[i][j].objeto2 = false;
+                    if (es_enemigo) 
+                    {
+                        return 1;
+                    } else {
+                        game->tiles[i][j].objeto2 = false;
+                        game->jugador.velocidad_actual *= 0.5f;
+                        SDL_Log("caja destruida");
+                    }
                 }
             }
         }
