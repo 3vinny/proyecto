@@ -56,41 +56,60 @@ void carga_Tiles(Game *game)
    P: posicion jugador
    X: item destruible/powerup
    E: enemigo
-   C: casa | c: casa destruida */
+   C: casa | c: casa destruida 
+   M: mancha
+   A: agua
+   */
    for(int i=0; i<tile_filas; i++)
    {
        if (fgets(linea, sizeof(linea), archivo) == NULL) break;
        for (int j=0; j<(int)tile_cols; j++)
        {
+           
+           char linea_actual = linea[j];
            // copia caracter txt para el render despues
            game->tiles[i][j].tipo = linea[j];
 
-           game->tiles[i][j].activo = (linea[j] == '.' || linea[j] == 'N');
-           game->tiles[i][j].activo_posJ = (linea[j] == 'P');
-           game->tiles[i][j].objeto2 = (linea[j] == 'X'); // caja
+           game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N');
+           game->tiles[i][j].activo_posJ = (linea_actual == 'P');
+           game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
            
-           if (linea[j] == 'E')
-           {
-               game->tiles[i][j].enemigo1 = 1;
-           }
-           
-           if (linea[j] == 'A')
+           if (linea_actual == 'A')
            {
                game->tiles[i][j].agua = 1;
            }
 
-           if (linea[j]=='C')
+           if (linea_actual =='C')
            {
                game->tiles[i][j].casa = 1;
-           } else if (linea[j] == 'c') 
+           } else if (linea_actual == 'c') 
            {
-               //game->tiles[i][j].casa = 0;               
+               //game->tiles[i][j].casa = -1;               
            }
            
-           if (linea[j]=='F')
+           if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M')
            {
-               printf("Peaton detectado\n");
-               game->tiles[i][j].enemigo2 = 1;
+               if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
+               {
+                   game->tiles[i][j].tipo = '=';
+               }
+               else if (j>0 && (game->tiles[i-1][j].tipo == '|' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '2'))
+               {
+                   game->tiles[i][j].tipo = '|';
+               }
+               else if (j>0 && (game->tiles[i-1][j].tipo == '='))
+               {
+                   game->tiles[i][j].tipo = '+';
+               }
+               else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A')) {
+                   printf("Tipo %c\n", game->tiles[i][j].tipo);
+                   game->tiles[i][j].tipo = '-';
+               }
+               
+               if (linea_actual == 'E') game->tiles[i][j].enemigo1 = 1;
+               if (linea_actual == 'M') game->tiles[i][j].aceite = 1;
+           } else {
+               game->tiles[i][j].tipo = linea_actual;
            }
        }
    }

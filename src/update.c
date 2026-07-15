@@ -247,14 +247,13 @@ void game_Update(Game *game)
     }
     
    // cronometro
-   Uint32 tiempo_actual = SDL_GetTicks();
-   Uint32 transcurrido = tiempo_actual - game->tiempo_inicio;
+   int tiempo_actual = SDL_GetTicks();
+   int transcurrido = tiempo_actual - game->tiempo_inicio;
    
    int minutos = (transcurrido / 60000); // ms a min
    int segundos = (transcurrido / 1000)%60;
    int centesimas = (transcurrido % 1000)/10;
-   
-   // esto le pedi ayuda a la ia: esto formatea mi string (01:23:40) como en js
+   // esto formatea mi string (ejemplo 01:23:40) como en js
    // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
    //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
 }
@@ -282,10 +281,8 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 }
             }
             
-            if (!es_enemigo)
+            if (game->tiles[i][j].casa)
             {
-                if (game->tiles[i][j].casa)
-                {
                     SDL_Rect tempcasa = {
                         .x = game->tiles[i][j].x_tiles,
                         .y = game->tiles[i][j].y_tiles,
@@ -295,29 +292,46 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 
                     if (SDL_HasIntersection(player_rect, &tempcasa))
                     {
+                        if (es_enemigo) return 1;
                         printf("Intersectó la casa\n");
                         game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
                     }
-                }
-                
-                if (game->tiles[i][j].agua)
-                {
-                
-                    SDL_Rect tempagua = {
-                        .x = game->tiles[i][j].x_tiles,
-                        .y = game->tiles[i][j].y_tiles,
-                        .w = game->tiles[i][j].w_tiles,
-                        .h = game->tiles[i][j].h_tiles
-                    };
-                
-                    if (SDL_HasIntersection(player_rect, &tempagua))
-                    {
-                        printf("Agua\n");
-                        game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
-                    }
-                }      
             }
-            
+
+            if (game->tiles[i][j].agua)
+            {
+                
+                SDL_Rect tempagua = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                
+                if (SDL_HasIntersection(player_rect, &tempagua))
+                {
+                    if (es_enemigo) return 1;
+                    printf("Agua\n");
+                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                }
+            }
+            if (game->tiles[i][j].aceite)
+            {
+                SDL_Rect tempaceite = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                if (SDL_HasIntersection(player_rect, &tempaceite))
+                {
+                    if (es_enemigo) return 1;
+                    printf("Aceite\n");
+                    game->jugador.velocidad_actual = 0.95*(game->jugador.velocidad_actual);
+                    game->jugador.x -= 0.1;
+                    game->jugador.y -= 0.1;
+                }
+            }
         }
     }
     
@@ -360,6 +374,7 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
         {
             if (SDL_HasIntersection(player_rect, &game->enemigos[i].rect))
             {
+                printf("Colision player-enemigo N°%d\n", i);
                 return 1;
             }
         }

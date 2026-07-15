@@ -112,7 +112,13 @@ void game_Input(Game *game)
             case SDLK_RIGHT: case SDLK_d: 
                 game->jugador.right = 1; break;
             case SDLK_SPACE: 
-                game->jugador.freno = 1; break;
+                game->jugador.freno = 1; 
+                if (game->sirena1 != NULL)
+                {
+                    printf("pato\n");
+                    Mix_PlayChannel(-1, game->sirena1, 0);
+                }
+                break;
 
             case SDLK_h:
                 int tiempo_actual = SDL_GetTicks();

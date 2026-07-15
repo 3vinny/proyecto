@@ -93,11 +93,12 @@ typedef struct {
     bool enemigo1;
     bool enemigo2;
     
-    int casa; // c y C
+    int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
     bool obstaculo; // N
     bool neumatico; // o
     bool semaforo; // S
+    bool aceite; // M
 } Tile;
 
 // --- GAME GENERAL ---
@@ -109,10 +110,12 @@ typedef struct {
     SDL_GameController *mando;
     TTF_Font *fuente;
     Mix_Chunk *vozinha;
+    Mix_Chunk *sirena1;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     SDL_Texture *texturaEnemigo;
     SDL_Texture *texturaCaja;
+    SDL_Texture *texturaAceite;
     
     // texto, cronometro y bocina
     SDL_Texture *texturaTexto;

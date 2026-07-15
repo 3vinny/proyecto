@@ -71,9 +71,6 @@ void game_Render(Game *game)
                     origen.x = 336; origen.y = 176;
                     break;
     
-                case 'E':
-                    origen.x = 32; origen.y = 0; //(32,0) recta horiz 
-                    break;
                 case '-':
                     origen.x = 32; origen.y = 0; //(32,0) recta horiz 
                     break;
@@ -100,10 +97,6 @@ void game_Render(Game *game)
                 case '#': //asfalto !!!
                     origen.x = 144; origen.y = 192; // 144, 192 COORDENADAS
                     break;
-                case 'P': // jugador
-                    origen.x = tam; origen.y = 0;
-                    break;
-                    //case '.': break; //pasto
                 case 'C':
                     origen.x = 384; origen.y = 144;
                     break;
@@ -114,9 +107,6 @@ void game_Render(Game *game)
                     break;
                 case 'M':
                     origen.x = 384; origen.y = 208;
-                    break;
-                case 'X':
-                    origen.x = tam; origen.y = 0; // objeto powerup : 'objeto2'
                     break;
                 case 'N':
                     origen.x = 384; origen.y = 176;
@@ -171,6 +161,22 @@ void game_Render(Game *game)
                 } else {
                     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
                     SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
+                }
+            }
+            if (game->tiles[i][j].aceite)
+            {
+                SDL_Rect Rectang_Aceite = {
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                if (game->texturaAceite != NULL)
+                {
+                    SDL_RenderCopy(game->pantalla.renderer, game->texturaAceite, NULL, &Rectang_Aceite);
+                } else {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Aceite);
                 }
             }
         }

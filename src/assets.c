@@ -41,10 +41,19 @@ bool cargarMedia(Game *game)
         return true;
     }
     
+    game->texturaAceite = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/oil.png");
+    if (!game->texturaAceite) return true;
+    
     game->vozinha = Mix_LoadWAV("./assets/sfx/bocina2.wav");
     if(game->vozinha == NULL)
     {
         printf("error con bocina.wav : %s\n", Mix_GetError());
+    }
+
+    game->sirena1 = Mix_LoadWAV("./assets/sfx/sirena_pato.wav");
+    if(game->sirena1 == NULL)
+    {
+        printf("error con sirena1.wav : %s\n", Mix_GetError());
     }
     
     return false;

@@ -80,6 +80,8 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->texturaTexto2);
    SDL_DestroyTexture(game->texturaImg);
    SDL_DestroyTexture(game->texturaPista);
+   SDL_DestroyTexture(game->texturaCaja);
+   SDL_DestroyTexture(game->texturaEnemigo);
    SDL_DestroyTexture(game->jugador.textura);
    SDL_DestroyWindow(game->pantalla.ventana);
 
