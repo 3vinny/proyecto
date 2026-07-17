@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 /*---- Estructuras & funciones -------*/
 // --- Pantalla ---
@@ -28,11 +29,23 @@ typedef struct {
     
     int nivel_w;
     int nivel_h;
- }Pantalla;
+ } Pantalla;
+
+// -- Balas/proyectiles/armamento --
+typedef struct {
+    float x;
+    float y;
+    float angulo;
+    float dir_x;
+    float dir_y;
+    int lado;
+    int velocidad;
+    bool activo;
+} Proyectil;
 
 // fondo: pendiente y unused
 typedef struct {
-}Fondo;
+} Fondo;
 
 // --- JUGADOR/PERSONAJE ---
 typedef struct {
@@ -41,6 +54,7 @@ typedef struct {
     float x;
     float y;
     float angulo;
+    int hp;
     
     // fisicas auto
     int velocidad;
@@ -71,11 +85,16 @@ typedef struct {
 typedef struct {
     float x;
     float y;
-    int dir_x, dir_y;
+    float angulo;
+    float cooldown_disparo;
+    int dir_x;
+    int dir_y;
     int lado;
     int velocidad;
     SDL_Rect rect;
     bool activo;
+    bool perseguir;
+    bool sirena;
 } Enemigo;
 
 // --- TILES ---
@@ -90,8 +109,8 @@ typedef struct {
     bool objeto2; //X
     char tipo; //- | 1 2 3 4
     
-    bool enemigo1;
-    bool enemigo2;
+    bool enemigo1; // auto policia
+    bool enemigo2; // peaton
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
@@ -128,6 +147,7 @@ typedef struct {
     // subestructuras
     Pantalla pantalla;
     Personaje jugador;
+    Proyectil proyectiles[MAX_PROYECTILES];
     Tile tiles[tile_filas][tile_cols];
     Enemigo enemigos[max_enemigos];
 } Game;

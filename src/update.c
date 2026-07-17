@@ -6,217 +6,221 @@
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
 #define POTENCIA_FRENO 1000.0f
-#define LIMITE 0.0f
+#define LIMITE 1.0f
+
+int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
+float calcula_direccion(int dir_x_input, int dir_y_input);
 void construir_rects(Game *game);
 
 void game_Update(Game *game)
 {
-   int ancho_act = game->pantalla.nivel_w;
-   int alto_act = game->pantalla.nivel_h;
+    int ancho_act = game->pantalla.nivel_w;
+    int alto_act = game->pantalla.nivel_h;
+    int dir_x_input = 0;
+    int dir_y_input = 0;
    
-   construir_rects(game);
+    construir_rects(game);
 
-   SDL_Rect temp1 = game->jugador.rect;
-   SDL_Rect temp2 = game->jugador.rect_colision;
+    SDL_Rect temp1 = game->jugador.rect;
+    SDL_Rect temp2 = game->jugador.rect_colision;
    
    /* direccion solicitada x input
        0=nada 1=derecha/abajo -1=izq/arriba */
-   
-   int dir_x_input = 0, dir_y_input = 0;
-   if (game->jugador.right == 1)
-   {
-       dir_x_input = 1;
-   } else if (game->jugador.left == 1)
-   {
-       dir_x_input = -1;
-   }
-   
-   if (game->jugador.down == 1)
-   {
-       dir_y_input = 1;
-   } else if (game->jugador.up == 1)
-   {
-       dir_y_input = -1;
-   }
+    if (game->jugador.right == 1)
+    {
+        dir_x_input = 1;
+    } else if (game->jugador.left == 1)
+    {
+        dir_x_input = -1;
+    }
+    
+    if (game->jugador.down == 1)
+    {
+        dir_y_input = 1;
+    } else if (game->jugador.up == 1)
+    {
+        dir_y_input = -1;
+    }
    
    /*Movimiento y invertir sentido*/
    
-   bool movimiento = (dir_x_input != 0 || dir_y_input != 0);
-   int invirtiendo = 0;
-   
-   if (dir_x_input != 0 && game->jugador.dir_x != 0 && dir_x_input != game->jugador.dir_x) invirtiendo = 1;
-   if (dir_y_input != 0 && game->jugador.dir_y != 0 && dir_y_input != game->jugador.dir_y) invirtiendo = 1;
-   float paso;
+    bool movimiento = (dir_x_input != 0 || dir_y_input != 0);
+    int invirtiendo = 0;
+
+    if (dir_x_input != 0 && game->jugador.dir_x != 0 && dir_x_input != game->jugador.dir_x) invirtiendo = 1;
+    if (dir_y_input != 0 && game->jugador.dir_y != 0 && dir_y_input != game->jugador.dir_y) invirtiendo = 1;
+    float paso;
    
     /* usamos sistema d pasos con el auto ahora tenemos 3 casos:
-   0. freno 
-   1. cuando se mete reversa 
-   2. cuando ta en movimiento 
-   3. cuando no se presiona nada 
-   */
-   if (game->jugador.freno == 1) 
-   {
-       game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
-       if (game->jugador.velocidad_actual <= LIMITE) {
+    0. freno 
+    1. cuando se mete reversa 
+    2. cuando ta en movimiento 
+    3. cuando no se presiona nada 
+    */
+    if (game->jugador.freno == 1) 
+    {
+        game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
 
-           game->jugador.velocidad_actual = LIMITE;
-           game->jugador.dir_x = 0;
-           game->jugador.dir_y = 0;
-           game->jugador.tiempo_arranque = 0.0f;
-       }
-       paso = (game->delta_time) * (game->jugador.velocidad_actual);
+        if (game->jugador.velocidad_actual <= LIMITE) 
+        {
+            game->jugador.velocidad_actual = LIMITE;
+            game->jugador.dir_x = 0;
+            game->jugador.dir_y = 0;
+            game->jugador.tiempo_arranque = 0.0f;
+        }
+        paso = (game->delta_time) * (game->jugador.velocidad_actual);
        
-   } else if (invirtiendo) {
-       game->jugador.velocidad_actual -= FRICCION * game->delta_time;
-       if (game->jugador.velocidad_actual <= 0.0f)
-       {
-           // si ya freno resetea el delay y cambia direccion dir_x
-           game->jugador.velocidad_actual = 0.0f;   
-           game->jugador.dir_x = dir_x_input;
-           game->jugador.dir_y = dir_y_input;
-           game->jugador.tiempo_arranque = 0.0f;
-       }
-       paso = 0.0f;
+    } else if (invirtiendo) 
+    {
+        game->jugador.velocidad_actual -= FRICCION * game->delta_time;
+        if (game->jugador.velocidad_actual <= 0.0f)
+        {
+            // si ya freno resetea el delay y cambia direccion dir_x
+            game->jugador.velocidad_actual = 0.0f;   
+            game->jugador.dir_x = dir_x_input;
+            game->jugador.dir_y = dir_y_input;
+            game->jugador.tiempo_arranque = 0.0f;
+        }
+        paso = 0.0f;
        
-   } else if (movimiento) 
-   {
-       game->jugador.dir_x = dir_x_input;
-       game->jugador.dir_y = dir_y_input;
+    } else if (movimiento) 
+    {
+        game->jugador.dir_x = dir_x_input;
+        game->jugador.dir_y = dir_y_input;
+        
+        // ANGULOS: 0 45 90 135 180 225 270 315
+        if (dir_x_input == 0 && dir_y_input == -1) game->jugador.angulo = 0.0;
+        else if (dir_x_input == 1 && dir_y_input == -1) game->jugador.angulo = 45.0;
+        else if (dir_x_input == 1 && dir_y_input == 0) game->jugador.angulo = 90.0;
+        else if (dir_x_input == 1 && dir_y_input == 1) game->jugador.angulo = 135.0;
+        else if (dir_x_input == 0 && dir_y_input == 1) game->jugador.angulo = 180.0;
+        else if (dir_x_input == -1 && dir_y_input == 1) game->jugador.angulo = 225.0; 
+        else if (dir_x_input == -1 && dir_y_input == 0) game->jugador.angulo = 270.0;
+        else if (dir_x_input == -1 && dir_y_input == -1) game->jugador.angulo = 315.0;
        
-       // ANGULOS: 0 45 90 135 180 225 270 315
-       if (dir_x_input == 0 && dir_y_input == -1) game->jugador.angulo = 0.0;
-       else if (dir_x_input == 1 && dir_y_input == -1) game->jugador.angulo = 45.0;
-       else if (dir_x_input == 1 && dir_y_input == 0) game->jugador.angulo = 90.0;
-       else if (dir_x_input == 1 && dir_y_input == 1) game->jugador.angulo = 135.0;
-       else if (dir_x_input == 0 && dir_y_input == 1) game->jugador.angulo = 180.0;
-       else if (dir_x_input == -1 && dir_y_input == 1) game->jugador.angulo = 225.0; 
-       else if (dir_x_input == -1 && dir_y_input == 0) game->jugador.angulo = 270.0;
-       else if (dir_x_input == -1 && dir_y_input == -1) game->jugador.angulo = 315.0;
-       
-       // aceleracion
-       if (game->jugador.velocidad_actual <= 0.0f) 
-       {
-           game->jugador.tiempo_arranque += game->delta_time;
-           if (game->jugador.tiempo_arranque >= DELAY_ARRANQUE) 
-           {
-               game->jugador.velocidad_actual += ACELERACION * game->delta_time;
-           }
-       } else {
-           game->jugador.velocidad_actual += ACELERACION * game->delta_time;
-       }
-       
-       if (game->jugador.velocidad_actual > game->jugador.velocidad)
-       {
-           game->jugador.velocidad_actual = game->jugador.velocidad;
-       }
-       paso = (game->delta_time) * (game->jugador.velocidad_actual);
-       
-   } else {
-       game->jugador.velocidad_actual -= FRICCION * game->delta_time;
-       
-       if (game->jugador.velocidad_actual < 0.0f) game->jugador.velocidad_actual = 0.0f;
-       if (game->jugador.velocidad_actual == 0.0f)
-       {
-           game->jugador.dir_x = 0;
-           game->jugador.dir_y = 0;
-           game->jugador.tiempo_arranque = 0.0f;
-       }
-       paso = (game->delta_time) * (game->jugador.velocidad_actual);
-   }
+        // aceleracion
+        if (game->jugador.velocidad_actual <= 0.0f) 
+        {
+            game->jugador.tiempo_arranque += game->delta_time;
+            if (game->jugador.tiempo_arranque >= DELAY_ARRANQUE) 
+            {
+                game->jugador.velocidad_actual += ACELERACION * game->delta_time;
+            }
+        } else {
+            game->jugador.velocidad_actual += ACELERACION * game->delta_time;
+        }
+        
+        if (game->jugador.velocidad_actual > game->jugador.velocidad)
+        {
+            game->jugador.velocidad_actual = game->jugador.velocidad;
+        }
+        paso = (game->delta_time) * (game->jugador.velocidad_actual);
+        
+    } else {
+        game->jugador.velocidad_actual -= FRICCION * game->delta_time;
+        
+        if (game->jugador.velocidad_actual < 0.0f) game->jugador.velocidad_actual = 0.0f;
+        if (game->jugador.velocidad_actual == 0.0f)
+        {
+            game->jugador.dir_x = 0;
+            game->jugador.dir_y = 0;
+            game->jugador.tiempo_arranque = 0.0f;
+        }
+        paso = (game->delta_time) * (game->jugador.velocidad_actual);
+    }
    
-   // conversion flotante entero variables temporales
-   temp1.x = (int)game->jugador.x;
-   temp1.y = (int)game->jugador.y;
+    // conversion flotante entero variables temporales
+    temp1.x = (int)game->jugador.x;
+    temp1.y = (int)game->jugador.y;
    
-   /* gestion al presionar teclas: hitbox, velocidades, colisiones
-   casos en y, casos en x
-   CASOS X
-   */
+    /* gestion al presionar teclas: hitbox, velocidades, colisiones
+    casos en y, casos en x
+    CASOS X
+    */
+    if (game->jugador.right == 1) 
+    {
+        temp1.x = (int)(game->jugador.x + paso);
+        if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) 
+        {
+            game->jugador.x += paso;
+            game->jugador.colisionando = 0;
+        } else if (!game->jugador.colisionando) 
+        {
+            game->jugador.velocidad_actual *= REDUCE_COLISION;
+            game->jugador.colisionando = 1;
+        }
+        
+    } else if (game->jugador.left == 1) 
+    {
+        temp1.x = (int)(game->jugador.x - paso);
+        if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x >= 0) 
+        {
+            game->jugador.x -= paso;
+            game->jugador.colisionando = 0;
+        } else if (!game->jugador.colisionando) 
+        {
+            game->jugador.velocidad_actual *= REDUCE_COLISION;
+            game->jugador.colisionando = 1;
+        }
+    }
    
-   if (game->jugador.right == 1) 
-   {
-      temp1.x = (int)(game->jugador.x + paso);
-      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) 
-      {
-         game->jugador.x += paso;
-         game->jugador.colisionando = 0;
-      } else if (!game->jugador.colisionando) 
-      {
-          game->jugador.velocidad_actual *= REDUCE_COLISION;
-          game->jugador.colisionando = 1;
-      }
-      
-   } else if (game->jugador.left == 1) 
-   {
-      temp1.x = (int)(game->jugador.x - paso);
-      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x >= 0) 
-      {
-          game->jugador.x -= paso;
-          game->jugador.colisionando = 0;
-      } else if (!game->jugador.colisionando) 
-      {
-          game->jugador.velocidad_actual *= REDUCE_COLISION;
-          game->jugador.colisionando = 1;
-      }
-   }
+    // reinicio temp x
+    temp1.x = (int)game->jugador.x;
    
-   // reinicio temp x
-   temp1.x = (int)game->jugador.x;
+    // CASOS Y
+    if (game->jugador.down == 1)
+    {
+        temp1.y = (int)(game->jugador.y + paso);
+        if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y <= alto_act - game->jugador.lado) 
+        {
+            game->jugador.y += paso;
+            game->jugador.colisionando = 0;
+        } else if (!game->jugador.colisionando) 
+        {
+            game->jugador.velocidad_actual *= REDUCE_COLISION;
+            game->jugador.colisionando = 1;
+        }
+    } else if (game->jugador.up == 1)
+    {
+        temp1.y = (int)(game->jugador.y - paso);
+        if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y >= 0) 
+        {
+            game->jugador.y -= paso;
+            game->jugador.colisionando = 0;
+        } else if (!game->jugador.colisionando) 
+        {
+            game->jugador.velocidad_actual *= REDUCE_COLISION;
+            game->jugador.colisionando = 1;
+        }
+    }
    
-   // CASOS Y
-   if (game->jugador.down == 1)
-   {
-      temp1.y = (int)(game->jugador.y + paso);
-      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y <= alto_act - game->jugador.lado) 
-      {
-         game->jugador.y += paso;
-         game->jugador.colisionando = 0;
-      } else if (!game->jugador.colisionando) 
-      {
-          game->jugador.velocidad_actual *= REDUCE_COLISION;
-          game->jugador.colisionando = 1;
-      }
-   } else if (game->jugador.up == 1)
-   {
-      temp1.y = (int)(game->jugador.y - paso);
-      if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.y >= 0) 
-      {
-         game->jugador.y -= paso;
-         game->jugador.colisionando = 0;
-      } else if (!game->jugador.colisionando) 
-      {
-          game->jugador.velocidad_actual *= REDUCE_COLISION;
-          game->jugador.colisionando = 1;
-      }
-   }
+    if (game->jugador.up == 0 && game->jugador.down == 0 && game->jugador.left == 0 && game->jugador.right == 0)
+    {
+        game->jugador.x -= 0.05*(paso);
+        game->jugador.velocidad_actual *= 0.97f;
+    }
    
-   if (game->jugador.up == 0 && game->jugador.down == 0 && game->jugador.left == 0 && game->jugador.right == 0)
-   {
-       game->jugador.x -= 0.05*(paso);
-       game->jugador.velocidad_actual *= 0.97f;
-   }
-   
-   // - CAMARA
-   //          definiendo el centro
-   game->pantalla.camara.x = (int)game->jugador.x + (game->jugador.lado/2) - (game->pantalla.win_w/2);
-   game->pantalla.camara.y = (int)game->jugador.y + (game->jugador.lado/2) - (game->pantalla.win_h/2);
-   
-   //          centrando camara
-   if (game->pantalla.camara.x < 0) game->pantalla.camara.x = 0;
-   if (game->pantalla.camara.y < 0) game->pantalla.camara.y = 0;
-   
-   if (game->pantalla.camara.x > game->pantalla.nivel_w - game->pantalla.camara.w) 
-   {
-       game->pantalla.camara.x = game->pantalla.nivel_w - game->pantalla.camara.w;
-   }
-   
-   if (game->pantalla.camara.y > game->pantalla.nivel_h - game->pantalla.camara.h) 
-   {
-       game->pantalla.camara.y = game->pantalla.nivel_h - game->pantalla.camara.h;
-   }
+    // - CAMARA
+    //          definiendo el centro
+    game->pantalla.camara.x = (int)game->jugador.x + (game->jugador.lado/2) - (game->pantalla.win_w/2);
+    game->pantalla.camara.y = (int)game->jugador.y + (game->jugador.lado/2) - (game->pantalla.win_h/2);
+    
+    //          centrando camara
+    if (game->pantalla.camara.x < 0) game->pantalla.camara.x = 0;
+    if (game->pantalla.camara.y < 0) game->pantalla.camara.y = 0;
+    
+    if (game->pantalla.camara.x > game->pantalla.nivel_w - game->pantalla.camara.w) 
+    {
+        game->pantalla.camara.x = game->pantalla.nivel_w - game->pantalla.camara.w;
+    }
+    
+    if (game->pantalla.camara.y > game->pantalla.nivel_h - game->pantalla.camara.h) 
+    {
+        game->pantalla.camara.y = game->pantalla.nivel_h - game->pantalla.camara.h;
+    }
    
     //     Mecanica enemigossssssssss
     for (int i = 0; i < max_enemigos; i++)
@@ -225,37 +229,156 @@ void game_Update(Game *game)
         {
             float paso_enm = game->enemigos[i].velocidad * game->delta_time;
             
-            game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm;
-            SDL_Rect rect_enm = {
-                (int)game->enemigos[i].x,
-                (int)game->enemigos[i].y,
-                game->enemigos[i].lado,
-                game->enemigos[i].lado
-            };
-            
-            if (chequea_tiles(game, &rect_enm, 1) || SDL_HasIntersection (&rect_enm, &game->jugador.rect_colision) || rect_enm.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm.x <= 0)
+            if (!game->enemigos[i].perseguir)
             {
-                game->enemigos[i].x -= game->enemigos[i].dir_x * paso_enm;
-                game->enemigos[i].dir_x *= -1;
+                game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm; 
+                SDL_Rect rect_enm1 = {
+                    (int)(game->enemigos[i].x),
+                    (int)(game->enemigos[i].y),
+                    game->enemigos[i].lado,
+                    game->enemigos[i].lado
+                };
+                
+                if (chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0)
+                {
+                    game->enemigos[i].x -= game->enemigos[i].dir_x*(paso_enm);
+                    game->enemigos[i].dir_x *= -1;
+                }
+            } else 
+            {
+                float dx = game->jugador.x - game->enemigos[i].x;
+                float dy = game->jugador.y - game->enemigos[i].y;
+                float dist = sqrtf(dx*dx + dy*dy);
+                
+                if (game->enemigos[i].cooldown_disparo > 0.0f)
+                {
+                    game->enemigos[i].cooldown_disparo -= game->delta_time;
+                }
+
+                if (game->enemigos[i].cooldown_disparo <= 0.0f && dist > 0.0f)
+                {
+                    for (int p = 0; p<MAX_PROYECTILES; p++)
+                    {
+                        if(!game->proyectiles[p].activo)
+                        {
+                            game->proyectiles[p].activo = true;
+                            game->proyectiles[p].x = game->enemigos[i].x + (game->enemigos[i].lado/2.0f);
+                            game->proyectiles[p].y = game->enemigos[i].y + (game->enemigos[i].lado/2.0f);
+                        
+
+                            game->proyectiles[p].dir_x = dx/dist;
+                            game->proyectiles[p].dir_y = dy/dist;
+
+                            game->proyectiles[p].velocidad = VELOCIDAD_DISPARO;
+                            game->proyectiles[p].lado = 6;
+                            game->enemigos[i].cooldown_disparo = COOLDOWN_DISPARO;
+                            break; //necesario romper el ciclo para que no continue
+                        }
+                    }
+                }
+
+                if (dist > RADIO_EJ)
+                {
+                    float paso_x = (dx/dist) * paso_enm;
+                    float paso_y = (dy/dist) * paso_enm;
+                    
+                    SDL_Rect rect_enm2 = {
+                       (int)(game->enemigos[i].x + paso_x),
+                       (int)(game->enemigos[i].y),
+                       game->enemigos[i].lado,
+                       game->enemigos[i].lado
+                    };
+                    
+                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && rect_enm2.x >= 0 && rect_enm2.x <= game->pantalla.nivel_w - game->enemigos[i].lado)
+                    {
+                        game->enemigos[i].x += paso_x;
+                        if (paso_x >= 0)
+                        {
+                            game->enemigos[i].dir_x = 1;
+                        } else {
+                            game->enemigos[i].dir_x = -1;
+                        }
+                    }
+                    
+                    rect_enm2.x = (int)game->enemigos[i].x;
+                    rect_enm2.y = (int)(game->enemigos[i].y + paso_y);
+                    
+                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && rect_enm2.y >= 0 && rect_enm2.y <= game->pantalla.nivel_h - game->enemigos[i].lado)
+                    {
+                        game->enemigos[i].y += paso_y;
+                        if (paso_y >= 0)
+                        {
+                            game->enemigos[i].dir_x = 1;
+                        } else {
+                            game->enemigos[i].dir_x = -1;
+                        }
+                    }
+                }
+                
+                SDL_Rect rect_eactual = {
+                    (int)game->enemigos[i].x,
+                    (int)game->enemigos[i].y,
+                    game->enemigos[i].lado - margen,
+                    game->enemigos[i].lado - margen
+                };
+                
+                // otro ciclo
+                for (int k=0; k < max_enemigos; k++)
+                {
+                    if (k != i && game->enemigos[k].activo && SDL_HasIntersection(&rect_eactual, &game->enemigos[k].rect))
+                    {
+                        game->enemigos[i].perseguir = false;
+                        break;
+                    }
+                }
             }
             
             game->enemigos[i].rect.x = (int)game->enemigos[i].x;
             game->enemigos[i].rect.y = (int)game->enemigos[i].y;
             game->enemigos[i].rect.w = game->enemigos[i].lado;
             game->enemigos[i].rect.h = game->enemigos[i].lado;
+            game->enemigos[i].angulo = calcula_direccion(game->enemigos[i].dir_x, game->enemigos[i].dir_y);
         }
     }
     
-   // cronometro
-   int tiempo_actual = SDL_GetTicks();
-   int transcurrido = tiempo_actual - game->tiempo_inicio;
+    // cronometro
+    int tiempo_actual = SDL_GetTicks();
+    int transcurrido = tiempo_actual - game->tiempo_inicio;
    
-   int minutos = (transcurrido / 60000); // ms a min
-   int segundos = (transcurrido / 1000)%60;
-   int centesimas = (transcurrido % 1000)/10;
-   // esto formatea mi string (ejemplo 01:23:40) como en js
-   // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
-   //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+    int minutos = (transcurrido / 60000); // ms a min
+    int segundos = (transcurrido / 1000)%60;
+    int centesimas = (transcurrido % 1000)/10;
+    // esto formatea mi string (ejemplo 01:23:40) como en js
+    // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
+    //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+
+    // actualiza balas activas
+    for (int p=0; p<MAX_PROYECTILES; p++)
+    {
+        if(game->proyectiles[p].activo)
+        {
+            game->proyectiles[p].x += game->proyectiles[p].dir_x * game->proyectiles[p].velocidad * game->delta_time;
+            game->proyectiles[p].y += game->proyectiles[p].dir_y * game->proyectiles[p].velocidad * game->delta_time;
+
+            SDL_Rect rect_bala = {
+                .x = (int)game->proyectiles[p].x,
+                .y = (int)game->proyectiles[p].y,
+                .w = game->proyectiles[p].lado,
+                .h = game->proyectiles[p].lado
+            };
+
+            if (rect_bala.x < 0 || rect_bala.y < 0 || chequea_tiles(game, &rect_bala, 1))
+            {
+                game->proyectiles[p].activo = false;
+            } else if (SDL_HasIntersection(&rect_bala, &game->jugador.rect))
+            {
+                game->proyectiles[p].activo = false;
+                game->jugador.hp -= 1;
+                //game->jugador.velocidad_actual *= 0.8f; //reduce velocidad al impactar
+                printf("El jugador recibio disparo !! -1 de HP : \n--HP: %d --velocidad_actual: %.2f\n", game->jugador.hp, game->jugador.velocidad_actual);
+            }
+        }
+    }
 }
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
@@ -292,15 +415,12 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 
                     if (SDL_HasIntersection(player_rect, &tempcasa))
                     {
-                        if (es_enemigo) return 1;
-                        printf("Intersectó la casa\n");
-                        game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                        return 1;
                     }
             }
 
             if (game->tiles[i][j].agua)
             {
-                
                 SDL_Rect tempagua = {
                     .x = game->tiles[i][j].x_tiles,
                     .y = game->tiles[i][j].y_tiles,
@@ -308,28 +428,30 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     .h = game->tiles[i][j].h_tiles
                 };
                 
-                if (SDL_HasIntersection(player_rect, &tempagua))
+                if (!es_enemigo)
                 {
-                    if (es_enemigo) return 1;
-                    printf("Agua\n");
-                    game->jugador.velocidad_actual = 0.9*(game->jugador.velocidad_actual);
+                    if (SDL_HasIntersection(player_rect, &tempagua))
+                    {
+                        //if (es_enemigo) return 1;
+                        game->jugador.velocidad_actual = 2*VELOCIDAD_ENEMIGO1;
+                    }
                 }
             }
-            if (game->tiles[i][j].aceite)
+
+            if (!es_enemigo && game->tiles[i][j].aceite)
             {
                 SDL_Rect tempaceite = {
                     .x = game->tiles[i][j].x_tiles,
                     .y = game->tiles[i][j].y_tiles,
-                    .w = game->tiles[i][j].w_tiles,
-                    .h = game->tiles[i][j].h_tiles
+                    .w = game->tiles[i][j].w_tiles - 2*margen,
+                    .h = game->tiles[i][j].h_tiles - 2*margen
                 };
+
                 if (SDL_HasIntersection(player_rect, &tempaceite))
                 {
-                    if (es_enemigo) return 1;
-                    printf("Aceite\n");
-                    game->jugador.velocidad_actual = 0.95*(game->jugador.velocidad_actual);
-                    game->jugador.x -= 0.1;
-                    game->jugador.y -= 0.1;
+                    //printf("Aceite\n");
+                    game->jugador.velocidad_actual = 100.0f;
+                    game->jugador.x -= 0.2;
                 }
             }
         }
@@ -357,7 +479,8 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     } else {
                         game->tiles[i][j].objeto2 = false;
                         game->jugador.velocidad_actual *= 0.5f;
-                        SDL_Log("caja destruida");
+                        SDL_Log("caja destruida!");
+                        game->jugador.velocidad_actual *= 1.2f;
                     }
                 }
             }
@@ -372,10 +495,25 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
     {
         if (game->enemigos[i].activo)
         {
-            if (SDL_HasIntersection(player_rect, &game->enemigos[i].rect))
+            SDL_Rect hitbox_enemigo = {
+                game->enemigos[i].rect.x + margen,
+                game->enemigos[i].rect.y + margen,
+                game->enemigos[i].rect.w - (margen*2),
+                game->enemigos[i].rect.h - (margen*2)
+            };
+            
+            if (SDL_HasIntersection(player_rect, &hitbox_enemigo))
             {
-                printf("Colision player-enemigo N°%d\n", i);
-                return 1;
+                //printf("Colision player-enemigo N°%d\n", i);
+                if (!game->enemigos[i].perseguir)
+                {
+                    game->enemigos[i].perseguir = true;
+                    game->enemigos[i].sirena = true;
+                    printf("Patrulla N°%d Perseguira!!\n", i);
+                    game->enemigos[i].velocidad = 0.9*(game->jugador.velocidad);
+                    return 1;
+                }
+                
             }
         }
     }
@@ -396,4 +534,18 @@ void construir_rects(Game *game)
         .w = game->jugador.w_colision,
         .h = game->jugador.h_colision
     };
+}
+
+float calcula_direccion(int dir_x_input, int dir_y_input)
+{
+    if (dir_x_input == 0 && dir_y_input == -1) return 0.0f;
+    if (dir_x_input == 1 && dir_y_input == -1) return 45.0f;
+    if (dir_x_input == 1 && dir_y_input == 0) return 90.0f;
+    if (dir_x_input == 1 && dir_y_input == 1) return 135.0f;
+    if (dir_x_input == 0 && dir_y_input == 1) return 180.0f;
+    if (dir_x_input == -1 && dir_y_input == 1) return 225.0f; 
+    if (dir_x_input == -1 && dir_y_input == 0) return 270.0f;
+    if (dir_x_input == -1 && dir_y_input == -1) return 315.0f;
+    return 90.0f;  
+
 }

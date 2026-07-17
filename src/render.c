@@ -9,7 +9,7 @@ void game_Render(Game *game)
     SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
     SDL_RenderClear(game->pantalla.renderer);
 
-    // BACKGROUND
+    // BACKGROUND y desfase
     SDL_Rect origen_pasto = { 224, 192, tam, tam };
     int desfase_x = -(game->pantalla.camara.x % tam);
     int desfase_y = -(game->pantalla.camara.y % tam);
@@ -100,8 +100,6 @@ void game_Render(Game *game)
                 case 'C':
                     origen.x = 384; origen.y = 144;
                     break;
-                case 'c':
-                    break;
                 case 'A':
                     origen.x = 384; origen.y = 112;
                     break;
@@ -147,6 +145,7 @@ void game_Render(Game *game)
     {
         for (int j=0; j<tile_cols; j++)
         {
+            // caja
             if (game->tiles[i][j].objeto2)
             {
                 SDL_Rect Rectang_Obj2 = {
@@ -155,6 +154,7 @@ void game_Render(Game *game)
                     game->tiles[i][j].w_tiles,
                     game->tiles[i][j].h_tiles
                 };
+
                 if (game->texturaCaja != NULL)
                 {
                     SDL_RenderCopy(game->pantalla.renderer, game->texturaCaja, NULL, &Rectang_Obj2); 
@@ -163,6 +163,7 @@ void game_Render(Game *game)
                     SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
                 }
             }
+
             if (game->tiles[i][j].aceite)
             {
                 SDL_Rect Rectang_Aceite = {
@@ -182,8 +183,7 @@ void game_Render(Game *game)
         }
     }
     
-    // ENEMIGOs
-    //
+    // CICLO QUE DIBUJA ENEMIGOS
     for (int i = 0; i < max_enemigos; i++)
     {
         if (game->enemigos[i].activo)
@@ -197,11 +197,26 @@ void game_Render(Game *game)
             
             if (game->texturaEnemigo != NULL)
             {
-                SDL_RenderCopyEx(game->pantalla.renderer, game->texturaEnemigo, NULL, &rect_enm, 90.0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(game->pantalla.renderer, game->texturaEnemigo, NULL, &rect_enm, game->enemigos[i].angulo, NULL, SDL_FLIP_NONE);
             } else {
                 SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
                 SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
             }        
+        }
+    }
+    // DIBUJA PROYECTILES/BALAS
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 255, 0, 255);
+    for (int p=0; p<MAX_PROYECTILES; p++)
+    {
+        if (game->proyectiles[p].activo)
+        {
+            SDL_Rect rect_bala = {
+                (int)(game->proyectiles[p].x) - game->pantalla.camara.x,
+                (int)(game->proyectiles[p].y) - game->pantalla.camara.y,
+                game->proyectiles[p].lado,
+                game->proyectiles[p].lado
+            };
+            SDL_RenderFillRect(game->pantalla.renderer, &rect_bala);
         }
     }
     SDL_RenderPresent(game->pantalla.renderer);

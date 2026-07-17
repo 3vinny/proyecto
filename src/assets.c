@@ -2,7 +2,7 @@
 
 bool cargarMedia(Game *game)
 {
-//./data/hitbox.txt
+    //./data/hitbox.txt
     game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg.png");
     if (!game->texturaImg)
     {
@@ -42,7 +42,11 @@ bool cargarMedia(Game *game)
     }
     
     game->texturaAceite = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/oil.png");
-    if (!game->texturaAceite) return true;
+    if (!game->texturaAceite)
+    {
+        printf("Error al iniciar textura aceite: %s\n", IMG_GetError());
+        return true;
+    }
     
     game->vozinha = Mix_LoadWAV("./assets/sfx/bocina2.wav");
     if(game->vozinha == NULL)
@@ -55,6 +59,19 @@ bool cargarMedia(Game *game)
     {
         printf("error con sirena1.wav : %s\n", Mix_GetError());
     }
+    
+   /* for (int i=0; i<max_enemigos; i++)
+    {
+        if (game->enemigos[i].sirena == true)
+        {
+            if (game->sirena1 != NULL)
+            {
+                printf("pato\n");
+                Mix_PlayChannel(-1, game->sirena1, 0);
+            }
+            game->enemigos[i].sirena == false;
+        }
+    }*/
     
     return false;
 }

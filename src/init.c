@@ -10,21 +10,25 @@ bool SDL_Inicia(Game *game)
       return true;
    }
 
-   if(SDL_NumJoysticks() > 0){
+   if(SDL_NumJoysticks() > 0)
+   {
       game->mando = SDL_GameControllerOpen(0);
-      if (game->mando){
+      if (game->mando)
+      {
          printf("Mando 1 conectado: %s\n", SDL_GameControllerName(game->mando));
       }
    }
 
    int inicia_Imagen = IMG_Init(FLAGS_IMAGEN);
-   if ((inicia_Imagen & FLAGS_IMAGEN) != FLAGS_IMAGEN) {
+   if ((inicia_Imagen & FLAGS_IMAGEN) != FLAGS_IMAGEN)
+   {
       printf("Error iniciando imagen SDL: %s\n", IMG_GetError());
    }
 
    // carga ventana
    game->pantalla.ventana = SDL_CreateWindow(titulo, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w_inicial, h_inicial, 0);
-   if (!game->pantalla.ventana) {
+   if (!game->pantalla.ventana)
+   {
       printf("Error al crear ventana: %s\n", SDL_GetError());
       return true;
    }
@@ -34,13 +38,15 @@ bool SDL_Inicia(Game *game)
 
    // carga render
    game->pantalla.renderer = SDL_CreateRenderer(game->pantalla.ventana, -1, 0);
-   if (!game->pantalla.renderer) {
+   if (!game->pantalla.renderer)
+   {
       printf("Error al crear renderer: %s\n", SDL_GetError());
       return true;
    }
 
    // Inicia ttf
-   if (TTF_Init() == -1){
+   if (TTF_Init() == -1)
+   {
       printf("Error al cargar TTF: %s\n", TTF_GetError());
       return true;
    }
@@ -55,18 +61,21 @@ bool SDL_Inicia(Game *game)
    }
    
    // carga audio
-   if((Mix_Init(FLAGS_AUDIO) & FLAGS_AUDIO) != FLAGS_AUDIO) {
+   if((Mix_Init(FLAGS_AUDIO) & FLAGS_AUDIO) != FLAGS_AUDIO)
+   {
        printf("Error al iniciar SDL_MIXER mp3:%s", SDL_GetError());
        return true;
    }
    
-   if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+   if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+   {
        printf("Error al abrir dispositivo audio mp3: %s", SDL_GetError());
        return true;
    }
    
    game->vozinha = Mix_LoadWAV("./assets/sfx/bocina2.wav");
-   if (game->vozinha == NULL) {
+   if (game->vozinha == NULL)
+   {
        printf("Error cargando sonido vozinha.wav: %s", Mix_GetError());
    }
 

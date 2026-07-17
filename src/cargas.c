@@ -40,79 +40,79 @@ void ajusta_Tiles(Game *game)
 
 void carga_Tiles(Game *game)
 {
-   FILE *archivo = fopen("./data/hitbox.txt", "r");
-   if (!archivo){
-      printf("Error: No se pudo abrir el archivo -> %s\n", "./data/hitbox.txt");
-      return;
-   }
+    char linea[256]; // arreglo grande
+    FILE *archivo = fopen("./data/hitbox.txt", "r");
+    if (!archivo){
+        printf("Error: No se pudo abrir el archivo -> %s\n", "./data/hitbox.txt");
+        return;
+    }
+    
+    if (game->pantalla.win_w == 0) game->pantalla.win_w = w_inicial;
+    if (game->pantalla.win_h == 0) game->pantalla.win_h = h_inicial;
 
-   char linea[256]; // arreglo grande
-   
-   if (game->pantalla.win_w == 0) game->pantalla.win_w = w_inicial;
-   if (game->pantalla.win_h == 0) game->pantalla.win_h = h_inicial;
+/*booleanos:
+.(textura) y #: cuadrado colision
+P: posicion jugador
+X: item destruible/powerup
+E: enemigo
+C: casa | c: casa destruida 
+M: mancha
+A: agua
+*/
+    for(int i=0; i<tile_filas; i++)
+    {
+        if (fgets(linea, sizeof(linea), archivo) == NULL) break;
+        for (int j=0; j<(int)tile_cols; j++)
+        {
+        
+            char linea_actual = linea[j];
+            // copia caracter txt para el render despues
+            game->tiles[i][j].tipo = linea[j];
 
-   /*booleanos:
-   .(textura) y #: cuadrado colision
-   P: posicion jugador
-   X: item destruible/powerup
-   E: enemigo
-   C: casa | c: casa destruida 
-   M: mancha
-   A: agua
-   */
-   for(int i=0; i<tile_filas; i++)
-   {
-       if (fgets(linea, sizeof(linea), archivo) == NULL) break;
-       for (int j=0; j<(int)tile_cols; j++)
-       {
-           
-           char linea_actual = linea[j];
-           // copia caracter txt para el render despues
-           game->tiles[i][j].tipo = linea[j];
+            game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N');
+            game->tiles[i][j].activo_posJ = (linea_actual == 'P');
+            game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
+        
+            if (linea_actual == 'A')
+            {
+                game->tiles[i][j].agua = true;
+            }
 
-           game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N');
-           game->tiles[i][j].activo_posJ = (linea_actual == 'P');
-           game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
-           
-           if (linea_actual == 'A')
-           {
-               game->tiles[i][j].agua = 1;
-           }
-
-           if (linea_actual =='C')
-           {
-               game->tiles[i][j].casa = 1;
-           } else if (linea_actual == 'c') 
-           {
-               //game->tiles[i][j].casa = -1;               
-           }
-           
-           if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M')
-           {
-               if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
-               {
-                   game->tiles[i][j].tipo = '=';
-               }
-               else if (j>0 && (game->tiles[i-1][j].tipo == '|' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '2'))
-               {
-                   game->tiles[i][j].tipo = '|';
-               }
-               else if (j>0 && (game->tiles[i-1][j].tipo == '='))
-               {
-                   game->tiles[i][j].tipo = '+';
-               }
-               else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A')) {
-                   printf("Tipo %c\n", game->tiles[i][j].tipo);
-                   game->tiles[i][j].tipo = '-';
-               }
-               
-               if (linea_actual == 'E') game->tiles[i][j].enemigo1 = 1;
-               if (linea_actual == 'M') game->tiles[i][j].aceite = 1;
-           } else {
-               game->tiles[i][j].tipo = linea_actual;
-           }
-       }
-   }
-   fclose(archivo);
-   ajusta_Tiles(game);
+            if (linea_actual =='C')
+            {
+                game->tiles[i][j].casa = true;
+            } else if (linea_actual == 'c') 
+            {
+                //game->tiles[i][j].casa = -1;               
+            }
+        
+            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M')
+            {
+                if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
+                {
+                    game->tiles[i][j].tipo = '=';
+                }
+                else if (j>0 && (game->tiles[i-1][j].tipo == '|' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '2'))
+                {
+                    game->tiles[i][j].tipo = '|';
+                }
+                else if (j>0 && (game->tiles[i-1][j].tipo == '='))
+                {
+                    game->tiles[i][j].tipo = '+';
+                }
+                else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A')) 
+                {
+                    printf("Tipo %c\n", game->tiles[i][j].tipo);
+                    game->tiles[i][j].tipo = '-';
+                }
+            
+                if (linea_actual == 'E') game->tiles[i][j].enemigo1 = true;
+                if (linea_actual == 'M') game->tiles[i][j].aceite = true;
+            } else {
+                game->tiles[i][j].tipo = linea_actual;
+            }
+        }
+    }
+    fclose(archivo);
+    ajusta_Tiles(game);
 }
