@@ -432,7 +432,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 {
                     if (SDL_HasIntersection(player_rect, &tempagua))
                     {
-                        //if (es_enemigo) return 1;
+                        if (!es_enemigo) return 1;
                         game->jugador.velocidad_actual = 2*VELOCIDAD_ENEMIGO1;
                     }
                 }

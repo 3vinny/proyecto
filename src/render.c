@@ -109,6 +109,9 @@ void game_Render(Game *game)
                 case 'N':
                     origen.x = 384; origen.y = 176;
                     break;
+                case 'T':
+                    origen.x = 336; origen.y = 208;
+                    break;
                 default: // si no es ninguno el booleano se cambia
                     dibuja_pista = false;
                     break;

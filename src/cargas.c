@@ -69,7 +69,7 @@ A: agua
             // copia caracter txt para el render despues
             game->tiles[i][j].tipo = linea[j];
 
-            game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N');
+            game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N' || linea_actual == 'T');
             game->tiles[i][j].activo_posJ = (linea_actual == 'P');
             game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
         
