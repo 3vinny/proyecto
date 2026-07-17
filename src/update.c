@@ -264,7 +264,6 @@ void game_Update(Game *game)
                             game->proyectiles[p].activo = true;
                             game->proyectiles[p].x = game->enemigos[i].x + (game->enemigos[i].lado/2.0f);
                             game->proyectiles[p].y = game->enemigos[i].y + (game->enemigos[i].lado/2.0f);
-                        
 
                             game->proyectiles[p].dir_x = dx/dist;
                             game->proyectiles[p].dir_y = dy/dist;
@@ -481,6 +480,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         game->jugador.velocidad_actual *= 0.5f;
                         SDL_Log("caja destruida!");
                         game->jugador.velocidad_actual *= 1.2f;
+                        game->jugador.hp += 1;
                     }
                 }
             }

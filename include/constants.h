@@ -19,6 +19,7 @@
 
 // -- jugador --
 #define HP_INICIAL 100
+#define HP_MAX 120
 
 // -- enemigos --
 #define max_enemigos 10
