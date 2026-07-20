@@ -31,7 +31,8 @@
 #define MAX_PROYECTILES 50
 #define VELOCIDAD_DISPARO 350.0f
 #define COOLDOWN_DISPARO 2.0f
-#define RADIO_EJ 100.0f 
+#define RADIO_EJ 100.0f
+#define RADIO_PERDIDO 500.0f
 
 
 #endif

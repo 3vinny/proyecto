@@ -12,6 +12,7 @@ int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
+int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
 float calcula_direccion(int dir_x_input, int dir_y_input);
 void construir_rects(Game *game);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
@@ -204,7 +205,7 @@ void game_Update(Game *game)
         game->pantalla.camara.y = game->pantalla.nivel_h - game->pantalla.camara.h;
     }
    
-    // Mecanica enemigossssssssss
+    //         Mecanica de los  enemigos
     for (int i = 0; i < max_enemigos; i++) {
         if (game->enemigos[i].activo) {
             float paso_enm = game->enemigos[i].velocidad * game->delta_time;
@@ -228,28 +229,34 @@ void game_Update(Game *game)
                 float dy = game->jugador.y - game->enemigos[i].y;
                 float dist = sqrtf(dx*dx + dy*dy);
                 
-                if (game->enemigos[i].cooldown_disparo > 0.0f) {
+                if (dist > RADIO_PERDIDO) {
+                    game->enemigos[i].perseguir = false;
+                    game->enemigos[i].sirena = false;  
+                } else {
+                    if (game->enemigos[i].cooldown_disparo > 0.0f) {
                     game->enemigos[i].cooldown_disparo -= game->delta_time;
-                }
-
-                if (game->enemigos[i].cooldown_disparo <= 0.0f && dist > 0.0f) {
+                    }
+    
+                    if (game->enemigos[i].cooldown_disparo <= 0.0f && dist > 0.0f) {
                     for (int p = 0; p<MAX_PROYECTILES; p++) {
                         if(!game->enemigos[i].proyectiles[p].activo) {
                             game->enemigos[i].proyectiles[p].activo = true;
                             game->enemigos[i].proyectiles[p].x = game->enemigos[i].x + (game->enemigos[i].lado/2.0f);
                             game->enemigos[i].proyectiles[p].y = game->enemigos[i].y + (game->enemigos[i].lado/2.0f);
-
+    
                             game->enemigos[i].proyectiles[p].dir_x = dx/dist;
                             game->enemigos[i].proyectiles[p].dir_y = dy/dist;
-
+    
                             game->enemigos[i].proyectiles[p].velocidad = VELOCIDAD_DISPARO;
                             game->enemigos[i].proyectiles[p].lado = 6;
                             game->enemigos[i].cooldown_disparo = COOLDOWN_DISPARO;
-                            game->enemigos[i].proyectiles[i].sonido = true;
+                            game->enemigos[i].proyectiles[p].sonido = true;
                             break; //necesario romper el ciclo para que no continue
                         }
                     }
                 }
+            }
+                
 
                 if (dist > RADIO_EJ) {
                     float paso_x = (dx/dist) * paso_enm;
@@ -262,7 +269,7 @@ void game_Update(Game *game)
                        game->enemigos[i].lado
                     };
                     
-                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && rect_enm2.x >= 0 && rect_enm2.x <= game->pantalla.nivel_w - game->enemigos[i].lado)
+                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && !chequea_entre_enemigos(game, &rect_enm2, i) && rect_enm2.x >= 0 && rect_enm2.x <= game->pantalla.nivel_w - game->enemigos[i].lado)
                     {
                         game->enemigos[i].x += paso_x;
                         if (paso_x >= 0) {
@@ -275,7 +282,7 @@ void game_Update(Game *game)
                     rect_enm2.x = (int)game->enemigos[i].x;
                     rect_enm2.y = (int)(game->enemigos[i].y + paso_y);
                     
-                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && rect_enm2.y >= 0 && rect_enm2.y <= game->pantalla.nivel_h - game->enemigos[i].lado)
+                    if (!chequea_tiles(game, &rect_enm2, 1) && !SDL_HasIntersection(&rect_enm2, &game->jugador.rect) && !chequea_entre_enemigos(game, &rect_enm2, i) && rect_enm2.y >= 0 && rect_enm2.y <= game->pantalla.nivel_h - game->enemigos[i].lado)
                     {
                         game->enemigos[i].y += paso_y;
                         if (paso_y >= 0) {
@@ -292,20 +299,6 @@ void game_Update(Game *game)
                     game->enemigos[i].lado - margen,
                     game->enemigos[i].lado - margen
                 };
-                
-                // otro ciclo
-                for (int k=0; k < max_enemigos; k++) {
-                    if (SDL_HasIntersection(&rect_eactual, &game->enemigos[k].rect))
-                    {
-                        game->enemigos[i].perseguir = false;
-                    }
-                    
-                    if (k != i && game->enemigos[k].activo)
-                    {
-                        game->enemigos[i].perseguir = false;
-                        break;
-                    }
-                }
             }
             
             game->enemigos[i].rect.x = (int)game->enemigos[i].x;
@@ -489,6 +482,20 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
                     return 1;
                 }
             }
+        }
+    }
+    return 0;
+}
+
+int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo)
+{
+    for (int i=0; i<max_enemigos; i++)
+    {
+        if (i == numero_enemigo || !game->enemigos[i].activo) continue;
+        
+        if (SDL_HasIntersection(rect, &game->enemigos[i].rect))
+        {
+            return 1;
         }
     }
     return 0;
