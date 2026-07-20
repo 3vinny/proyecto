@@ -41,6 +41,8 @@ typedef struct {
     int lado;
     int velocidad;
     bool activo;
+    bool es_enemigo;
+    bool sonido;
 } Proyectil;
 
 // fondo: pendiente y unused
@@ -79,6 +81,10 @@ typedef struct {
     int h_colision;
     SDL_Rect rect;
     SDL_Rect rect_colision;
+    Proyectil proyectiles[MAX_PROYECTILES];
+    // arreglo balas personaje
+    // colocar cantidad almacena cantidad de balas
+    // poner otro objeto que recargue
 } Personaje;
 
 // --- ENEMIGOS ---
@@ -95,6 +101,8 @@ typedef struct {
     bool activo;
     bool perseguir;
     bool sirena;
+    Proyectil proyectiles[MAX_PROYECTILES];
+    //colocar arreglo de balas aqui
 } Enemigo;
 
 // --- TILES ---
@@ -147,7 +155,6 @@ typedef struct {
     // subestructuras
     Pantalla pantalla;
     Personaje jugador;
-    Proyectil proyectiles[MAX_PROYECTILES];
     Tile tiles[tile_filas][tile_cols];
     Enemigo enemigos[max_enemigos];
 } Game;

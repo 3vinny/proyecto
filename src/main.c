@@ -58,9 +58,19 @@ int main(int argc, char **argv)
       }
    };
 
+   // inicializando proyectiles jugador
    for (int i=0; i < MAX_PROYECTILES; i++)
    {
-      game.proyectiles[i].activo = false;
+      game.jugador.proyectiles[i].activo = false;
+   }
+   
+   // inicia proyectiles cada enemigo
+   for (int i=0; i < max_enemigos; i++)
+   {
+       for (int j=0; j < MAX_PROYECTILES; j++)
+       {
+           game.enemigos[i].proyectiles[j].activo = false;
+       }
    }
 
    fprintf(stderr, "----Inicializando SDL----\n");

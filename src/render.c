@@ -103,6 +103,9 @@ void game_Render(Game *game)
                 case 'A':
                     origen.x = 384; origen.y = 112;
                     break;
+                case 'a':
+                    origen.x = 384; origen.y = 112;
+                    break;
                 case 'M':
                     origen.x = 384; origen.y = 208;
                     break;
@@ -207,21 +210,35 @@ void game_Render(Game *game)
             }        
         }
     }
-    // DIBUJA PROYECTILES/BALAS
+    
+    // DIBUJA PROYECTILES/BALAS DEL ENEMIGO
     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 255, 0, 255);
-    for (int p=0; p<MAX_PROYECTILES; p++)
-    {
-        if (game->proyectiles[p].activo)
-        {
+    for (int i=0; i<max_enemigos; i++) {
+        for (int p=0; p<MAX_PROYECTILES; p++) {
+            if (game->enemigos[i].proyectiles[p].activo) {
+                SDL_Rect rect_bala = {
+                    (int)(game->enemigos[i].proyectiles[p].x) - game->pantalla.camara.x,
+                    (int)(game->enemigos[i].proyectiles[p].y) - game->pantalla.camara.y,
+                    game->enemigos[i].proyectiles[p].lado,
+                    game->enemigos[i].proyectiles[p].lado
+                };
+                SDL_RenderFillRect(game->pantalla.renderer, &rect_bala);
+            }
+        } 
+    }
+    
+    // balas del jugador
+    for(int p=0; p<MAX_PROYECTILES; p++) {
+        if(game->jugador.proyectiles[p].activo) {
             SDL_Rect rect_bala = {
-                (int)(game->proyectiles[p].x) - game->pantalla.camara.x,
-                (int)(game->proyectiles[p].y) - game->pantalla.camara.y,
-                game->proyectiles[p].lado,
-                game->proyectiles[p].lado
+                (int)(game->jugador.proyectiles[p].x) - game->pantalla.camara.x,
+                (int)(game->jugador.proyectiles[p].y) - game->pantalla.camara.y,
+                game->jugador.proyectiles[p].lado,
+                game->jugador.proyectiles[p].lado
             };
-            SDL_RenderFillRect(game->pantalla.renderer, &rect_bala);
         }
     }
+    
     SDL_RenderPresent(game->pantalla.renderer);
 }
 

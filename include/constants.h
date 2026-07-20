@@ -20,15 +20,18 @@
 // -- jugador --
 #define HP_INICIAL 100
 #define HP_MAX 120
+#define MAX_JUGADORES 2
 
 // -- enemigos --
 #define max_enemigos 10
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
+
+// enemigo-jugador
 #define MAX_PROYECTILES 50
 #define VELOCIDAD_DISPARO 350.0f
 #define COOLDOWN_DISPARO 2.0f
 #define RADIO_EJ 100.0f 
-// radio enemigo-jugador
+
 
 #endif
