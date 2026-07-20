@@ -2,7 +2,7 @@
 .xmake/
 build/
 linux/
-linux/game
+./linux/game
 
 # sprites sin utilizar
 assets/sprites/unused
