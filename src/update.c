@@ -11,7 +11,7 @@
 int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
-int enemigos_escapan(Game *game, SDL_Rect *player_rect, int num_enemigo);
+int enemigos_escapan(Game *game, int numero_enemigo);
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
 float calcula_direccion(int dir_x_input, int dir_y_input);
@@ -211,6 +211,7 @@ void game_Update(Game *game)
         if (game->enemigos[i].activo) {
             float paso_enm = game->enemigos[i].velocidad * game->delta_time;
             
+            // si no esta en persecucion la comprobamos
             if (!game->enemigos[i].perseguir) {
                 game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm; 
                 SDL_Rect rect_enm1 = {
@@ -220,6 +221,11 @@ void game_Update(Game *game)
                     game->enemigos[i].lado
                 };
                 
+                // si esta en el agua llamamos la funcion
+                if (enemigos_escapan(game, i)) {
+                continue;
+                }
+
                 if (chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0)
                 {
                     game->enemigos[i].x -= game->enemigos[i].dir_x*(paso_enm);
@@ -419,11 +425,6 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     if (SDL_HasIntersection(player_rect, &tempagua)) {
                         if (!es_enemigo) return 1;
                     }
-                } else {
-                    if (SDL_HasIntersection(player_rect, &tempagua)) {
-                        // que se escape del agua
-                        enemigos_escapan(game, player_rect, 1);
-                    }
                 }
             }
 
@@ -507,12 +508,64 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
     return 0;
 }
 
-int enemigos_escapan(Game *game, SDL_Rect *player_rect, int num_enemigo)
+int enemigos_escapan(Game *game, int numero_enemigo)
 {
-    for (int i=0; i<max_enemigos; i++)
-    {
-        
+    // game->enemigos[numero_enemigo].OBJETO
+    SDL_Rect rect_enemigo = {
+        (int)game->enemigos[numero_enemigo].x,
+        (int)game->enemigos[numero_enemigo].y,
+        (int)game->enemigos[numero_enemigo].lado,
+        (int)game->enemigos[numero_enemigo].lado
+    };
+    
+    for (int i=0; i<tile_filas; i++) {
+        for (int j=0; j<tile_cols; j++) {
+            if (!game->tiles[i][j].agua) continue;
+            // rect temporal ubicacion agua
+            SDL_Rect temp_agua = {
+                .x = game->tiles[i][j].x_tiles,
+                .y = game->tiles[i][j].y_tiles,
+                .w = game->tiles[i][j].w_tiles,
+                .h = game->tiles[i][j].h_tiles
+            };
+            
+            if (!SDL_HasIntersection(&rect_enemigo, &temp_agua)) continue;
+            SDL_Rect rprueba = rect_enemigo;
+            
+            // caso derecha >
+            rprueba.x += game->enemigos[numero_enemigo].lado;
+            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+                game->enemigos[numero_enemigo].dir_x = 1;
+                game->enemigos[numero_enemigo].dir_y = 0;
+            }
+            // caso izquierda <
+            rprueba.x -= game->enemigos[numero_enemigo].lado;
+            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+                game->enemigos[numero_enemigo].dir_x = -1;
+                game->enemigos[numero_enemigo].dir_y = 0;
+            }
+
+            // caso arriba ^
+            rprueba.y -= game->enemigos[numero_enemigo].lado;
+            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+                game->enemigos[numero_enemigo].dir_x = 0;
+                game->enemigos[numero_enemigo].dir_y = -1;
+            }
+            // caso abajo
+            rprueba.y += game->enemigos[numero_enemigo].lado;
+            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+                game->enemigos[numero_enemigo].dir_x = 0;
+                game->enemigos[numero_enemigo].dir_y = 1;
+            }
+
+            float paso_enm = game->enemigos[numero_enemigo].velocidad * game->delta_time;
+            game->enemigos[numero_enemigo].x += game->enemigos[numero_enemigo].dir_x * paso_enm;
+            game->enemigos[numero_enemigo].y += game->enemigos[numero_enemigo].dir_y * paso_enm;
+            
+            return 1; // funcion entero
+        }
     }
+    return 0;
 }
 
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo)
