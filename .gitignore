@@ -6,6 +6,8 @@ linux/
 
 # sprites sin utilizar
 assets/sprites/unused
+/unused
+assets/sfx/unused
 
 # MacOS Cache
 .DS_Store

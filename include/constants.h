@@ -18,14 +18,15 @@
 #define PI 3.1415926535
 
 // -- jugador --
-#define HP_INICIAL 100
-#define HP_MAX 120
+#define HP_INICIAL 10
+#define HP_MAX 20
 #define MAX_JUGADORES 2
 
 // -- enemigos --
 #define max_enemigos 10
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
+#define HP_ENEMIGOS 10
 
 // enemigo-jugador
 #define MAX_PROYECTILES 50

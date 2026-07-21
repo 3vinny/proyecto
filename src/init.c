@@ -95,6 +95,8 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyWindow(game->pantalla.ventana);
 
    Mix_FreeChunk(game->vozinha);
+   Mix_FreeChunk(game->sirena1);
+   Mix_FreeChunk(game->bala);
    Mix_CloseAudio();
    
    Mix_Quit();

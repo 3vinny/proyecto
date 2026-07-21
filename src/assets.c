@@ -48,7 +48,7 @@ bool cargarMedia(Game *game)
         return true;
     }
     
-    game->vozinha = Mix_LoadWAV("./assets/sfx/bocina2.wav");
+    game->vozinha = Mix_LoadWAV("./assets/sfx/bocina3.wav");
     if(game->vozinha == NULL)
     {
         printf("error con bocina.wav : %s\n", Mix_GetError());
@@ -60,18 +60,11 @@ bool cargarMedia(Game *game)
         printf("error con sirena1.wav : %s\n", Mix_GetError());
     }
     
-   /* for (int i=0; i<max_enemigos; i++)
+    game->bala = Mix_LoadWAV("./assets/sfx/disparo_1.wav");
+    if (game->bala == NULL)
     {
-        if (game->enemigos[i].sirena == true)
-        {
-            if (game->sirena1 != NULL)
-            {
-                printf("pato\n");
-                Mix_PlayChannel(-1, game->sirena1, 0);
-            }
-            game->enemigos[i].sirena == false;
-        }
-    }*/
+        printf("error con disparo_1.wav : %s\n", Mix_GetError());
+    }
     
     return false;
 }

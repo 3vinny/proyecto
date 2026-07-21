@@ -45,9 +45,9 @@ typedef struct {
     bool sonido;
 } Proyectil;
 
-// fondo: pendiente y unused
+// fondo & interfaz: pendiente y unused
 typedef struct {
-} Fondo;
+} Interfaz;
 
 // --- JUGADOR/PERSONAJE ---
 typedef struct {
@@ -138,6 +138,7 @@ typedef struct {
     TTF_Font *fuente;
     Mix_Chunk *vozinha;
     Mix_Chunk *sirena1;
+    Mix_Chunk *bala;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     SDL_Texture *texturaEnemigo;

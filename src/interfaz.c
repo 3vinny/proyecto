@@ -21,4 +21,7 @@ void interfaz_Inicia(Game *game)
         game->texturaTexto2 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto2);
         SDL_FreeSurface(surfaceTexto2);
     }*/
+    
+    // HP, Velocidad
+    //SDL_Surface *surfaceTexto3 = TTF_RenderText_Solid(game->fuente, "HP: xx", colorTexto);
 }

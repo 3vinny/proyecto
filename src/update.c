@@ -11,6 +11,7 @@
 int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
+int enemigos_escapan(Game *game, SDL_Rect *player_rect, int num_enemigo);
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
 float calcula_direccion(int dir_x_input, int dir_y_input);
@@ -251,6 +252,11 @@ void game_Update(Game *game)
                             game->enemigos[i].proyectiles[p].lado = 6;
                             game->enemigos[i].cooldown_disparo = COOLDOWN_DISPARO;
                             game->enemigos[i].proyectiles[p].sonido = true;
+                            if (game->bala != NULL && dist < RADIO_PERDIDO) {
+                                printf("Sonido bala!\n");
+                                Mix_PlayChannel(-1, game->bala, 0);
+                            }
+                            
                             break; //necesario romper el ciclo para que no continue
                         }
                     }
@@ -412,7 +418,11 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 if (!es_enemigo) {
                     if (SDL_HasIntersection(player_rect, &tempagua)) {
                         if (!es_enemigo) return 1;
-                        game->jugador.velocidad_actual = 2*VELOCIDAD_ENEMIGO1;
+                    }
+                } else {
+                    if (SDL_HasIntersection(player_rect, &tempagua)) {
+                        // que se escape del agua
+                        enemigos_escapan(game, player_rect, 1);
                     }
                 }
             }
@@ -479,12 +489,30 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
                     game->enemigos[i].sirena = true;
                     printf("Patrulla N°%d Perseguira!!\n", i);
                     game->enemigos[i].velocidad = 0.95*(game->jugador.velocidad);
+                    if (game->enemigos[i].sirena == true && game->enemigos[i].perseguir == true) {
+                        if (game->sirena1 != NULL) {
+                            printf("pato\n");
+                            Mix_PlayChannel(-1, game->sirena1, 0);
+                            break;
+                        }
+                        game->enemigos[i].sirena == false;
+                    }
                     return 1;
                 }
+                
+                
             }
         }
     }
     return 0;
+}
+
+int enemigos_escapan(Game *game, SDL_Rect *player_rect, int num_enemigo)
+{
+    for (int i=0; i<max_enemigos; i++)
+    {
+        
+    }
 }
 
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo)

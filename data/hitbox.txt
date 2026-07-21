@@ -3,8 +3,8 @@
 ...1-----------------------------------2...|7===8I
 ...|5==P=M==E==============M===========I...3+++++4
 ..T|i++++++++++++++++++X+++++++++++6iiiIT.........
-.N.|IN....TC.T.CAAAAAAAAACCCCCC12C.3iiiI.T....1--2
-...|IN...T.C...CAAAAAAAAAC1-2CC34CC.|iiIT.T...|56I
+.N.|IN....TC.T.CAAAAAAAAACCCCCCCCC.3iiiI.T....1--2
+...|IN...T.C...CAAAAAAAAAC1-2CC..CC.|iiIT.T...|56I
 .N.|I...T..C...CAAAAAAAAAC3+4CCCCC..|iiI.T....3++4
 .N.|IT.T.T.CTCTCAAAAAAAAACCCCC.T.T..|iiITT........
 ..M|7-------------M----------2CCCCCC3iii2.T.......
