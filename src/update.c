@@ -11,11 +11,13 @@
 int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
-int enemigos_escapan(Game *game, int numero_enemigo);
+void construir_rects(Game *game);
+
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
+int enemigos_escapan(Game *game, int numero_enemigo);
+int esta_en_agua(Game *game, SDL_Rect *rect);
 float calcula_direccion(int dir_x_input, int dir_y_input);
-void construir_rects(Game *game);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 
 void game_Update(Game *game)
@@ -213,23 +215,33 @@ void game_Update(Game *game)
             
             // si no esta en persecucion la comprobamos
             if (!game->enemigos[i].perseguir) {
-                game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm; 
+                // si esta en el agua llamamos la funcion y esta llama a estaenagua
+                if (esta_en_agua(game, &game->enemigos[i].rect)) {
+                    if(!game->enemigos[i].escapando) {
+                        enemigos_escapan(game, i);
+                        game->enemigos[i].escapando = 1;
+                    }
+                } else {
+                    game->enemigos[i].escapando = 0;
+                }
+
+                game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm;
+                game->enemigos[i].y += game->enemigos[i].dir_y * paso_enm;
+
                 SDL_Rect rect_enm1 = {
                     (int)(game->enemigos[i].x),
                     (int)(game->enemigos[i].y),
                     game->enemigos[i].lado,
                     game->enemigos[i].lado
                 };
-                
-                // si esta en el agua llamamos la funcion
-                if (enemigos_escapan(game, i)) {
-                continue;
-                }
 
                 if (chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0)
                 {
                     game->enemigos[i].x -= game->enemigos[i].dir_x*(paso_enm);
+                    game->enemigos[i].y -= game->enemigos[i].dir_y*(paso_enm);
+
                     game->enemigos[i].dir_x *= -1;
+                    game->enemigos[i].dir_y *= -1;
                 }
             } else {
                 float dx = game->jugador.x - game->enemigos[i].x;
@@ -245,31 +257,30 @@ void game_Update(Game *game)
                     }
     
                     if (game->enemigos[i].cooldown_disparo <= 0.0f && dist > 0.0f) {
-                    for (int p = 0; p<MAX_PROYECTILES; p++) {
-                        if(!game->enemigos[i].proyectiles[p].activo) {
-                            game->enemigos[i].proyectiles[p].activo = true;
-                            game->enemigos[i].proyectiles[p].x = game->enemigos[i].x + (game->enemigos[i].lado/2.0f);
-                            game->enemigos[i].proyectiles[p].y = game->enemigos[i].y + (game->enemigos[i].lado/2.0f);
-    
-                            game->enemigos[i].proyectiles[p].dir_x = dx/dist;
-                            game->enemigos[i].proyectiles[p].dir_y = dy/dist;
-    
-                            game->enemigos[i].proyectiles[p].velocidad = VELOCIDAD_DISPARO;
-                            game->enemigos[i].proyectiles[p].lado = 6;
-                            game->enemigos[i].cooldown_disparo = COOLDOWN_DISPARO;
-                            game->enemigos[i].proyectiles[p].sonido = true;
-                            if (game->bala != NULL && dist < RADIO_PERDIDO) {
-                                printf("Sonido bala!\n");
-                                Mix_PlayChannel(-1, game->bala, 0);
+                        for (int p = 0; p<MAX_PROYECTILES; p++) {
+                            if(!game->enemigos[i].proyectiles[p].activo) {
+                                game->enemigos[i].proyectiles[p].activo = true;
+                                game->enemigos[i].proyectiles[p].x = game->enemigos[i].x + (game->enemigos[i].lado/2.0f);
+                                game->enemigos[i].proyectiles[p].y = game->enemigos[i].y + (game->enemigos[i].lado/2.0f);
+        
+                                game->enemigos[i].proyectiles[p].dir_x = dx/dist;
+                                game->enemigos[i].proyectiles[p].dir_y = dy/dist;
+        
+                                game->enemigos[i].proyectiles[p].velocidad = VELOCIDAD_DISPARO;
+                                game->enemigos[i].proyectiles[p].lado = 6;
+                                game->enemigos[i].cooldown_disparo = COOLDOWN_DISPARO;
+                                game->enemigos[i].proyectiles[p].sonido = true;
+                                if (game->bala != NULL && dist < RADIO_PERDIDO) {
+                                    printf("Sonido bala!\n");
+                                    Mix_PlayChannel(-1, game->bala, 0);
+                                }
+                                
+                                break; //necesario romper el ciclo para que no continue
                             }
-                            
-                            break; //necesario romper el ciclo para que no continue
-                        }
+                        }       
                     }
-                }
-            }
+                }   
                 
-
                 if (dist > RADIO_EJ) {
                     float paso_x = (dx/dist) * paso_enm;
                     float paso_y = (dy/dist) * paso_enm;
@@ -475,7 +486,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
 int chequea_enemigos(Game *game, SDL_Rect *player_rect)
 {
     for (int i = 0; i < max_enemigos; i++) {
-        if (game->enemigos[i].activo) {
+        if (game->enemigos[i].activo && !game->enemigos[i].es_camion) {
             SDL_Rect hitbox_enemigo = {
                 game->enemigos[i].rect.x + margen,
                 game->enemigos[i].rect.y + margen,
@@ -530,39 +541,72 @@ int enemigos_escapan(Game *game, int numero_enemigo)
             };
             
             if (!SDL_HasIntersection(&rect_enemigo, &temp_agua)) continue;
-            SDL_Rect rprueba = rect_enemigo;
-            
+
+            SDL_Rect rprueba; // rect vacio
+            printf("enemigo %d buscando escapatoria. Tamano lado enemigo: %d\n", numero_enemigo, game->enemigos[numero_enemigo].lado);
+            printf("Dir: %d %d\n", game->enemigos[numero_enemigo].dir_x, game->enemigos[numero_enemigo].dir_y);
+
             // caso derecha >
+            rprueba = rect_enemigo;
             rprueba.x += game->enemigos[numero_enemigo].lado;
-            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+            if (!esta_en_agua(game, &rprueba)) {
                 game->enemigos[numero_enemigo].dir_x = 1;
                 game->enemigos[numero_enemigo].dir_y = 0;
+                printf("Derecha\n");
+                return 1;
             }
+
             // caso izquierda <
+            rprueba = rect_enemigo;
             rprueba.x -= game->enemigos[numero_enemigo].lado;
-            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+            if (!esta_en_agua(game, &rprueba)) {
                 game->enemigos[numero_enemigo].dir_x = -1;
                 game->enemigos[numero_enemigo].dir_y = 0;
+                printf("Izquierda\n");
+                return 1;
             }
-
-            // caso arriba ^
-            rprueba.y -= game->enemigos[numero_enemigo].lado;
-            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
-                game->enemigos[numero_enemigo].dir_x = 0;
-                game->enemigos[numero_enemigo].dir_y = -1;
-            }
+            
             // caso abajo
+            rprueba = rect_enemigo;
             rprueba.y += game->enemigos[numero_enemigo].lado;
-            if (!SDL_HasIntersection(&rprueba, &temp_agua)) {
+            if (!esta_en_agua(game, &rprueba)) {
                 game->enemigos[numero_enemigo].dir_x = 0;
                 game->enemigos[numero_enemigo].dir_y = 1;
+                printf("Abajo\n");
+                return 1;
             }
 
-            float paso_enm = game->enemigos[numero_enemigo].velocidad * game->delta_time;
-            game->enemigos[numero_enemigo].x += game->enemigos[numero_enemigo].dir_x * paso_enm;
-            game->enemigos[numero_enemigo].y += game->enemigos[numero_enemigo].dir_y * paso_enm;
+            // caso arriba
+            rprueba = rect_enemigo;
+            rprueba.y -= game->enemigos[numero_enemigo].lado;
+            if (!esta_en_agua(game, &rprueba)) {
+                game->enemigos[numero_enemigo].dir_x = 0;
+                game->enemigos[numero_enemigo].dir_y = -1;
+                printf("Arriba\n");
+                return 1;
+            }
+            printf("Posicion(x,y): %.2f %.2f\n", game->enemigos[numero_enemigo].x, game->enemigos[numero_enemigo].y);
             
             return 1; // funcion entero
+        }
+    }
+    return 0;
+}
+
+int esta_en_agua(Game *game, SDL_Rect *rect)
+{
+    for (int i=0; i<tile_filas; i++) {
+        for (int j=0; j<tile_cols; j++) {
+            if (game->tiles[i][j].agua) {
+                SDL_Rect agua = {
+                    game->tiles[i][j].x_tiles,
+                    game->tiles[i][j].y_tiles,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                
+                if (SDL_HasIntersection(rect, &agua)) return 1;
+            }
         }
     }
     return 0;

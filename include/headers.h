@@ -100,7 +100,10 @@ typedef struct {
     SDL_Rect rect;
     bool activo;
     bool perseguir;
+    bool escapando;
     bool sirena;
+    bool es_camion;
+    //bool es_peaton;
     Proyectil proyectiles[MAX_PROYECTILES];
     //colocar arreglo de balas aqui
 } Enemigo;
@@ -119,6 +122,7 @@ typedef struct {
     
     bool enemigo1; // auto policia
     bool enemigo2; // peaton
+    bool enemigo3; // camion gas
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
@@ -142,6 +146,7 @@ typedef struct {
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     SDL_Texture *texturaEnemigo;
+    SDL_Texture *texturaEnemigo3;
     SDL_Texture *texturaCaja;
     SDL_Texture *texturaAceite;
     

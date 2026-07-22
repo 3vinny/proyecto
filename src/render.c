@@ -100,6 +100,9 @@ void game_Render(Game *game)
                 case 'C':
                     origen.x = 384; origen.y = 144;
                     break;
+                case 'c':
+                    origen.x = 272; origen.y = 208;
+                    break;
                 case 'A':
                     origen.x = 384; origen.y = 112;
                     break;
@@ -127,15 +130,6 @@ void game_Render(Game *game)
         }
     }
 
-    // RECTANGULO DEL JUGADOR !!! acaaa
-    SDL_Rect Rectang = { 
-        (int)game->jugador.x - game->pantalla.camara.x, 
-        (int)game->jugador.y - game->pantalla.camara.y, 
-        game->jugador.lado, 
-        game->jugador.lado 
-    };
-    SDL_RenderCopyEx(game->pantalla.renderer, game->jugador.textura, NULL, &Rectang, game->jugador.angulo, NULL, SDL_FLIP_NONE);
-   
     // TEXT
     SDL_QueryTexture(game->texturaTexto, NULL, NULL, &wText, &hText);
     SDL_Rect textoRec = { 0, 0, wText/2, hText/2 }; // posicion texto, ancho y alto
@@ -200,10 +194,16 @@ void game_Render(Game *game)
                 game->enemigos[i].lado,
                 game->enemigos[i].lado
             };
-            
-            if (game->texturaEnemigo != NULL)
+
+            // si no entra al if devuelve patrulla (default)
+            SDL_Texture *textura_enemigo = game->texturaEnemigo;
+            if (game->enemigos[i].es_camion == true) {
+                textura_enemigo = game->texturaEnemigo3;
+            }
+
+            if (textura_enemigo != NULL)
             {
-                SDL_RenderCopyEx(game->pantalla.renderer, game->texturaEnemigo, NULL, &rect_enm, game->enemigos[i].angulo, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(game->pantalla.renderer, textura_enemigo, NULL, &rect_enm, game->enemigos[i].angulo, NULL, SDL_FLIP_NONE);
             } else {
                 SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
                 SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
@@ -226,7 +226,16 @@ void game_Render(Game *game)
             }
         } 
     }
-    
+
+    // RECTANGULO DEL JUGADOR !!! acaaa
+    SDL_Rect Rectang = { 
+        (int)game->jugador.x - game->pantalla.camara.x, 
+        (int)game->jugador.y - game->pantalla.camara.y, 
+        game->jugador.lado, 
+        game->jugador.lado 
+    };
+    SDL_RenderCopyEx(game->pantalla.renderer, game->jugador.textura, NULL, &Rectang, game->jugador.angulo, NULL, SDL_FLIP_NONE);
+   
     // balas del jugador
     for(int p=0; p<MAX_PROYECTILES; p++) {
         if(game->jugador.proyectiles[p].activo) {

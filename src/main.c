@@ -23,7 +23,7 @@ int main(int argc, char **argv)
          .win_h = h_inicial,
          .camara = { 0,0,w_inicial,h_inicial },
          .nivel_w = tile_cols*tam,
-         .nivel_h = tile_cols*tam
+         .nivel_h = tile_filas*tam
       },
       
       .jugador = {

@@ -11,8 +11,10 @@
 #define h_inicial 900
 
 // -- tiles: valores de referencia & geometria --
-#define tile_cols 50
-#define tile_filas 30
+// 50x30 -> 60x40
+#define tile_cols 60
+#define tile_filas 40
+#define LIMITE_LINEA 256
 #define tam 32
 #define ZOOM 2
 #define PI 3.1415926535
@@ -27,6 +29,7 @@
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
 #define HP_ENEMIGOS 10
+#define VELOCIDAD_ENEMIGO3 40.0f
 
 // enemigo-jugador
 #define MAX_PROYECTILES 50

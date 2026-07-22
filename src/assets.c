@@ -33,6 +33,13 @@ bool cargarMedia(Game *game)
         printf("Error al iniciar textura enemigo(s): %s\n", IMG_GetError());
         return true;
     }
+
+    game->texturaEnemigo3 = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/c_gas.png");
+    if (!game->texturaEnemigo3)
+    {
+        printf("Error al iniciar textura enemigo gas: %s\n", IMG_GetError());
+        return true;
+    }
     
     game->texturaCaja = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/box.png");
     if (!game->texturaCaja)

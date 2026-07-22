@@ -34,13 +34,26 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].activo = true;
                 contador_enemigos++;
             }
+            // enemigo camion
+            if (game->tiles[i][j].enemigo3 && contador_enemigos < max_enemigos)
+            {
+                game->enemigos[contador_enemigos].x = j*tile_w_px;
+                game->enemigos[contador_enemigos].y = i*tile_h_px;
+                game->enemigos[contador_enemigos].lado = 32;
+                game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO1;
+                game->enemigos[contador_enemigos].dir_x = 1;
+                game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].activo = true;
+                contador_enemigos++;
+            }
+
         }
     }
 }
 
 void carga_Tiles(Game *game)
 {
-    char linea[256]; // arreglo grande
+    char linea[LIMITE_LINEA]; // arreglo grande
     FILE *archivo = fopen("./data/hitbox.txt", "r");
     if (!archivo){
         printf("Error: No se pudo abrir el archivo -> %s\n", "./data/hitbox.txt");
@@ -86,7 +99,7 @@ A: agua
                 //game->tiles[i][j].casa = -1;               
             }
         
-            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M')
+            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M' || linea_actual == 'G')
             {
                 if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
                 {
@@ -102,12 +115,12 @@ A: agua
                 }
                 else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A')) 
                 {
-                    printf("Tipo %c\n", game->tiles[i][j].tipo);
                     game->tiles[i][j].tipo = '-';
                 }
             
                 if (linea_actual == 'E') game->tiles[i][j].enemigo1 = true;
                 if (linea_actual == 'M') game->tiles[i][j].aceite = true;
+                if (linea_actual == 'G') game->tiles[i][j].enemigo3 = true;
             } else {
                 game->tiles[i][j].tipo = linea_actual;
             }
