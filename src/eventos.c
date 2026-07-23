@@ -118,6 +118,10 @@ void game_Input(Game *game)
                     game->jugador.freno = 1;
                     break;
 
+                case SDLK_j:
+                    game->jugador.disparo = 1;
+                    break;
+
                 case SDLK_h:
                     int tiempo_actual = SDL_GetTicks();
                     int cooldown = 200;
@@ -160,6 +164,10 @@ void game_Input(Game *game)
                 case SDLK_RIGHT: case SDLK_d: game->jugador.right = 0; break;
                 case SDLK_SPACE: game->jugador.freno = 0; break;
                 case SDLK_h: game->jugador.bocina = 0; break;
+                case SDLK_j:
+                    game->jugador.disparo = 0;
+                    break;
+                    
                 default:
                     break;
             }

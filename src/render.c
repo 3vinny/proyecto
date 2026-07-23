@@ -131,12 +131,15 @@ void game_Render(Game *game)
     }
 
     // TEXT
-    SDL_QueryTexture(game->texturaTexto, NULL, NULL, &wText, &hText);
+    SDL_QueryTexture(game->interfaz.texturaTexto, NULL, NULL, &wText, &hText);
     SDL_Rect textoRec = { 0, 0, wText/2, hText/2 }; // posicion texto, ancho y alto
-    SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto, NULL, &textoRec);
+    SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto, NULL, &textoRec);
 
     // TEXTO 2
-    render_Cronometro(game);
+    //render_Cronometro(game);
+
+    // TEXTO 3
+    render_hp(game);
     
     // RECTANGULO (interactivo objeto2 txt) destruible!!!!!!
     SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
@@ -172,8 +175,8 @@ void game_Render(Game *game)
                     game->tiles[i][j].w_tiles,
                     game->tiles[i][j].h_tiles
                 };
-                if (game->texturaAceite != NULL)
-                {
+
+                if (game->texturaAceite != NULL) {
                     SDL_RenderCopy(game->pantalla.renderer, game->texturaAceite, NULL, &Rectang_Aceite);
                 } else {
                     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
@@ -227,6 +230,20 @@ void game_Render(Game *game)
         } 
     }
 
+    // DIBUJA PROYECTILES/BALAS DEL JUGADOR
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 255, 0, 255);
+    for (int p=0; p<MAX_PROYECTILES; p++) {
+        if (game->jugador.proyectiles[p].activo) {
+            SDL_Rect rect_bala_jug = {
+                (int)(game->jugador.proyectiles[p].x) - game->pantalla.camara.x,
+                (int)(game->jugador.proyectiles[p].y) - game->pantalla.camara.y,
+                game->jugador.proyectiles[p].lado,
+                game->jugador.proyectiles[p].lado
+            };
+            SDL_RenderFillRect(game->pantalla.renderer, &rect_bala_jug);
+        }
+    }
+
     // RECTANGULO DEL JUGADOR !!! acaaa
     SDL_Rect Rectang = { 
         (int)game->jugador.x - game->pantalla.camara.x, 
@@ -254,25 +271,49 @@ void game_Render(Game *game)
 void render_Cronometro(Game *game)
 {
     // PREVIENE FUGAS DE MEMORIA (ya paso :v)
-    if (game->texturaTexto2 != NULL) 
+    if (game->interfaz.texturaTexto2 != NULL) 
     {
-        SDL_DestroyTexture(game->texturaTexto2);
-        game->texturaTexto2 = NULL;
+        SDL_DestroyTexture(game->interfaz.texturaTexto2);
+        game->interfaz.texturaTexto2 = NULL;
     }
     
     SDL_Color colorBlanco = {255,255,255,155}; //rgb y transparencia
-    SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->texto_cronometro, colorBlanco);
+    SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_cronometro, colorBlanco);
     
     if (surfaceTemporal != NULL)
     {
-        game->texturaTexto2 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
+        game->interfaz.texturaTexto2 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
         SDL_FreeSurface(surfaceTemporal);
     }
     
-    if (game->texturaTexto2 != NULL)
+    if (game->interfaz.texturaTexto2 != NULL)
     {
-        SDL_QueryTexture(game->texturaTexto2, NULL, NULL, &wText, &hText);
+        SDL_QueryTexture(game->interfaz.texturaTexto2, NULL, NULL, &wText, &hText);
         SDL_Rect textoRec2 = { game->pantalla.win_w - wText, game->pantalla.win_h - hText, wText/2, hText/2 };
-        SDL_RenderCopy(game->pantalla.renderer, game->texturaTexto2, NULL, &textoRec2);
+        SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto2, NULL, &textoRec2);
+    }
+}
+
+void render_hp(Game *game)
+{
+    if (game->interfaz.texturaHP != NULL) {
+        SDL_DestroyTexture(game->interfaz.texturaHP);
+        game->interfaz.texturaHP = NULL;
+    }
+
+    SDL_Color colorBlanco = {255,255,255,255}; //rgb y transparencia
+    SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_HP, colorBlanco);
+
+    if (surfaceTemporal != NULL)
+    {
+        game->interfaz.texturaHP = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
+        SDL_FreeSurface(surfaceTemporal);
+    }
+
+    if (game->interfaz.texturaHP != NULL)
+    {
+        SDL_QueryTexture(game->interfaz.texturaHP, NULL, NULL, &wText, &hText);
+        SDL_Rect textoRec2 = { 0, game->pantalla.win_h - hText, wText/2, hText/2 };
+        SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaHP, NULL, &textoRec2);
     }
 }

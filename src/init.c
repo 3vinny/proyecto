@@ -85,8 +85,9 @@ bool SDL_Inicia(Game *game)
 void game_Limpieza(Game *game, int exitStatus)
 {
    SDL_DestroyRenderer(game->pantalla.renderer);
-   SDL_DestroyTexture(game->texturaTexto);
-   SDL_DestroyTexture(game->texturaTexto2);
+   SDL_DestroyTexture(game->interfaz.texturaTexto);
+   SDL_DestroyTexture(game->interfaz.texturaTexto2);
+   SDL_DestroyTexture(game->interfaz.texturaHP);
    SDL_DestroyTexture(game->texturaImg);
    SDL_DestroyTexture(game->texturaPista);
    SDL_DestroyTexture(game->texturaCaja);

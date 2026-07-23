@@ -23,6 +23,7 @@
 #define HP_INICIAL 10
 #define HP_MAX 20
 #define MAX_JUGADORES 2
+#define COOLDOWN_DISPARO_JUGADOR 0.3f
 
 // -- enemigos --
 #define max_enemigos 10
@@ -36,7 +37,11 @@
 #define VELOCIDAD_DISPARO 350.0f
 #define COOLDOWN_DISPARO 2.0f
 #define RADIO_EJ 100.0f
-#define RADIO_PERDIDO 500.0f
+#define RADIO_PERDIDO 600.0f
+
+// enemigo 3 camion gas
+#define EMPUJE_CAMION 90.0f
+#define HP_CAMION 4
 
 
 #endif

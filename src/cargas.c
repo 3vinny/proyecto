@@ -44,6 +44,7 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].dir_x = 1;
                 game->enemigos[contador_enemigos].dir_y = 0;
                 game->enemigos[contador_enemigos].activo = true;
+                game->enemigos[contador_enemigos].es_camion = true;
                 contador_enemigos++;
             }
 

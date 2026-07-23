@@ -9,8 +9,6 @@ int main(int argc, char **argv)
       .vozinha = NULL,
       .ultimo_tiempo_vozinha = 0,
       .texturaImg = NULL,
-      .texturaPista = NULL,
-      .texturaTexto2 = NULL,
       .quit = false,
       .tiempo_inicio = 0,
       .ultimo_pitido = 0,
@@ -24,6 +22,12 @@ int main(int argc, char **argv)
          .camara = { 0,0,w_inicial,h_inicial },
          .nivel_w = tile_cols*tam,
          .nivel_h = tile_filas*tam
+      },
+      
+      .interfaz = {
+         .texturaTexto = NULL,
+         .texturaTexto2 = NULL,
+         .texturaHP = NULL
       },
       
       .jugador = {
@@ -52,9 +56,9 @@ int main(int argc, char **argv)
       },
       
       .enemigos = {
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f },
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f },
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f }
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 },
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 },
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 }
       }
    };
 

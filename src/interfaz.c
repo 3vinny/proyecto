@@ -10,7 +10,7 @@ void interfaz_Inicia(Game *game)
     SDL_Surface *surfaceTexto1 = TTF_RenderText_Solid(game->fuente, "Usa AWSD, Flechas o el pad del mando para moverte. H para bocina", colorTexto);
     if (surfaceTexto1 != NULL)
     {
-        game->texturaTexto = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto1);
+        game->interfaz.texturaTexto = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto1);
         SDL_FreeSurface(surfaceTexto1);
     }
     

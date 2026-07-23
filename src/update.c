@@ -19,6 +19,8 @@ int enemigos_escapan(Game *game, int numero_enemigo);
 int esta_en_agua(Game *game, SDL_Rect *rect);
 float calcula_direccion(int dir_x_input, int dir_y_input);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
+void empuja_camion(Game *game);
+void dispara_jugador(Game *game);
 
 void game_Update(Game *game)
 {
@@ -28,6 +30,7 @@ void game_Update(Game *game)
     int dir_y_input = 0;
    
     construir_rects(game);
+    empuja_camion(game);
 
     SDL_Rect temp1 = game->jugador.rect;
     SDL_Rect temp2 = game->jugador.rect_colision;
@@ -341,7 +344,12 @@ void game_Update(Game *game)
     int centesimas = (transcurrido % 1000)/10;
     // esto formatea mi string (ejemplo 01:23:40) como en js
     // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
-    //sprintf(game->texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+    //sprintf(game->interfaz.texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+
+    // HP
+    sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
+
+    dispara_jugador(game); //mecanica para que mi jugador dispare hacia una direccion en rads
     
     for (int i=0; i<max_enemigos; i++)
     {
@@ -384,7 +392,13 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
             for (int i=0; i<max_enemigos; i++) {
                 if (game->enemigos[i].activo && SDL_HasIntersection(&rect_bala, &game->enemigos[i].rect)) {
                     proyectiles[p].activo = false;
-                    printf("Enemigo n°%d recibio disparo!\n", i);
+                    if (game->enemigos[i].es_camion) printf("Es camion!!!!\n");
+                    game->enemigos[i].hp--;
+                    printf("Enemigo n°%d recibio disparo! y ahora tiene HP: %d\n", i, game->enemigos[i].hp);
+                    if (game->enemigos[i].hp <= 0) {
+                        game->enemigos[i].activo = false;
+                        printf("Enemigo n%d debería desaparecer\n", i);
+                    }
                     break;
                 }
             }
@@ -591,6 +605,77 @@ int enemigos_escapan(Game *game, int numero_enemigo)
         }
     }
     return 0;
+}
+
+void empuja_camion(Game *game)
+{
+    SDL_Rect rect_jugador = {
+        (int)game->jugador.x,
+        (int)game->jugador.y,
+        game->jugador.lado,
+        game->jugador.lado
+    };
+
+    for (int i=0; i<max_enemigos; i++) {
+        if(!game->enemigos[i].activo || !game->enemigos[i].es_camion) continue;
+        SDL_Rect rect_camion = {
+            (int)game->enemigos[i].x,
+            (int)game->enemigos[i].y,
+            game->jugador.lado,
+            game->jugador.lado
+        };
+
+        if (SDL_HasIntersection(&rect_jugador, &rect_camion)) {
+            float rad = game->jugador.angulo * PI / 180.0f;
+            float empuje = EMPUJE_CAMION * game->delta_time;
+            game->jugador.x += sinf(rad) * empuje;
+            game->jugador.y += -cosf(rad) * empuje;
+
+            // para q no se salga del mapa mi jugador
+            if (game->jugador.x < 0) game->jugador.x = 0;
+            if (game->jugador.y < 0) game->jugador.y = 0;
+            if (game->jugador.x > game->pantalla.nivel_w - game->jugador.lado) game->jugador.x = game->pantalla.nivel_w - game->jugador.lado;
+            if (game->jugador.y > game->pantalla.nivel_h - game->jugador.lado) game->jugador.y = game->pantalla.nivel_h - game->jugador.lado;
+            return;
+        }
+    }
+}
+
+void dispara_jugador(Game *game)
+{
+    if (game->jugador.cooldown_disparo > 0.0f) {
+        game->jugador.cooldown_disparo -= game->delta_time;
+    }
+
+    if (game->jugador.disparo && game->jugador.cooldown_disparo <= 0.0f) {
+        // ° a radianes
+        float rad = game->jugador.angulo * PI / 180.0f;
+        float dir_x = sinf(rad);
+        float dir_y = -cosf(rad);
+
+        for (int p=0; p<MAX_PROYECTILES; p++)
+        {
+            if (!game->jugador.proyectiles[p].activo) {
+                game->jugador.proyectiles[p].activo = true;
+                game->jugador.proyectiles[p].x = game->jugador.x + (game->jugador.lado/2.0f);
+                game->jugador.proyectiles[p].y = game->jugador.y + (game->jugador.lado/2.0f);
+                
+                game->jugador.proyectiles[p].dir_x = dir_x;
+                game->jugador.proyectiles[p].dir_y = dir_y;
+
+                game->jugador.proyectiles[p].velocidad = VELOCIDAD_DISPARO;
+                game->jugador.proyectiles[p].lado = 6;
+                game->jugador.proyectiles[p].es_enemigo = false;
+                game->jugador.cooldown_disparo = COOLDOWN_DISPARO_JUGADOR;
+                game->jugador.proyectiles[p].sonido = true;
+                if (game->bala != NULL) {
+                    printf("Sonido bala! (jugador)\n");
+                    Mix_PlayChannel(-1, game->bala, 0);
+                }
+                break;
+            }
+        }
+    }
 }
 
 int esta_en_agua(Game *game, SDL_Rect *rect)

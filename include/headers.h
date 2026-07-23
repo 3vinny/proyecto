@@ -47,6 +47,11 @@ typedef struct {
 
 // fondo & interfaz: pendiente y unused
 typedef struct {
+    SDL_Texture *texturaTexto;
+    SDL_Texture *texturaTexto2;
+    SDL_Texture *texturaHP;
+    char texto_HP[64];
+    char texto_cronometro[64];
 } Interfaz;
 
 // --- JUGADOR/PERSONAJE ---
@@ -73,6 +78,8 @@ typedef struct {
     int right;
     int freno;
     int bocina;
+    int disparo;
+    float cooldown_disparo;
     
     //hitbox
     int x_colision;
@@ -96,6 +103,7 @@ typedef struct {
     int dir_x;
     int dir_y;
     int lado;
+    int hp; // o impactos
     int velocidad;
     SDL_Rect rect;
     bool activo;
@@ -151,16 +159,15 @@ typedef struct {
     SDL_Texture *texturaAceite;
     
     // texto, cronometro y bocina
-    SDL_Texture *texturaTexto;
-    SDL_Texture *texturaTexto2;
+    
     Uint32 tiempo_inicio;
     Uint32 ultimo_pitido;
     Uint32 ultimo_tiempo_vozinha;
-    char texto_cronometro[64];
     
     // subestructuras
     Pantalla pantalla;
     Personaje jugador;
+    Interfaz interfaz;
     Tile tiles[tile_filas][tile_cols];
     Enemigo enemigos[max_enemigos];
 } Game;
@@ -180,5 +187,6 @@ void ajusta_Tiles(Game *game); // cargas.c
 void game_Update(Game *game);  // update.c
 void game_Render(Game *game);  // render.c
 void render_Cronometro(Game *game); // render.c
+void render_hp(Game *game); // render.c
 
 #endif

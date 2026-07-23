@@ -34,7 +34,7 @@ bool cargarMedia(Game *game)
         return true;
     }
 
-    game->texturaEnemigo3 = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/c_gas.png");
+    game->texturaEnemigo3 = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/camion.png");
     if (!game->texturaEnemigo3)
     {
         printf("Error al iniciar textura enemigo gas: %s\n", IMG_GetError());
