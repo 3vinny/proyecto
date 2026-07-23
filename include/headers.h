@@ -50,6 +50,8 @@ typedef struct {
     SDL_Texture *texturaTexto;
     SDL_Texture *texturaTexto2;
     SDL_Texture *texturaHP;
+    SDL_Texture *texturaBalas;
+    char texto_Balas[64];
     char texto_HP[64];
     char texto_cronometro[64];
 } Interfaz;
@@ -80,6 +82,7 @@ typedef struct {
     int bocina;
     int disparo;
     float cooldown_disparo;
+    int contador_balas;
     
     //hitbox
     int x_colision;
@@ -111,6 +114,7 @@ typedef struct {
     bool escapando;
     bool sirena;
     bool es_camion;
+    bool es_bote;
     //bool es_peaton;
     Proyectil proyectiles[MAX_PROYECTILES];
     //colocar arreglo de balas aqui
@@ -128,9 +132,10 @@ typedef struct {
     bool objeto2; //X
     char tipo; //- | 1 2 3 4
     
-    bool enemigo1; // auto policia
-    bool enemigo2; // peaton
-    bool enemigo3; // camion gas
+    bool enemigo1; // auto policia (E)
+    bool enemigo2; // peaton (W)
+    bool enemigo3; // camion gas (G)
+    bool enemigo4; // Bote (B)
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
@@ -138,6 +143,7 @@ typedef struct {
     bool neumatico; // o
     bool semaforo; // S
     bool aceite; // M
+    
 } Tile;
 
 // --- GAME GENERAL ---
@@ -154,7 +160,9 @@ typedef struct {
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     SDL_Texture *texturaEnemigo;
-    SDL_Texture *texturaEnemigo3;
+    SDL_Texture *texturaEnemigo2; //peaton (W)
+    SDL_Texture *texturaEnemigo3; // gas (G)
+    SDL_Texture *texturaEnemigo4; // bote (B)
     SDL_Texture *texturaCaja;
     SDL_Texture *texturaAceite;
     

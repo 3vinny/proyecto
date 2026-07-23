@@ -348,6 +348,8 @@ void game_Update(Game *game)
 
     // HP
     sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
+    // BALAS
+    sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
 
     dispara_jugador(game); //mecanica para que mi jugador dispare hacia una direccion en rads
     
@@ -392,7 +394,11 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
             for (int i=0; i<max_enemigos; i++) {
                 if (game->enemigos[i].activo && SDL_HasIntersection(&rect_bala, &game->enemigos[i].rect)) {
                     proyectiles[p].activo = false;
-                    if (game->enemigos[i].es_camion) printf("Es camion!!!!\n");
+                    if (game->enemigos[i].es_camion || game->enemigos[i].es_bote) {
+                        printf("Es camion / bote!!!!\n");
+                    } else {
+                        game->enemigos[i].perseguir = true;
+                    }
                     game->enemigos[i].hp--;
                     printf("Enemigo n°%d recibio disparo! y ahora tiene HP: %d\n", i, game->enemigos[i].hp);
                     if (game->enemigos[i].hp <= 0) {
@@ -655,7 +661,7 @@ void dispara_jugador(Game *game)
 
         for (int p=0; p<MAX_PROYECTILES; p++)
         {
-            if (!game->jugador.proyectiles[p].activo) {
+            if (!game->jugador.proyectiles[p].activo && game->jugador.contador_balas > 0) {
                 game->jugador.proyectiles[p].activo = true;
                 game->jugador.proyectiles[p].x = game->jugador.x + (game->jugador.lado/2.0f);
                 game->jugador.proyectiles[p].y = game->jugador.y + (game->jugador.lado/2.0f);
@@ -668,6 +674,9 @@ void dispara_jugador(Game *game)
                 game->jugador.proyectiles[p].es_enemigo = false;
                 game->jugador.cooldown_disparo = COOLDOWN_DISPARO_JUGADOR;
                 game->jugador.proyectiles[p].sonido = true;
+                game->jugador.contador_balas--; //inicializado en MAX_PROYECTILES
+                printf("Numero balas: %d\n", game->jugador.contador_balas);
+               
                 if (game->bala != NULL) {
                     printf("Sonido bala! (jugador)\n");
                     Mix_PlayChannel(-1, game->bala, 0);

@@ -11,9 +11,9 @@
 #define h_inicial 900
 
 // -- tiles: valores de referencia & geometria --
-// 50x30 -> 60x40
-#define tile_cols 60
-#define tile_filas 40
+// 50x30 -> 60x40 -> 80x60
+#define tile_cols 80
+#define tile_filas 60
 #define LIMITE_LINEA 256
 #define tam 32
 #define ZOOM 2
@@ -29,8 +29,10 @@
 #define max_enemigos 10
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
-#define HP_ENEMIGOS 10
-#define VELOCIDAD_ENEMIGO3 40.0f
+#define HP_ENEMIGOS 15
+#define HP_BOTE 15
+#define VELOCIDAD_ENEMIGO3 50.0f
+#define VELOCIDAD_BOTE 25.0f
 
 // enemigo-jugador
 #define MAX_PROYECTILES 50
@@ -42,6 +44,5 @@
 // enemigo 3 camion gas
 #define EMPUJE_CAMION 90.0f
 #define HP_CAMION 4
-
 
 #endif

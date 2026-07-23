@@ -31,6 +31,7 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO1;
                 game->enemigos[contador_enemigos].dir_x = 1;
                 game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].hp = HP_ENEMIGOS;
                 game->enemigos[contador_enemigos].activo = true;
                 contador_enemigos++;
             }
@@ -40,14 +41,28 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].x = j*tile_w_px;
                 game->enemigos[contador_enemigos].y = i*tile_h_px;
                 game->enemigos[contador_enemigos].lado = 32;
-                game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO1;
+                game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO3;
                 game->enemigos[contador_enemigos].dir_x = 1;
                 game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].hp = HP_CAMION;
                 game->enemigos[contador_enemigos].activo = true;
                 game->enemigos[contador_enemigos].es_camion = true;
                 contador_enemigos++;
             }
-
+            // enemigo bote (este debera moverse circular solo donde A/a)
+            if (game->tiles[i][j].enemigo4 && contador_enemigos < max_enemigos)
+            {
+                game->enemigos[contador_enemigos].x = j*tile_w_px;
+                game->enemigos[contador_enemigos].y = i*tile_h_px;
+                game->enemigos[contador_enemigos].lado = 32;
+                game->enemigos[contador_enemigos].velocidad = VELOCIDAD_BOTE;
+                game->enemigos[contador_enemigos].dir_x = 1;
+                game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].hp = HP_BOTE;
+                game->enemigos[contador_enemigos].activo = true;
+                game->enemigos[contador_enemigos].es_bote = true;
+                contador_enemigos++;
+            }
         }
     }
 }
@@ -99,6 +114,8 @@ A: agua
             {
                 //game->tiles[i][j].casa = -1;               
             }
+            
+            if (linea_actual == 'B') game->tiles[i][j].enemigo4 = true;
         
             if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M' || linea_actual == 'G')
             {

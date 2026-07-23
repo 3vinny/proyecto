@@ -38,6 +38,7 @@ int main(int argc, char **argv)
          .angulo = 0.0,
          .hp = HP_INICIAL,
          .velocidad = 200,
+         .contador_balas = MAX_PROYECTILES,
          .velocidad_actual = 0.0f,
          .dir_x = 0,
          .dir_y = 0,

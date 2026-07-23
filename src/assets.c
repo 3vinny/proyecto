@@ -41,6 +41,13 @@ bool cargarMedia(Game *game)
         return true;
     }
     
+    game->texturaEnemigo4 = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/bote.png");
+    if (!game->texturaEnemigo4)
+    {
+        printf("Error al iniciar textura enemigo bote: %s\n", IMG_GetError());
+        return true;
+    }
+    
     game->texturaCaja = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/box.png");
     if (!game->texturaCaja)
     {
