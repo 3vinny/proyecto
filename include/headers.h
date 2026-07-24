@@ -137,6 +137,7 @@ typedef struct {
     bool enemigo2; // peaton (W)
     bool enemigo3; // camion gas (G)
     bool enemigo4; // Bote (B)
+    //bool enemigo5; //torreta (T)
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A

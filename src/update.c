@@ -17,6 +17,7 @@ int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
 int enemigos_escapan(Game *game, int numero_enemigo);
 int esta_en_agua(Game *game, SDL_Rect *rect);
 int bote_agua(Game *game, int numero_enemigo);
+void bote_dispara(Game *game, int numero_enemigo);
 float calcula_direccion(int dir_x_input, int dir_y_input);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 void empuja_camion(Game *game);
@@ -225,20 +226,20 @@ void game_Update(Game *game)
                             bote_agua(game, i); // funcion del bote
                             game->enemigos[i].escapando = 1;
                         }
-                } else {
-                    game->enemigos[i].escapando = 0;
-                }
-            } else {
-                if (esta_en_agua(game, &game->enemigos[i].rect)) {
-                    if(!game->enemigos[i].escapando) {
-                        enemigos_escapan(game, i); // funcion patrullas
-                        game->enemigos[i].escapando = 1;
+                    } else {
+                        game->enemigos[i].escapando = 0;
                     }
+                    bote_dispara(game, i); // dispara si es bote
                 } else {
-                    game->enemigos[i].escapando = 0;
+                    if (esta_en_agua(game, &game->enemigos[i].rect)) {
+                        if(!game->enemigos[i].escapando) {
+                            enemigos_escapan(game, i); // funcion patrullas
+                            game->enemigos[i].escapando = 1;
+                        }
+                    } else {
+                        game->enemigos[i].escapando = 0;
+                    }
                 }
-            }
-
                 game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm;
                 game->enemigos[i].y += game->enemigos[i].dir_y * paso_enm;
     
@@ -256,7 +257,7 @@ void game_Update(Game *game)
                 if (chocar) {
                     game->enemigos[i].x -= game->enemigos[i].dir_x*(paso_enm);
                     game->enemigos[i].y -= game->enemigos[i].dir_y*(paso_enm);
-    
+
                     game->enemigos[i].dir_x *= -1;
                     game->enemigos[i].dir_y *= -1;
                 }
@@ -403,6 +404,11 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                 proyectiles[p].activo = false;
                 game->jugador.hp -= 1;
                 printf("El jugador recibio disparo !! -1 de HP : \n--HP: %d --velocidad_actual: %.2f\n", game->jugador.hp, game->jugador.velocidad_actual);
+                
+                if (game->jugador.hp <= 0) {
+                    printf("El loco murio!!!!\n");
+                    game->quit = true;
+                }
             } 
         } else {
             for (int i=0; i<max_enemigos; i++) {
@@ -541,7 +547,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
 int chequea_enemigos(Game *game, SDL_Rect *player_rect)
 {
     for (int i = 0; i < max_enemigos; i++) {
-        if (game->enemigos[i].activo && !game->enemigos[i].es_camion) {
+        if (game->enemigos[i].activo && !game->enemigos[i].es_camion && !game->enemigos[i].es_bote) {
             SDL_Rect hitbox_enemigo = {
                 game->enemigos[i].rect.x + margen,
                 game->enemigos[i].rect.y + margen,
@@ -648,7 +654,7 @@ int enemigos_escapan(Game *game, int numero_enemigo)
     return 0;
 }
 
-int bote_agua(Game *game, int numero_enemigo)
+int bote_agua(Game *game, int numero_enemigo) // SOLO FUE COPIAR LA FUNCION DE ARRIBA Y SACARLE EL !
 {
     SDL_Rect rect_enemigo = {
         (int)game->enemigos[numero_enemigo].x,
@@ -659,7 +665,6 @@ int bote_agua(Game *game, int numero_enemigo)
     SDL_Rect rprueba;
     
     // caso derecha >
-    // SOLO FUE COPIAR LA FUNCION DE ARRIBA Y SACARLE EL !
     rprueba = rect_enemigo;
     rprueba.x += game->enemigos[numero_enemigo].lado;
     if (esta_en_agua(game, &rprueba)) {
@@ -697,6 +702,44 @@ int bote_agua(Game *game, int numero_enemigo)
     return 0; // no encontro agua
 }
 
+void bote_dispara(Game *game, int numero_enemigo)
+{
+    if (game->enemigos[numero_enemigo].cooldown_disparo > 0.0f) {
+        game->enemigos[numero_enemigo].cooldown_disparo -= game->delta_time;
+    }
+
+    float dx = game->jugador.x - game->enemigos[numero_enemigo].x;
+    float dy = game->jugador.y - game->enemigos[numero_enemigo].y;
+    float dist = sqrtf(dx*dx + dy*dy);
+
+    if (dist <= RADIO_PERDIDO) {
+        if (game->enemigos[numero_enemigo].cooldown_disparo <= 0.0f && dist > 0.0f) {
+            for (int p = 0; p<MAX_PROYECTILES; p++) {
+                if(!game->enemigos[numero_enemigo].proyectiles[p].activo) {
+                    game->enemigos[numero_enemigo].proyectiles[p].activo = true;
+
+                    game->enemigos[numero_enemigo].proyectiles[p].x = game->enemigos[numero_enemigo].x + (game->enemigos[numero_enemigo].lado/2.0f);
+                    game->enemigos[numero_enemigo].proyectiles[p].y = game->enemigos[numero_enemigo].y + (game->enemigos[numero_enemigo].lado/2.0f);
+
+                    game->enemigos[numero_enemigo].proyectiles[p].dir_x = dx/dist;
+                    game->enemigos[numero_enemigo].proyectiles[p].dir_y = dy/dist;
+
+                    game->enemigos[numero_enemigo].proyectiles[p].velocidad = VELOCIDAD_DISPARO;
+                    game->enemigos[numero_enemigo].proyectiles[p].lado = 6;
+                    game->enemigos[numero_enemigo].cooldown_disparo = COOLDOWN_DISPARO;
+                    game->enemigos[numero_enemigo].proyectiles[p].sonido = true;
+                    if (game->bala != NULL && dist < RADIO_PERDIDO) {
+                        printf("Sonido bala!\n");
+                        Mix_PlayChannel(-1, game->bala, 0);
+                    }
+                    break; //necesario romper el ciclo para que no continue
+                }
+            }       
+        }
+    }
+    
+}
+
 void empuja_camion(Game *game)
 {
     SDL_Rect rect_jugador = {
@@ -715,7 +758,8 @@ void empuja_camion(Game *game)
             game->jugador.lado
         };
 
-        if (SDL_HasIntersection(&rect_jugador, &rect_camion)) {
+        if (SDL_HasIntersection(&rect_jugador, &rect_camion)) 
+        {
             float rad = game->jugador.angulo * PI / 180.0f;
             float empuje = EMPUJE_CAMION * game->delta_time;
             game->jugador.x += sinf(rad) * empuje;
@@ -737,13 +781,14 @@ void dispara_jugador(Game *game)
         game->jugador.cooldown_disparo -= game->delta_time;
     }
 
-    if (game->jugador.disparo && game->jugador.cooldown_disparo <= 0.0f) {
+    if (game->jugador.disparo && game->jugador.cooldown_disparo <= 0.0f) 
+    {
         // ° a radianes
         float rad = game->jugador.angulo * PI / 180.0f;
         float dir_x = sinf(rad);
         float dir_y = -cosf(rad);
 
-        for (int p=0; p<MAX_PROYECTILES; p++)
+        for (int p=0; p<MAX_PROYECTILES; p++) 
         {
             if (!game->jugador.proyectiles[p].activo && game->jugador.contador_balas > 0) {
                 game->jugador.proyectiles[p].activo = true;
@@ -792,12 +837,10 @@ int esta_en_agua(Game *game, SDL_Rect *rect)
 
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo)
 {
-    for (int i=0; i<max_enemigos; i++)
-    {
+    for (int i=0; i<max_enemigos; i++) {
         if (i == numero_enemigo || !game->enemigos[i].activo) continue;
         
-        if (SDL_HasIntersection(rect, &game->enemigos[i].rect))
-        {
+        if (SDL_HasIntersection(rect, &game->enemigos[i].rect)) {
             return 1;
         }
     }
