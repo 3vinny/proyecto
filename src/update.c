@@ -12,11 +12,11 @@ int margen = 5;
 
 int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo);
 void construir_rects(Game *game);
-
 int chequea_enemigos(Game *game, SDL_Rect *player_rect);
 int chequea_entre_enemigos(Game *game, SDL_Rect *rect, int numero_enemigo);
 int enemigos_escapan(Game *game, int numero_enemigo);
 int esta_en_agua(Game *game, SDL_Rect *rect);
+int bote_agua(Game *game, int numero_enemigo);
 float calcula_direccion(int dir_x_input, int dir_y_input);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 void empuja_camion(Game *game);
@@ -218,31 +218,45 @@ void game_Update(Game *game)
             
             // si no esta en persecucion la comprobamos
             if (!game->enemigos[i].perseguir) {
-                // si esta en el agua llamamos la funcion y esta llama a estaenagua
+                if (game->enemigos[i].es_bote) {
+                    // si esta en el agua caso bote llama a funcion del bote
+                    if (esta_en_agua(game, &game->enemigos[i].rect)) {
+                        if(!game->enemigos[i].escapando) {
+                            bote_agua(game, i); // funcion del bote
+                            game->enemigos[i].escapando = 1;
+                        }
+                } else {
+                    game->enemigos[i].escapando = 0;
+                }
+            } else {
                 if (esta_en_agua(game, &game->enemigos[i].rect)) {
                     if(!game->enemigos[i].escapando) {
-                        enemigos_escapan(game, i);
+                        enemigos_escapan(game, i); // funcion patrullas
                         game->enemigos[i].escapando = 1;
                     }
                 } else {
                     game->enemigos[i].escapando = 0;
                 }
+            }
 
                 game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm;
                 game->enemigos[i].y += game->enemigos[i].dir_y * paso_enm;
-
+    
                 SDL_Rect rect_enm1 = {
                     (int)(game->enemigos[i].x),
                     (int)(game->enemigos[i].y),
                     game->enemigos[i].lado,
                     game->enemigos[i].lado
                 };
+                
+                int chocar = chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0;
 
-                if (chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0)
-                {
+                if (!chocar && game->enemigos[i].es_bote && !esta_en_agua(game, &rect_enm1)) chocar = 1;
+                
+                if (chocar) {
                     game->enemigos[i].x -= game->enemigos[i].dir_x*(paso_enm);
                     game->enemigos[i].y -= game->enemigos[i].dir_y*(paso_enm);
-
+    
                     game->enemigos[i].dir_x *= -1;
                     game->enemigos[i].dir_y *= -1;
                 }
@@ -498,6 +512,27 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     }
                 }
             }
+            
+            if (game->tiles[i][j].objeto3) {
+                SDL_Rect temp6 = {
+                    game->tiles[i][j].x_tiles,
+                    game->tiles[i][j].y_tiles,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                
+                if (SDL_HasIntersection(player_rect, &temp6)) {
+                    if (es_enemigo) {
+                        return 1;
+                    } else {
+                        game->tiles[i][j].objeto3 = false;
+                        game->jugador.velocidad_actual *= 0.6f;
+                        SDL_Log("caja de 5 balas destruida!!");
+                        game->jugador.velocidad_actual *= 1.2f;
+                        game->jugador.contador_balas += 5;
+                    }
+                }
+            }
         }
     }
     return 0; 
@@ -611,6 +646,55 @@ int enemigos_escapan(Game *game, int numero_enemigo)
         }
     }
     return 0;
+}
+
+int bote_agua(Game *game, int numero_enemigo)
+{
+    SDL_Rect rect_enemigo = {
+        (int)game->enemigos[numero_enemigo].x,
+        (int)game->enemigos[numero_enemigo].y,
+        (int)game->enemigos[numero_enemigo].lado,
+        (int)game->enemigos[numero_enemigo].lado 
+    };
+    SDL_Rect rprueba;
+    
+    // caso derecha >
+    // SOLO FUE COPIAR LA FUNCION DE ARRIBA Y SACARLE EL !
+    rprueba = rect_enemigo;
+    rprueba.x += game->enemigos[numero_enemigo].lado;
+    if (esta_en_agua(game, &rprueba)) {
+        game->enemigos[numero_enemigo].dir_x = 1;
+        game->enemigos[numero_enemigo].dir_y = 0;
+        return 1;
+    }
+
+    // caso izquierda <
+    rprueba = rect_enemigo;
+    rprueba.x -= game->enemigos[numero_enemigo].lado;
+    if (esta_en_agua(game, &rprueba)) {
+        game->enemigos[numero_enemigo].dir_x = -1;
+        game->enemigos[numero_enemigo].dir_y = 0;
+        return 1;
+    }
+    
+    // caso abajo
+    rprueba = rect_enemigo;
+    rprueba.y += game->enemigos[numero_enemigo].lado;
+    if (esta_en_agua(game, &rprueba)) {
+        game->enemigos[numero_enemigo].dir_x = 0;
+        game->enemigos[numero_enemigo].dir_y = 1;
+        return 1;
+    }
+
+    // caso arriba
+    rprueba = rect_enemigo;
+    rprueba.y -= game->enemigos[numero_enemigo].lado;
+    if (esta_en_agua(game, &rprueba)) {
+        game->enemigos[numero_enemigo].dir_x = 0;
+        game->enemigos[numero_enemigo].dir_y = -1;
+        return 1;
+    }
+    return 0; // no encontro agua
 }
 
 void empuja_camion(Game *game)

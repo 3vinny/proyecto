@@ -129,7 +129,8 @@ typedef struct {
     
     bool activo; //# .
     bool activo_posJ; //P
-    bool objeto2; //X
+    bool objeto2; //X (caja con +1HP)
+    bool objeto3; //Z (caja con balas)
     char tipo; //- | 1 2 3 4
     
     bool enemigo1; // auto policia (E)
@@ -143,7 +144,6 @@ typedef struct {
     bool neumatico; // o
     bool semaforo; // S
     bool aceite; // M
-    
 } Tile;
 
 // --- GAME GENERAL ---
@@ -163,7 +163,8 @@ typedef struct {
     SDL_Texture *texturaEnemigo2; //peaton (W)
     SDL_Texture *texturaEnemigo3; // gas (G)
     SDL_Texture *texturaEnemigo4; // bote (B)
-    SDL_Texture *texturaCaja;
+    SDL_Texture *texturaCaja; // caja (X)
+    SDL_Texture *texturaCajaBalas; // caja (Z)
     SDL_Texture *texturaAceite;
     
     // texto, cronometro y bocina

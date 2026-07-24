@@ -55,6 +55,13 @@ bool cargarMedia(Game *game)
         return true;
     }
     
+    game->texturaCajaBalas = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/box_balas.png");
+    if (!game->texturaCajaBalas)
+    {
+        printf("Error al iniciar textura caja(s): %s\n", IMG_GetError());
+        return true;
+    }
+    
     game->texturaAceite = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/oil.png");
     if (!game->texturaAceite)
     {

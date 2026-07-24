@@ -172,6 +172,23 @@ void game_Render(Game *game)
                     SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj2);
                 }
             }
+            
+            if (game->tiles[i][j].objeto3)
+            {
+                SDL_Rect Rectang_Obj3 = {
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                if (game->texturaCajaBalas != NULL)
+                {
+                    SDL_RenderCopy(game->pantalla.renderer, game->texturaCajaBalas, NULL, &Rectang_Obj3); 
+                } else {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj3);
+                }
+            }
 
             if (game->tiles[i][j].aceite)
             {

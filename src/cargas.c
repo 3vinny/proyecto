@@ -101,11 +101,14 @@ A: agua
             game->tiles[i][j].activo = (linea_actual == '.' || linea_actual == 'N' || linea_actual == 'T');
             game->tiles[i][j].activo_posJ = (linea_actual == 'P');
             game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
+            game->tiles[i][j].objeto3 = (linea_actual == 'Z');
         
-            if (linea_actual == 'A')
+            if (linea_actual == 'A' || linea_actual == 'B')
             {
                 game->tiles[i][j].agua = true;
             }
+            
+            if (linea_actual == 'B') game->tiles[i][j].enemigo4 = true;
 
             if (linea_actual =='C')
             {
@@ -114,10 +117,8 @@ A: agua
             {
                 //game->tiles[i][j].casa = -1;               
             }
-            
-            if (linea_actual == 'B') game->tiles[i][j].enemigo4 = true;
         
-            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'F' || linea_actual == 'M' || linea_actual == 'G')
+            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'Z' || linea_actual == 'F' || linea_actual == 'M' || linea_actual == 'G')
             {
                 if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
                 {
