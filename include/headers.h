@@ -180,6 +180,10 @@ typedef struct {
     Interfaz interfaz;
     Tile tiles[tile_filas][tile_cols];
     Enemigo enemigos[max_enemigos];
+    
+    // mecanica niveles (1,2,3)
+    int nivel_actual;
+    bool cambiar_nivel;
 } Game;
 
 /*---- PROTOTIPOS DE FUNCIONES -------*/
@@ -194,9 +198,8 @@ void interfaz_Inicia(Game *game);               // interfaz.c
 void game_Input(Game *game);   // eventos.c
 void carga_Tiles(Game *game);  // cargas.c
 void ajusta_Tiles(Game *game); // cargas.c
+void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c
 void game_Update(Game *game);  // update.c
 void game_Render(Game *game);  // render.c
-void render_Cronometro(Game *game); // render.c
-void render_hp(Game *game); // render.c
 
 #endif

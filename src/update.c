@@ -38,19 +38,15 @@ void game_Update(Game *game)
    
    /* direccion solicitada x input
        0=nada 1=derecha/abajo -1=izq/arriba */
-    if (game->jugador.right == 1)
-    {
+    if (game->jugador.right == 1) {
         dir_x_input = 1;
-    } else if (game->jugador.left == 1)
-    {
+    } else if (game->jugador.left == 1) {
         dir_x_input = -1;
     }
     
-    if (game->jugador.down == 1)
-    {
+    if (game->jugador.down == 1) {
         dir_y_input = 1;
-    } else if (game->jugador.up == 1)
-    {
+    } else if (game->jugador.up == 1) {
         dir_y_input = -1;
     }
    
@@ -72,7 +68,8 @@ void game_Update(Game *game)
     if (game->jugador.freno == 1){
         game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
 
-        if (game->jugador.velocidad_actual <= LIMITE){
+        if (game->jugador.velocidad_actual <= LIMITE)
+        {
             game->jugador.velocidad_actual = LIMITE;
             game->jugador.dir_x = 0;
             game->jugador.dir_y = 0;
@@ -80,10 +77,9 @@ void game_Update(Game *game)
         }
         paso = (game->delta_time) * (game->jugador.velocidad_actual);
        
-    } else if (invirtiendo){
+    } else if (invirtiendo) {
         game->jugador.velocidad_actual -= FRICCION * game->delta_time;
-        if (game->jugador.velocidad_actual <= 0.0f)
-        {
+        if (game->jugador.velocidad_actual <= 0.0f) {
             // si ya freno resetea el delay y cambia direccion dir_x
             game->jugador.velocidad_actual = 0.0f;   
             game->jugador.dir_x = dir_x_input;
@@ -92,11 +88,12 @@ void game_Update(Game *game)
         }
         paso = 0.0f;
        
-    } else if (movimiento){
+    } else if (movimiento) {
         game->jugador.dir_x = dir_x_input;
         game->jugador.dir_y = dir_y_input;
         
         // ANGULOS: 0 45 90 135 180 225 270 315
+        // RECORDATORIO CAMBIAR ESTO POR LA FUNCION float calcula_direccion
         if (dir_x_input == 0 && dir_y_input == -1) game->jugador.angulo = 0.0;
         else if (dir_x_input == 1 && dir_y_input == -1) game->jugador.angulo = 45.0;
         else if (dir_x_input == 1 && dir_y_input == 0) game->jugador.angulo = 90.0;
@@ -136,10 +133,9 @@ void game_Update(Game *game)
     temp1.x = (int)game->jugador.x;
     temp1.y = (int)game->jugador.y;
    
-    /* gestion al presionar teclas: hitbox, velocidades, colisiones
+    /* manejo al presionar teclas: hitbox con tiles & enemigos, velocidades, colisiones
     casos en y, casos en x
-    CASOS X
-    */
+    CASOS X */
     if (game->jugador.right == 1){
         temp1.x = (int)(game->jugador.x + paso);
         if(!chequea_tiles(game, &temp1, 0) && !chequea_enemigos(game, &temp1) && temp1.x <= ancho_act - game->jugador.lado) 
@@ -350,16 +346,16 @@ void game_Update(Game *game)
         }
     }
     
-    // cronometro
+    /* CRONOMETRO DESACTIVADO POR LAG
     int tiempo_actual = SDL_GetTicks();
     int transcurrido = tiempo_actual - game->tiempo_inicio;
    
     int minutos = (transcurrido / 60000); // ms a min
     int segundos = (transcurrido / 1000)%60;
     int centesimas = (transcurrido % 1000)/10;
-    // esto formatea mi string (ejemplo 01:23:40) como en js
-    // snprintf(buffer,sizeof(buffer), "Texto a formatear"); buffer es mi char definido
-    //sprintf(game->interfaz.texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);
+    
+    // snprintf es mejor: tiene tamanio x ende es mas seguro pero necesita un sizeof como limite
+    sprintf(game->interfaz.texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);*/
 
     // HP
     sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
@@ -406,13 +402,15 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                 printf("El jugador recibio disparo !! -1 de HP : \n--HP: %d --velocidad_actual: %.2f\n", game->jugador.hp, game->jugador.velocidad_actual);
                 
                 if (game->jugador.hp <= 0) {
-                    printf("El loco murio!!!!\n");
-                    game->quit = true;
+                    printf("El jugador murio!!!!\n");
+                    //game->quit = true;
                 }
             } 
-        } else {
-            for (int i=0; i<max_enemigos; i++) {
-                if (game->enemigos[i].activo && SDL_HasIntersection(&rect_bala, &game->enemigos[i].rect)) {
+        } else { // caso que no es el enemigo el que da la bala
+            for (int i=0; i<max_enemigos; i++)
+            {
+                if (game->enemigos[i].activo && SDL_HasIntersection(&rect_bala, &game->enemigos[i].rect)) 
+                {
                     proyectiles[p].activo = false;
                     if (game->enemigos[i].es_camion || game->enemigos[i].es_bote) {
                         printf("Es camion / bote!!!!\n");
@@ -420,6 +418,7 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                         game->enemigos[i].perseguir = true;
                     }
                     game->enemigos[i].hp--;
+                    
                     printf("Enemigo n°%d recibio disparo! y ahora tiene HP: %d\n", i, game->enemigos[i].hp);
                     if (game->enemigos[i].hp <= 0) {
                         game->enemigos[i].activo = false;
@@ -664,6 +663,7 @@ int bote_agua(Game *game, int numero_enemigo) // SOLO FUE COPIAR LA FUNCION DE A
     };
     SDL_Rect rprueba;
     
+    // !enemigos_escapan
     // caso derecha >
     rprueba = rect_enemigo;
     rprueba.x += game->enemigos[numero_enemigo].lado;
@@ -704,7 +704,8 @@ int bote_agua(Game *game, int numero_enemigo) // SOLO FUE COPIAR LA FUNCION DE A
 
 void bote_dispara(Game *game, int numero_enemigo)
 {
-    if (game->enemigos[numero_enemigo].cooldown_disparo > 0.0f) {
+    if (game->enemigos[numero_enemigo].cooldown_disparo > 0.0f)
+    {
         game->enemigos[numero_enemigo].cooldown_disparo -= game->delta_time;
     }
 
@@ -712,10 +713,14 @@ void bote_dispara(Game *game, int numero_enemigo)
     float dy = game->jugador.y - game->enemigos[numero_enemigo].y;
     float dist = sqrtf(dx*dx + dy*dy);
 
-    if (dist <= RADIO_PERDIDO) {
-        if (game->enemigos[numero_enemigo].cooldown_disparo <= 0.0f && dist > 0.0f) {
-            for (int p = 0; p<MAX_PROYECTILES; p++) {
-                if(!game->enemigos[numero_enemigo].proyectiles[p].activo) {
+    if (dist <= RADIO_PERDIDO) 
+    {
+        if (game->enemigos[numero_enemigo].cooldown_disparo <= 0.0f && dist > 0.0f) 
+        {
+            for (int p = 0; p<MAX_PROYECTILES; p++) 
+            {
+                if(!game->enemigos[numero_enemigo].proyectiles[p].activo) 
+                {
                     game->enemigos[numero_enemigo].proyectiles[p].activo = true;
 
                     game->enemigos[numero_enemigo].proyectiles[p].x = game->enemigos[numero_enemigo].x + (game->enemigos[numero_enemigo].lado/2.0f);
@@ -728,6 +733,7 @@ void bote_dispara(Game *game, int numero_enemigo)
                     game->enemigos[numero_enemigo].proyectiles[p].lado = 6;
                     game->enemigos[numero_enemigo].cooldown_disparo = COOLDOWN_DISPARO;
                     game->enemigos[numero_enemigo].proyectiles[p].sonido = true;
+                    
                     if (game->bala != NULL && dist < RADIO_PERDIDO) {
                         printf("Sonido bala!\n");
                         Mix_PlayChannel(-1, game->bala, 0);
@@ -760,7 +766,7 @@ void empuja_camion(Game *game)
 
         if (SDL_HasIntersection(&rect_jugador, &rect_camion)) 
         {
-            float rad = game->jugador.angulo * PI / 180.0f;
+            float rad = game->jugador.angulo * PI / 180.0f; //ANGULO A RADIANES PARA FUNC MATH.H
             float empuje = EMPUJE_CAMION * game->delta_time;
             game->jugador.x += sinf(rad) * empuje;
             game->jugador.y += -cosf(rad) * empuje;

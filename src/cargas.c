@@ -69,10 +69,14 @@ void ajusta_Tiles(Game *game)
 
 void carga_Tiles(Game *game)
 {
+    char ruta_archivo[32];
     char linea[LIMITE_LINEA]; // arreglo grande
-    FILE *archivo = fopen("./data/hitbox.txt", "r");
+    // para evitar errores formateo ruta
+    snprintf(ruta_archivo, sizeof(ruta_archivo), "./data/%d.txt", game->nivel_actual);
+    
+    FILE *archivo = fopen(ruta_archivo, "r");
     if (!archivo){
-        printf("Error: No se pudo abrir el archivo -> %s\n", "./data/hitbox.txt");
+        printf("Error: No se pudo abrir el archivo -> %s\n", ruta_archivo);
         return;
     }
     
@@ -147,4 +151,24 @@ A: agua
     }
     fclose(archivo);
     ajusta_Tiles(game);
+}
+
+void carga_Nivel(Game *game, int nuevo_nivel)
+{
+    game->nivel_actual = nuevo_nivel;
+    
+    // limpieza de objetos
+    for (int i=0; i<max_enemigos; i++) {
+        game->enemigos[i].activo = false;
+        for (int p=0; p<MAX_PROYECTILES; p++) {
+            game->enemigos[i].proyectiles[p].activo = false;
+        }
+    }
+    
+    // limpia proyectiles (jugador)
+    for (int p=0; p<MAX_PROYECTILES; p++) {
+        game->jugador.proyectiles[p].activo = false;
+    }
+    
+    carga_Tiles(game);
 }

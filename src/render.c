@@ -5,14 +5,25 @@ int wText = 32;
 // estandar pixel art 32x32
 
 void render_contbalas(Game *game);
+void render_hp(Game *game); // render.c
+void render_Cronometro(Game *game); // render.c
 
 void game_Render(Game *game)
 {
     SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
     SDL_RenderClear(game->pantalla.renderer);
 
-    // BACKGROUND y desfase
-    SDL_Rect origen_pasto = { 224, 192, tam, tam };
+    SDL_Rect origen_fondo;
+    
+    if (game->nivel_actual == 2) {
+        origen_fondo = (SDL_Rect){ 112, 0, tam, tam };
+    } else if (game->nivel_actual == 3) {
+        origen_fondo = (SDL_Rect){ 144, 192, tam, tam };
+    } else {
+        origen_fondo = (SDL_Rect){ 224, 192, tam, tam };
+    }
+    
+    // DESFASE CAMARA
     int desfase_x = -(game->pantalla.camara.x % tam);
     int desfase_y = -(game->pantalla.camara.y % tam);
     
@@ -22,8 +33,8 @@ void game_Render(Game *game)
     {
         for (x = desfase_x - tam; x < game->pantalla.win_w + tam; x = x+tam)
         {
-            SDL_Rect destino_pasto = { x, y, tam, tam };
-            SDL_RenderCopy(game->pantalla.renderer, game->texturaPista, &origen_pasto, &destino_pasto);
+            SDL_Rect destino_fondo = { x, y, tam, tam };
+            SDL_RenderCopy(game->pantalla.renderer, game->texturaPista, &origen_fondo, &destino_fondo);
         }
     }
     
