@@ -51,9 +51,11 @@ typedef struct {
     SDL_Texture *texturaTexto2;
     SDL_Texture *texturaHP;
     SDL_Texture *texturaBalas;
+    SDL_Texture *texturaNivel;
     char texto_Balas[64];
     char texto_HP[64];
     char texto_cronometro[64];
+    char texto_Nivel[64];
 } Interfaz;
 
 // --- JUGADOR/PERSONAJE ---

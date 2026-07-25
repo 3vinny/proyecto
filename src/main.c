@@ -12,7 +12,7 @@ int main(int argc, char **argv)
       .quit = false,
       .tiempo_inicio = 0,
       .ultimo_pitido = 0,
-      .nivel_actual = 2,     // partimos desde nivel 1
+      .nivel_actual = 1,     // partimos desde nivel 1
       
       .pantalla = {
          .ventana = NULL,

@@ -357,11 +357,6 @@ void game_Update(Game *game)
     // snprintf es mejor: tiene tamanio x ende es mas seguro pero necesita un sizeof como limite
     sprintf(game->interfaz.texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);*/
 
-    // HP
-    sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
-    // BALAS
-    sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
-
     dispara_jugador(game); //mecanica para que mi jugador dispare hacia una direccion en rads
     
     for (int i=0; i<max_enemigos; i++)
