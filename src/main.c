@@ -8,7 +8,10 @@ int main(int argc, char **argv)
       .fuente = NULL,
       .vozinha = NULL,
       .ultimo_tiempo_vozinha = 0,
+      .ultimo_tiempo_meta = 0,
       .texturaImg = NULL,
+      .vueltas = 1, // iniciado en 1/3
+      .llego_meta = false,
       .quit = false,
       .tiempo_inicio = 0,
       .ultimo_pitido = 0,

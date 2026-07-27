@@ -152,11 +152,16 @@ void game_Render(Game *game)
     SDL_Rect textoRec = { 0, 0, wText/2, hText/2 }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto, NULL, &textoRec);
 
-    // TEXTO 2
-    //render_Cronometro(game);
-
-    // TEXTO 3
+    // TEXTO CRONOMETRO
+    int tiempo_actual = SDL_GetTicks();
+    int transcurrido = tiempo_actual - game->tiempo_inicio;
+   
+    int minutos = (transcurrido / 60000); // ms a min
+    int segundos = (transcurrido / 1000)%60;
+    int centesimas = (transcurrido % 1000)/10;
     
+    // CRONOMETRO
+    snprintf(game->interfaz.texto_cronometro, sizeof(game->interfaz.texto_cronometro), "%02d:%02d:%02d", minutos, segundos, centesimas);
     // HP
     sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
     // BALAS
@@ -164,6 +169,7 @@ void game_Render(Game *game)
     // NIVEL
     sprintf(game->interfaz.texto_Nivel, "Nivel: %01d", game->nivel_actual);
     
+    render_Cronometro(game);
     render_hp(game);
     render_contbalas(game);
     render_nivel(game);
@@ -208,6 +214,24 @@ void game_Render(Game *game)
                 } else {
                     SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
                     SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Obj3);
+                }
+            }
+            
+            if (game->tiles[i][j].meta)
+            {
+                SDL_Rect Rectang_Meta = {
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                
+                if (game->texturaMeta != NULL)
+                {
+                    SDL_RenderCopy(game->pantalla.renderer, game->texturaMeta, NULL, &Rectang_Meta);
+                } else {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Meta);
                 }
             }
 

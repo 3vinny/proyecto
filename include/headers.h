@@ -143,6 +143,7 @@ typedef struct {
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
+    bool meta; // F
     bool obstaculo; // N
     bool neumatico; // o
     bool semaforo; // S
@@ -162,19 +163,28 @@ typedef struct {
     Mix_Chunk *bala;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
-    SDL_Texture *texturaEnemigo;
+    
+    SDL_Texture *texturaEnemigo; // patrulla (E)
+    SDL_Texture *indicadorEnemigo; // patrulla (E)
+    
     SDL_Texture *texturaEnemigo2; //peaton (W)
     SDL_Texture *texturaEnemigo3; // gas (G)
     SDL_Texture *texturaEnemigo4; // bote (B)
     SDL_Texture *texturaCaja; // caja (X)
     SDL_Texture *texturaCajaBalas; // caja (Z)
-    SDL_Texture *texturaAceite;
+    SDL_Texture *texturaAceite; // aceite (M)
+    SDL_Texture *texturaMeta; // finish (F)
+    
+    // meta y finalizacion
+    int vueltas;
+    bool llego_meta;
     
     // texto, cronometro y bocina
     
     Uint32 tiempo_inicio;
     Uint32 ultimo_pitido;
     Uint32 ultimo_tiempo_vozinha;
+    Uint32 ultimo_tiempo_meta;
     
     // subestructuras
     Pantalla pantalla;

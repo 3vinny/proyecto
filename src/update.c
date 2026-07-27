@@ -22,6 +22,7 @@ float calcula_direccion(int dir_x_input, int dir_y_input);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 void empuja_camion(Game *game);
 void dispara_jugador(Game *game);
+void funcion_meta(Game *game);
 
 void game_Update(Game *game)
 {
@@ -345,17 +346,6 @@ void game_Update(Game *game)
             game->enemigos[i].angulo = calcula_direccion(game->enemigos[i].dir_x, game->enemigos[i].dir_y);
         }
     }
-    
-    /* CRONOMETRO DESACTIVADO POR LAG
-    int tiempo_actual = SDL_GetTicks();
-    int transcurrido = tiempo_actual - game->tiempo_inicio;
-   
-    int minutos = (transcurrido / 60000); // ms a min
-    int segundos = (transcurrido / 1000)%60;
-    int centesimas = (transcurrido % 1000)/10;
-    
-    // snprintf es mejor: tiene tamanio x ende es mas seguro pero necesita un sizeof como limite
-    sprintf(game->interfaz.texto_cronometro, "%02d:%02d:%02d", minutos, segundos, centesimas);*/
 
     dispara_jugador(game); //mecanica para que mi jugador dispare hacia una direccion en rads
     
@@ -398,7 +388,7 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                 
                 if (game->jugador.hp <= 0) {
                     printf("El jugador murio!!!!\n");
-                    //game->quit = true;
+                    game->quit = true;
                 }
             } 
         } else { // caso que no es el enemigo el que da la bala
@@ -471,6 +461,33 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         if (!es_enemigo) return 1;
                     }
                 }
+            }
+            
+            if (game->tiles[i][j].meta) {
+                SDL_Rect tempmeta = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                
+                    if (SDL_HasIntersection(player_rect, &tempmeta)) {
+                        if (es_enemigo) return 1;
+                        
+                        Uint32 tiempo_actual = SDL_GetTicks();
+                        Uint32 cooldown_meta = 5000; // 20 segundos
+                        
+                        if (tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta) {
+                            game->llego_meta = true;
+                            if (game->llego_meta = true && tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta) {
+                                game->vueltas++;
+                                funcion_meta(game);
+                                game->quit = true;
+                            }
+                        }
+                        
+                       
+                    }
             }
 
             if (!es_enemigo && game->tiles[i][j].aceite) {
@@ -862,6 +879,30 @@ void construir_rects(Game *game)
         .w = game->jugador.w_colision,
         .h = game->jugador.h_colision
     };
+}
+
+void funcion_meta(Game *game)
+{
+    // aca ira lo que tengo arriba respecto a la meta la gracia de esto es la escritura archivo
+    printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d", game->interfaz.texto_cronometro, game->vueltas);
+    
+    // archivo
+    char formato[60];
+    char ruta[32];
+    char nombre[12] = "test";
+    
+    // formateo
+    snprintf(ruta, sizeof(ruta), "./data/score_%d.txt", game->nivel_actual);
+    snprintf(formato, sizeof(formato), "Niv %d-T (%s)-Jug [%s]-HP %d-Lap%d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas);
+    
+    FILE *archivo_score = fopen(ruta, "a");
+    if (!archivo_score){
+        printf("Error: No se pudo abrir el archivo %s\n", ruta);
+        return;
+    }
+    
+    fprintf(archivo_score, "%s\n", formato);
+    fclose(archivo_score);
 }
 
 float calcula_direccion(int dir_x_input, int dir_y_input)

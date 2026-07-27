@@ -24,6 +24,8 @@
 #define HP_MAX 20
 #define MAX_JUGADORES 2
 #define COOLDOWN_DISPARO_JUGADOR 0.3f
+#define MAX_VUELTAS 3
+//#define COOLDOWN_META 5000
 
 // -- enemigos --
 #define max_enemigos 10

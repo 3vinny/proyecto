@@ -10,7 +10,7 @@ bool cargarMedia(Game *game)
         return true;
     }
     
-    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/mclaren.png");
+    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/micro.png");
     if(!surfaceTemp)
     {
         printf("Error cargando imagen car1 : %s\n", IMG_GetError());
@@ -30,7 +30,14 @@ bool cargarMedia(Game *game)
     game->texturaEnemigo = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/carab.png");
     if (!game->texturaEnemigo)
     {
-        printf("Error al iniciar textura enemigo(s): %s\n", IMG_GetError());
+        printf("Error al iniciar textura enemigo patrulla(s): %s\n", IMG_GetError());
+        return true;
+    }
+    
+    game->indicadorEnemigo = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/alerta.png");
+    if (!game->indicadorEnemigo)
+    {
+        printf("Error al iniciar indicador enemigo: %s", IMG_GetError());
         return true;
     }
 
@@ -45,6 +52,13 @@ bool cargarMedia(Game *game)
     if (!game->texturaEnemigo4)
     {
         printf("Error al iniciar textura enemigo bote: %s\n", IMG_GetError());
+        return true;
+    }
+    
+    game->texturaMeta = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/meta.png");
+    if (!game->texturaMeta)
+    {
+        printf("Error al iniciar tex meta: %s\n", IMG_GetError());
         return true;
     }
     
