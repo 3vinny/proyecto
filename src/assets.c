@@ -10,7 +10,7 @@ bool cargarMedia(Game *game)
         return true;
     }
     
-    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/micro.png");
+    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/mclaren.png");
     if(!surfaceTemp)
     {
         printf("Error cargando imagen car1 : %s\n", IMG_GetError());
@@ -25,7 +25,7 @@ bool cargarMedia(Game *game)
         return true;
     }
     
-    game->texturaPista = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/tileset.png");
+    game->texturaPista = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/tileset_2.png");
     
     game->texturaEnemigo = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/carab.png");
     if (!game->texturaEnemigo)
@@ -54,11 +54,25 @@ bool cargarMedia(Game *game)
         printf("Error al iniciar textura enemigo bote: %s\n", IMG_GetError());
         return true;
     }
+
+    game->texturaEnemigo5 = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/torreta.png");
+    if (!game->texturaEnemigo4)
+    {
+        printf("Error al iniciar textura enemigo torreta: %s\n", IMG_GetError());
+        return true;
+    }
     
     game->texturaMeta = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/meta.png");
     if (!game->texturaMeta)
     {
         printf("Error al iniciar tex meta: %s\n", IMG_GetError());
+        return true;
+    }
+    
+    game->texturaDireccion = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/direccion.png");
+    if (!game->texturaDireccion)
+    {
+        printf("Error al iniciar tex direccion: %s\n", IMG_GetError());
         return true;
     }
     
@@ -99,6 +113,16 @@ bool cargarMedia(Game *game)
     if (game->bala == NULL)
     {
         printf("error con disparo_1.wav : %s\n", Mix_GetError());
+    }
+
+    // explosiones
+    char ruta_explosion[64];
+    for (int i=0; i<FRAMES_EXPLOSION; i++) {
+        snprintf(ruta_explosion, sizeof(ruta_explosion), "./assets/sprites/explosion%d.png", i+1);
+        game->texturaExplosion[i] = IMG_LoadTexture(game->pantalla.renderer, ruta_explosion);
+        if (game->texturaExplosion[i] == NULL){
+            printf("Error al cargar frame %d explosion: %s\n", i, IMG_GetError());
+        }
     }
     
     return false;

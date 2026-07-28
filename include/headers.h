@@ -58,6 +58,13 @@ typedef struct {
     char texto_Nivel[64];
 } Interfaz;
 
+typedef struct {
+    float x;
+    float y;
+    float tiempo;
+    bool activa;
+} Explosion;
+
 // --- JUGADOR/PERSONAJE ---
 typedef struct {
     SDL_Texture *textura;
@@ -115,8 +122,11 @@ typedef struct {
     bool perseguir;
     bool escapando;
     bool sirena;
+    bool es_patrulla;
     bool es_camion;
     bool es_bote;
+    bool es_torreta;
+    bool indicador;
     //bool es_peaton;
     Proyectil proyectiles[MAX_PROYECTILES];
     //colocar arreglo de balas aqui
@@ -130,7 +140,7 @@ typedef struct {
     int h_tiles;
     
     bool activo; //# .
-    bool activo_posJ; //P
+    bool activo_posJ; //P y p
     bool objeto2; //X (caja con +1HP)
     bool objeto3; //Z (caja con balas)
     char tipo; //- | 1 2 3 4
@@ -139,7 +149,7 @@ typedef struct {
     bool enemigo2; // peaton (W)
     bool enemigo3; // camion gas (G)
     bool enemigo4; // Bote (B)
-    //bool enemigo5; //torreta (T)
+    bool enemigo5; //torreta (V)
     
     int casa; // c y C (0,1,-1=destruida)
     bool agua; // A
@@ -148,6 +158,7 @@ typedef struct {
     bool neumatico; // o
     bool semaforo; // S
     bool aceite; // M
+    int direccion; // D y d
 } Tile;
 
 // --- GAME GENERAL ---
@@ -170,10 +181,12 @@ typedef struct {
     SDL_Texture *texturaEnemigo2; //peaton (W)
     SDL_Texture *texturaEnemigo3; // gas (G)
     SDL_Texture *texturaEnemigo4; // bote (B)
+    SDL_Texture *texturaEnemigo5; // torreta (V)
     SDL_Texture *texturaCaja; // caja (X)
     SDL_Texture *texturaCajaBalas; // caja (Z)
     SDL_Texture *texturaAceite; // aceite (M)
     SDL_Texture *texturaMeta; // finish (F)
+    SDL_Texture *texturaDireccion; // direccion (D) y (d)
     
     // meta y finalizacion
     int vueltas;
@@ -190,6 +203,10 @@ typedef struct {
     Pantalla pantalla;
     Personaje jugador;
     Interfaz interfaz;
+
+    // explosiones y arreglos
+    SDL_Texture *texturaExplosion[FRAMES_EXPLOSION];
+    Explosion explosiones[MAX_EXPLOSIONES];
     Tile tiles[tile_filas][tile_cols];
     Enemigo enemigos[max_enemigos];
     

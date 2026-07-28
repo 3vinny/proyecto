@@ -5,7 +5,8 @@
 #define FRICCION 1000.0f
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
-#define POTENCIA_FRENO 1000.0f
+#define POTENCIA_FRENO 1100.0f
+#define VELOCIDAD_IDLE 30.0f
 #define LIMITE 1.0f
 
 int margen = 5;
@@ -23,6 +24,9 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 void empuja_camion(Game *game);
 void dispara_jugador(Game *game);
 void funcion_meta(Game *game);
+void crea_explosion(Game *game, float x, float y);
+void dano_explosion(Game *game, float x, float y);
+void actualiza_explosiones(Game *game);
 
 void game_Update(Game *game)
 {
@@ -186,10 +190,26 @@ void game_Update(Game *game)
         }
     }
    
+    // IDLE / QUIETO
     if (game->jugador.up == 0 && game->jugador.down == 0 && game->jugador.left == 0 && game->jugador.right == 0)
     {
-        game->jugador.x -= 0.05*(paso);
-        game->jugador.velocidad_actual *= 0.97f;
+        float rad_idle = game->jugador.angulo * PI / 180.0f;
+        float paso_idle = VELOCIDAD_IDLE * game->delta_time;
+        SDL_Rect temp_idle = temp1;
+        temp_idle.x = (int)(game->jugador.x + sinf(rad_idle) * paso_idle);
+        temp_idle.y = (int)(game->jugador.y + (-cosf(rad_idle)) * paso_idle);
+
+        //vemos que nada interfiera su camino
+        if (!chequea_tiles(game, &temp_idle, 0) && !chequea_enemigos(game, &temp_idle)) {
+            bool dentromapa = temp_idle.x >= 0 && temp_idle.x <= ancho_act - game->jugador.lado && temp_idle.y >= 0 && temp_idle.y <= ancho_act - game->jugador.lado;
+
+            if (dentromapa) {
+                    game->jugador.x += sinf(rad_idle) * paso_idle;
+                    game->jugador.y += -cosf(rad_idle) * paso_idle;
+            }
+        }
+        //game->jugador.x -= 0.05*(paso);
+        //game->jugador.velocidad_actual *= 0.97f;
     }
    
     // - CAMARA
@@ -227,6 +247,9 @@ void game_Update(Game *game)
                         game->enemigos[i].escapando = 0;
                     }
                     bote_dispara(game, i); // dispara si es bote
+                } else if (game->enemigos[i].es_torreta) {
+                    game->enemigos[i].escapando = 0;
+                    bote_dispara(game, i);
                 } else {
                     if (esta_en_agua(game, &game->enemigos[i].rect)) {
                         if(!game->enemigos[i].escapando) {
@@ -353,7 +376,10 @@ void game_Update(Game *game)
     {
         actualiza_proyectiles(game, game->enemigos[i].proyectiles, true);
     }
+
+    // actualiza reloj de proyectiles y explosiones
     actualiza_proyectiles(game, game->jugador.proyectiles, false);
+    actualiza_explosiones(game);
 }
 
 // chequea proyectiles del enemigo y jugador:
@@ -372,7 +398,7 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
             .h = proyectiles[p].lado
         };
     
-        if (rect_bala.x < 0 || rect_bala.y < 0 || chequea_tiles(game, &rect_bala, 1))
+        if (rect_bala.x < 0 || rect_bala.y < 0 || chequea_tiles(game, &rect_bala, 2))
         {
            proyectiles[p].activo = false;
            continue;
@@ -380,6 +406,7 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
         
         if (es_enemigo)
         {
+            // caso bala hacia jugador
             if (SDL_HasIntersection(&rect_bala, &game->jugador.rect)) 
             {
                 proyectiles[p].activo = false;
@@ -391,21 +418,26 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                     game->quit = true;
                 }
             } 
-        } else { // caso que no es el enemigo el que da la bala
+        } else { // caso enemigo recibe bala
             for (int i=0; i<max_enemigos; i++)
             {
                 if (game->enemigos[i].activo && SDL_HasIntersection(&rect_bala, &game->enemigos[i].rect)) 
                 {
                     proyectiles[p].activo = false;
-                    if (game->enemigos[i].es_camion || game->enemigos[i].es_bote) {
-                        printf("Es camion / bote!!!!\n");
+                    if (game->enemigos[i].es_camion || game->enemigos[i].es_bote || game->enemigos[i].es_torreta) {
+                        printf("Es camion / bote / torreta!!!! falta agrandar\n");
                     } else {
                         game->enemigos[i].perseguir = true;
+                        game->enemigos[i].indicador = true;
                     }
                     game->enemigos[i].hp--;
                     
                     printf("Enemigo n°%d recibio disparo! y ahora tiene HP: %d\n", i, game->enemigos[i].hp);
                     if (game->enemigos[i].hp <= 0) {
+                        if (game->enemigos[i].es_camion == true) {
+                            SDL_Log("BOOM!!!!\n");
+                            crea_explosion(game, game->enemigos[i].x, game->enemigos[i].y);
+                        }
                         game->enemigos[i].activo = false;
                         printf("Enemigo n%d debería desaparecer\n", i);
                     }
@@ -431,7 +463,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 
                 // comprueba si chocaste con cualquier tile
                 if (SDL_HasIntersection(player_rect, &temp4)) {
-                    return 1; 
+                    return 1;
                 }
             }
             
@@ -468,7 +500,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     .x = game->tiles[i][j].x_tiles,
                     .y = game->tiles[i][j].y_tiles,
                     .w = game->tiles[i][j].w_tiles,
-                    .h = game->tiles[i][j].h_tiles
+                    .h = game->tiles[i][j].h_tiles - 2*margen
                 };
                 
                     if (SDL_HasIntersection(player_rect, &tempmeta)) {
@@ -480,9 +512,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         if (tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta) {
                             game->llego_meta = true;
                             if (game->llego_meta = true && tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta) {
-                                game->vueltas++;
                                 funcion_meta(game);
-                                game->quit = true;
                             }
                         }
                         
@@ -558,7 +588,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
 int chequea_enemigos(Game *game, SDL_Rect *player_rect)
 {
     for (int i = 0; i < max_enemigos; i++) {
-        if (game->enemigos[i].activo && !game->enemigos[i].es_camion && !game->enemigos[i].es_bote) {
+        if (game->enemigos[i].activo && !game->enemigos[i].es_camion && !game->enemigos[i].es_bote && !game->enemigos[i].es_torreta) {
             SDL_Rect hitbox_enemigo = {
                 game->enemigos[i].rect.x + margen,
                 game->enemigos[i].rect.y + margen,
@@ -571,6 +601,7 @@ int chequea_enemigos(Game *game, SDL_Rect *player_rect)
                 if (!game->enemigos[i].perseguir) {
                     game->enemigos[i].perseguir = true;
                     game->enemigos[i].sirena = true;
+                    game->enemigos[i].indicador = true;
                     printf("Patrulla N°%d Perseguira!!\n", i);
                     game->enemigos[i].velocidad = 0.95*(game->jugador.velocidad);
                     if (game->enemigos[i].sirena == true && game->enemigos[i].perseguir == true) {
@@ -714,6 +745,7 @@ int bote_agua(Game *game, int numero_enemigo) // SOLO FUE COPIAR LA FUNCION DE A
     return 0; // no encontro agua
 }
 
+// y torretas
 void bote_dispara(Game *game, int numero_enemigo)
 {
     if (game->enemigos[numero_enemigo].cooldown_disparo > 0.0f)
@@ -747,7 +779,6 @@ void bote_dispara(Game *game, int numero_enemigo)
                     game->enemigos[numero_enemigo].proyectiles[p].sonido = true;
                     
                     if (game->bala != NULL && dist < RADIO_PERDIDO) {
-                        printf("Sonido bala!\n");
                         Mix_PlayChannel(-1, game->bala, 0);
                     }
                     break; //necesario romper el ciclo para que no continue
@@ -772,8 +803,8 @@ void empuja_camion(Game *game)
         SDL_Rect rect_camion = {
             (int)game->enemigos[i].x,
             (int)game->enemigos[i].y,
-            game->jugador.lado,
-            game->jugador.lado
+            game->enemigos[i].lado,
+            game->enemigos[i].lado
         };
 
         if (SDL_HasIntersection(&rect_jugador, &rect_camion)) 
@@ -795,10 +826,11 @@ void empuja_camion(Game *game)
 
 void dispara_jugador(Game *game)
 {
+    // chequea el cooldown del disparo y le restamos x tiempo
     if (game->jugador.cooldown_disparo > 0.0f) {
         game->jugador.cooldown_disparo -= game->delta_time;
     }
-
+    // si jugador dispara y el cooldown termino
     if (game->jugador.disparo && game->jugador.cooldown_disparo <= 0.0f) 
     {
         // ° a radianes
@@ -881,19 +913,21 @@ void construir_rects(Game *game)
     };
 }
 
-void funcion_meta(Game *game)
+void funcion_meta(Game *game) //cambiar a int
 {
     // aca ira lo que tengo arriba respecto a la meta la gracia de esto es la escritura archivo
     printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d", game->interfaz.texto_cronometro, game->vueltas);
     
+    game->vueltas++;
+    
     // archivo
-    char formato[60];
+    char formato[100];
     char ruta[32];
     char nombre[12] = "test";
     
     // formateo
     snprintf(ruta, sizeof(ruta), "./data/score_%d.txt", game->nivel_actual);
-    snprintf(formato, sizeof(formato), "Niv %d-T (%s)-Jug [%s]-HP %d-Lap%d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas);
+    snprintf(formato, sizeof(formato), "Niv %d | T (%s) | Jug [%s] | HP %d | Lap%d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas);
     
     FILE *archivo_score = fopen(ruta, "a");
     if (!archivo_score){
@@ -903,6 +937,7 @@ void funcion_meta(Game *game)
     
     fprintf(archivo_score, "%s\n", formato);
     fclose(archivo_score);
+    game->quit = true;
 }
 
 float calcula_direccion(int dir_x_input, int dir_y_input)
@@ -916,4 +951,63 @@ float calcula_direccion(int dir_x_input, int dir_y_input)
     if (dir_x_input == -1 && dir_y_input == 0) return 270.0f;
     if (dir_x_input == -1 && dir_y_input == -1) return 315.0f;
     return 90.0f;
+}
+
+void dano_explosion(Game *game, float x, float y)
+{
+    // centro explosion (para dp aplicar el radio) le sumamos 16
+    float centro_x = x + (tam/2.0f);
+    float centro_y = y + (tam/2.0f);
+
+    // chequea contra jugador
+    float dx = (game->jugador.x + game->jugador.lado/2.0f) - centro_x;
+    float dy = (game->jugador.y + game->jugador.lado/2.0f) - centro_y;
+    float dist = sqrtf(dx*dx + dy*dy);
+
+    if (dist <= RADIO_EXPLOSION) {
+        game->jugador.hp -= DANO_EXPLOSION;
+        if (game->jugador.hp <= 0) game->quit = true;
+    }
+
+    for (int i=0; i<max_enemigos; i++) {
+        if (!game->enemigos[i].activo) continue;
+        // chequea contra cada enemigo del mapa
+        float dx_e = (game->enemigos[i].x + game->enemigos[i].lado/2.0f) - centro_x;
+        float dy_e = (game->enemigos[i].y + game->enemigos[i].lado/2.0f) - centro_y;
+        float dist_e = sqrtf(dx*dx + dy*dy);
+        
+        if (dist_e <= RADIO_EXPLOSION) {
+            game->enemigos[i].hp -= DANO_EXPLOSION;
+            if (game->enemigos[i].hp <= 0) {
+                game->enemigos[i].activo = false;
+                // mata enemigos
+            }
+        }
+    }
+}
+
+void crea_explosion(Game *game, float x, float y)
+{
+    for (int i=0; i<MAX_EXPLOSIONES; i++) {
+        if (!game->explosiones[i].activa) {
+            game->explosiones[i].x = x;
+            game->explosiones[i].y = y;
+            game->explosiones[i].tiempo = 0.0f;
+            game->explosiones[i].activa = true;
+            break;
+        }
+    }
+    dano_explosion(game, x, y);
+}
+
+void actualiza_explosiones(Game *game)
+{
+    for (int i=0; i<MAX_EXPLOSIONES; i++){
+        if (!game->explosiones[i].activa) continue;
+        game->explosiones[i].tiempo += game->delta_time;
+
+        if (game->explosiones[i].tiempo >= DURACION_EXPLOSION) {
+            game->explosiones[i].activa = false;
+        }
+    }
 }

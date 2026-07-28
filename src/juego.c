@@ -8,7 +8,6 @@ void game_Main(Game *game, int exitStatus)
     game->tiempo_inicio = SDL_GetTicks();
     Uint32 tiempo_anterior = SDL_GetTicks();
     
-
     while (!game->quit)
     {
         // delta time

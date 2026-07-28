@@ -61,9 +61,9 @@ int main(int argc, char **argv)
       },
       
       .enemigos = {
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 },
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 },
-         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4 }
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4, .indicador = false },
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4, .indicador = false },
+         { .x=0, .y=0, .angulo=90.0, .velocidad=0, .activo=true, .cooldown_disparo=0.0f, .hp = 4, .indicador = false }
       }
    };
 

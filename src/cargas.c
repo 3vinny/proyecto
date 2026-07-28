@@ -40,7 +40,7 @@ void ajusta_Tiles(Game *game)
             {
                 game->enemigos[contador_enemigos].x = j*tile_w_px;
                 game->enemigos[contador_enemigos].y = i*tile_h_px;
-                game->enemigos[contador_enemigos].lado = 32;
+                game->enemigos[contador_enemigos].lado = 64;
                 game->enemigos[contador_enemigos].velocidad = VELOCIDAD_ENEMIGO3;
                 game->enemigos[contador_enemigos].dir_x = 1;
                 game->enemigos[contador_enemigos].dir_y = 0;
@@ -61,6 +61,20 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].hp = HP_BOTE;
                 game->enemigos[contador_enemigos].activo = true;
                 game->enemigos[contador_enemigos].es_bote = true;
+                contador_enemigos++;
+            }
+            // torreta
+            if (game->tiles[i][j].enemigo5 && contador_enemigos < max_enemigos)
+            {
+                game->enemigos[contador_enemigos].x = j*tile_w_px;
+                game->enemigos[contador_enemigos].y = i*tile_h_px;
+                game->enemigos[contador_enemigos].lado = 32;
+                game->enemigos[contador_enemigos].velocidad = 0;
+                game->enemigos[contador_enemigos].dir_x = 1;
+                game->enemigos[contador_enemigos].dir_y = 0;
+                game->enemigos[contador_enemigos].hp = HP_CAMION;
+                game->enemigos[contador_enemigos].activo = true;
+                game->enemigos[contador_enemigos].es_torreta = true;
                 contador_enemigos++;
             }
         }
@@ -113,6 +127,7 @@ A: agua
             }
             
             if (linea_actual == 'B') game->tiles[i][j].enemigo4 = true;
+            if (linea_actual == 'V') game->tiles[i][j].enemigo5 = true;
             
             if (linea_actual == 'F') game->tiles[i][j].meta = true;
 
@@ -122,6 +137,12 @@ A: agua
             } else if (linea_actual == 'c') 
             {
                 //game->tiles[i][j].casa = -1;               
+            }
+            
+            if (linea_actual == 'D') {
+                game->tiles[i][j].direccion = 1;
+            } else if (linea_actual == 'd') {
+                game->tiles[i][j].direccion = -1;
             }
         
             if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'Z' || linea_actual == 'M' || linea_actual == 'G')

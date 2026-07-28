@@ -8,6 +8,7 @@ linux/
 assets/sprites/unused
 /unused
 assets/sfx/unused
+assets/music
 
 # MacOS Cache
 .DS_Store
@@ -19,3 +20,4 @@ assets/sfx/unused
 *.env
 *.old
 *.zip
+*.mp3

@@ -1,0 +1,3 @@
+fullscreen=false
+max_jugadores=2
+nivel_actual=1

@@ -28,7 +28,7 @@
 //#define COOLDOWN_META 5000
 
 // -- enemigos --
-#define max_enemigos 10
+#define max_enemigos 50
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
 #define HP_ENEMIGOS 15
@@ -46,5 +46,12 @@
 // enemigo 3 camion gas
 #define EMPUJE_CAMION 90.0f
 #define HP_CAMION 4
+// explosion camion gas
+#define RADIO_EXPLOSION 80.0f
+#define DURACION_EXPLOSION 0.6f
+#define DANO_EXPLOSION 3
+#define MAX_EXPLOSIONES 10
+#define FRAMES_EXPLOSION 6
+#define TAM_EXPLOSION 64
 
 #endif

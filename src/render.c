@@ -16,7 +16,7 @@ void game_Render(Game *game)
 
     SDL_Rect origen_fondo;
     
-    if (game->nivel_actual == 2) {
+    if (game->nivel_actual == 2 || game->nivel_actual == 4) {
         origen_fondo = (SDL_Rect){ 112, 0, tam, tam };
     } else if (game->nivel_actual == 3) {
         origen_fondo = (SDL_Rect){ 144, 192, tam, tam };
@@ -59,6 +59,7 @@ void game_Render(Game *game)
             SDL_Rect origen = { 0,0,tam,tam };
             switch(tipo) 
             {
+                // curvas con borde rojo
                 case '1':
                     origen.x = 0; origen.y = 0; //(0,0) superior izq
                     break;
@@ -71,7 +72,7 @@ void game_Render(Game *game)
                 case '4':
                     origen.x = 64; origen.y = 64; // (128,128) inferior derecha
                     break;
-                    
+                // curvas sin borde
                 case '5':
                     origen.x = 272; origen.y = 112;
                     break;
@@ -84,7 +85,7 @@ void game_Render(Game *game)
                 case '8':
                     origen.x = 336; origen.y = 176;
                     break;
-    
+                // lineas horizontales
                 case '-':
                     origen.x = 32; origen.y = 0; //(32,0) recta horiz 
                     break;
@@ -92,9 +93,10 @@ void game_Render(Game *game)
                     origen.x = 32; origen.y = 64;
                     break;
                 case '=':
+                case 'P':
                     origen.x = 304; origen.y = 112;
                     break;
-               
+               // lineas verticales
                 case '|':
                     origen.x = 0; origen.y = tam; //recta vertical (0, 64)
                     break;
@@ -104,9 +106,9 @@ void game_Render(Game *game)
                 case 'i':
                     origen.x = 272; origen.y = 144;
                     break;
-                case 'l':
+               /* case 'l':
                     origen.x = 64; origen.y = 32;
-                    break;
+                    break;*/
                
                 case '#': //asfalto !!!
                     origen.x = 144; origen.y = 192; // 144, 192 COORDENADAS
@@ -126,14 +128,31 @@ void game_Render(Game *game)
                 case 'B':
                     origen.x = 384; origen.y = 112;
                     break;
+                case 'D':
+                    origen.x = 224; origen.y = 192;
+                    break;
+                case 'd':
+                    origen.x = 224; origen.y = 192;
+                    break;
                 case 'M':
                     origen.x = 384; origen.y = 208;
                     break;
                 case 'N':
                     origen.x = 384; origen.y = 176;
                     break;
+                case 'L':
+                    origen.x = 272; origen.y = 240;
+                    break;
+                case 'l':
+                    origen.x = 304;; origen.y = 240;
+                    break;
                 case 'T':
-                    origen.x = 336; origen.y = 208;
+                    if (game->nivel_actual == 2) {
+                        origen.x = 336;
+                        origen.y = 240;
+                    } else {
+                        origen.x = 336; origen.y = 208;
+                    }
                     break;
                 default: // si no es ninguno el booleano se cambia
                     dibuja_pista = false;
@@ -161,7 +180,7 @@ void game_Render(Game *game)
     int centesimas = (transcurrido % 1000)/10;
     
     // CRONOMETRO
-    snprintf(game->interfaz.texto_cronometro, sizeof(game->interfaz.texto_cronometro), "%02d:%02d:%02d", minutos, segundos, centesimas);
+    snprintf(game->interfaz.texto_cronometro, sizeof(game->interfaz.texto_cronometro), "Tiempo: %02d:%02d:%02d", minutos, segundos, centesimas);
     // HP
     sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
     // BALAS
@@ -251,6 +270,25 @@ void game_Render(Game *game)
                     SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Aceite);
                 }
             }
+            
+            if (game->tiles[i][j].direccion == 1 || game->tiles[i][j].direccion == -1) {
+                SDL_Rect Rectang_Direccion = {
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                
+                float angulo_dir = 0.0f;
+                if (game->tiles[i][j].direccion == 1) angulo_dir = 180.0f;
+                
+                if (game->texturaDireccion != NULL) {
+                    SDL_RenderCopyEx(game->pantalla.renderer, game->texturaDireccion, NULL, &Rectang_Direccion, angulo_dir, NULL, SDL_FLIP_NONE);
+                } else {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 105);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_Direccion);
+                }
+            }
         }
     }
     
@@ -272,6 +310,8 @@ void game_Render(Game *game)
                 textura_enemigo = game->texturaEnemigo3;
             } else if (game->enemigos[i].es_bote == true) {
                 textura_enemigo = game->texturaEnemigo4;
+            } else if (game->enemigos[i].es_torreta == true) {
+                textura_enemigo = game->texturaEnemigo5;
             }
 
             if (textura_enemigo != NULL)
@@ -280,6 +320,14 @@ void game_Render(Game *game)
             } else {
                 SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 50, 50, 255);
                 SDL_RenderFillRect(game->pantalla.renderer, &rect_enm);
+            }
+            
+            if (!game->enemigos[i].es_bote && !game->enemigos[i].es_camion && !game->enemigos[i].es_torreta && game->enemigos[i].indicador) {
+                if (game->indicadorEnemigo != NULL) {
+                    SDL_SetTextureBlendMode(game->indicadorEnemigo, SDL_BLENDMODE_BLEND);
+                    SDL_SetTextureAlphaMod(game->indicadorEnemigo, 100);
+                    SDL_RenderCopyEx(game->pantalla.renderer, game->indicadorEnemigo, NULL, &rect_enm, game->enemigos[i].angulo, NULL, SDL_FLIP_NONE);
+                }
             }        
         }
     }
@@ -334,6 +382,28 @@ void game_Render(Game *game)
             };
         }
     }
+
+    // EXPLOSIONES
+    for (int i=0; i<MAX_EXPLOSIONES; i++) {
+        if (!game->explosiones[i].activa) continue;
+
+        // numero de fotograma que toca mostrar por tiempo
+        int frame = (int)((game->explosiones[i].tiempo / DURACION_EXPLOSION) * FRAMES_EXPLOSION);
+        if (frame >= FRAMES_EXPLOSION) {
+            frame = FRAMES_EXPLOSION - 1;
+        }
+        
+        SDL_Rect rect_explosion = {
+            (int)game->explosiones[i].x - game->pantalla.camara.x - (tam),
+            (int)game->explosiones[i].y - game->pantalla.camara.y - (tam),
+            TAM_EXPLOSION,
+            TAM_EXPLOSION,
+        };
+
+        if (game->texturaExplosion[frame] != NULL){
+            SDL_RenderCopy(game->pantalla.renderer, game->texturaExplosion[frame], NULL, &rect_explosion);
+        }
+    }
     
     SDL_RenderPresent(game->pantalla.renderer);
 }
@@ -347,7 +417,7 @@ void render_Cronometro(Game *game)
         game->interfaz.texturaTexto2 = NULL;
     }
     
-    SDL_Color colorBlanco = {255,255,255,155}; //rgb y transparencia
+    SDL_Color colorBlanco = {255,255,255,200}; //rgb y transparencia
     SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_cronometro, colorBlanco);
     
     if (surfaceTemporal != NULL)
@@ -359,7 +429,7 @@ void render_Cronometro(Game *game)
     if (game->interfaz.texturaTexto2 != NULL)
     {
         SDL_QueryTexture(game->interfaz.texturaTexto2, NULL, NULL, &wText, &hText);
-        SDL_Rect textoRec2 = { game->pantalla.win_w - wText, game->pantalla.win_h - hText, wText/2, hText/2 };
+        SDL_Rect textoRec2 = { 0, game->pantalla.win_h - 100, (int)wText/2, (int)hText/2 };
         SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto2, NULL, &textoRec2);
     }
 }
