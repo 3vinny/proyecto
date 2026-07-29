@@ -10,7 +10,7 @@ bool cargarMedia(Game *game)
         return true;
     }
     
-    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/mclaren.png");
+    SDL_Surface *surfaceTemp = IMG_Load("./assets/sprites/auto1.png");
     if(!surfaceTemp)
     {
         printf("Error cargando imagen car1 : %s\n", IMG_GetError());
@@ -113,6 +113,11 @@ bool cargarMedia(Game *game)
     if (game->bala == NULL)
     {
         printf("error con disparo_1.wav : %s\n", Mix_GetError());
+    }
+
+    game->sel_menu = Mix_LoadWAV("./assets/sfx/menu.wav");
+    if (game->sel_menu == NULL) {
+        printf("error con seleccion del menu : %s\n", Mix_GetError());
     }
 
     // explosiones

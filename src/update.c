@@ -1,12 +1,12 @@
 // colisiones direccion y fisicas, etc
 #include "headers.h"
 
-#define ACELERACION 200.0f
+#define ACELERACION 110.0f
 #define FRICCION 1000.0f
 #define REDUCE_COLISION 0.4f
 #define DELAY_ARRANQUE 0.11f
 #define POTENCIA_FRENO 1100.0f
-#define VELOCIDAD_IDLE 30.0f
+#define VELOCIDAD_IDLE 10.0f
 #define LIMITE 1.0f
 
 int margen = 5;
@@ -23,6 +23,7 @@ float calcula_direccion(int dir_x_input, int dir_y_input);
 void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo);
 void empuja_camion(Game *game);
 void dispara_jugador(Game *game);
+int funcion_misiones(Game *game);
 void funcion_meta(Game *game);
 void crea_explosion(Game *game, float x, float y);
 void dano_explosion(Game *game, float x, float y);
@@ -370,6 +371,14 @@ void game_Update(Game *game)
         }
     }
 
+    // inicio reloj del cooldown
+    if (game->jugador.cooldown_agua > 0.0f) {
+        game->jugador.cooldown_agua -= game->delta_time;
+    }
+    if (game->jugador.cooldown_choque > 0.0f) {
+        game->jugador.cooldown_choque -= game->delta_time;
+    }
+
     dispara_jugador(game); //mecanica para que mi jugador dispare hacia una direccion en rads
     
     for (int i=0; i<max_enemigos; i++)
@@ -436,6 +445,7 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                     if (game->enemigos[i].hp <= 0) {
                         if (game->enemigos[i].es_camion == true) {
                             SDL_Log("BOOM!!!!\n");
+                            game->contador_camiones--;
                             crea_explosion(game, game->enemigos[i].x, game->enemigos[i].y);
                         }
                         game->enemigos[i].activo = false;
@@ -476,10 +486,25 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                     };
                 
                     if (SDL_HasIntersection(player_rect, &tempcasa)) {
+                        // si es jugador e impacta
+                        if (!es_enemigo && game->jugador.cooldown_choque <= 0.0f) {
+
+                            if (game->jugador.velocidad_actual >= 150.0f) {
+                                game->jugador.hp -= 2;
+                                game->jugador.cooldown_choque = 3.0f; // 3 segundo
+                                printf("Choque fuerte... HP: %d\n", game->jugador.hp);
+                            } else if (game->jugador.velocidad_actual > 80.0f) {
+                                game->jugador.hp -= 1;
+                                game->jugador.cooldown_choque = 3.0f;
+                                printf("Choque suave... HP: %d\n", game->jugador.hp);
+                            }
+                        }
+
                         return 1;
                     }
             }
 
+            // MECANICA DEL .AGUA
             if (game->tiles[i][j].agua) {
                 SDL_Rect tempagua = {
                     .x = game->tiles[i][j].x_tiles,
@@ -489,8 +514,51 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 };
                 
                 if (!es_enemigo) {
-                    if (SDL_HasIntersection(player_rect, &tempagua)) {
+                    // lo alineamos al centro del tile para que no nos haga dano solo rozando
+                    int centro_x = player_rect->x + (player_rect->w / 2);
+                    int centro_y = player_rect->y + (player_rect->h / 2);
+                    
+                    if(centro_x >= tempagua.x && centro_x <= tempagua.x + tempagua.w) {
+                        if (centro_y >= tempagua.y && centro_y <= tempagua.y + tempagua.h) {
+                            game->jugador.velocidad_actual *= 0.8f;
+
+                            if (game->jugador.cooldown_agua <= 0.0f) {
+                                game->jugador.hp -= 1;
+                                game->jugador.cooldown_agua = 0.8f;
+                                printf("Dano x agua!. hp actual jugador: %d\n", game->jugador.hp);
+                            }
+                        }
+                    }
+                    /*if (SDL_HasIntersection(player_rect, &tempagua)) {
                         if (!es_enemigo) return 1;
+                    }*/
+                }
+            }
+            
+            if (game->tiles[i][j].movediza >= 1){
+                SDL_Rect temparena = {
+                    .x = game->tiles[i][j].x_tiles + margen,
+                    .y = game->tiles[i][j].y_tiles + margen,
+                    .w = game->tiles[i][j].w_tiles - margen,
+                    .h = game->tiles[i][j].h_tiles - margen
+                };
+                
+                if (!es_enemigo) {
+                    if (SDL_HasIntersection(player_rect, &temparena)) {
+                        if (game->tiles[i][j].movediza == 2)
+                        {
+                            game->jugador.velocidad_actual -= POTENCIA_FRENO * game->delta_time;
+                            if (game->jugador.velocidad_actual <= LIMITE)
+                            {
+                                game->jugador.velocidad_actual = LIMITE;
+                                game->jugador.dir_x = 0;
+                                game->jugador.dir_y = 0;
+                                game->jugador.tiempo_arranque = 0.0f;
+                            }
+                            game->jugador.velocidad_actual = (game->delta_time) * (game->jugador.velocidad_actual);
+                        } else {
+                            game->jugador.velocidad_actual *= 0.5;
+                        }
                     }
                 }
             }
@@ -507,7 +575,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         if (es_enemigo) return 1;
                         
                         Uint32 tiempo_actual = SDL_GetTicks();
-                        Uint32 cooldown_meta = 5000; // 20 segundos
+                        Uint32 cooldown_meta = 20000; // 20 segundos
                         
                         if (tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta) {
                             game->llego_meta = true;
@@ -555,7 +623,10 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         game->jugador.velocidad_actual *= 0.5f;
                         SDL_Log("caja destruida!");
                         game->jugador.velocidad_actual *= 1.2f;
-                        game->jugador.hp += 1;
+                        if (game->jugador.hp <= HP_MAX) {
+                            game->jugador.hp += 1;
+                        }
+                        
                     }
                 }
             }
@@ -917,7 +988,7 @@ void funcion_meta(Game *game) //cambiar a int
 {
     // aca ira lo que tengo arriba respecto a la meta la gracia de esto es la escritura archivo
     printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d", game->interfaz.texto_cronometro, game->vueltas);
-    
+    funcion_misiones(game);
     game->vueltas++;
     
     // archivo
@@ -926,7 +997,7 @@ void funcion_meta(Game *game) //cambiar a int
     char nombre[12] = "test";
     
     // formateo
-    snprintf(ruta, sizeof(ruta), "./data/score_%d.txt", game->nivel_actual);
+    snprintf(ruta, sizeof(ruta), "./data/score/score_%d.txt", game->nivel_actual);
     snprintf(formato, sizeof(formato), "Niv %d | T (%s) | Jug [%s] | HP %d | Lap%d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas);
     
     FILE *archivo_score = fopen(ruta, "a");
@@ -938,6 +1009,15 @@ void funcion_meta(Game *game) //cambiar a int
     fprintf(archivo_score, "%s\n", formato);
     fclose(archivo_score);
     game->quit = true;
+}
+
+int funcion_misiones(Game *game)
+{
+    printf("Funcion misiones\n");
+    if (game->nivel_actual == 2){
+        printf("misiones niv 2\n");
+    }
+    return 1;
 }
 
 float calcula_direccion(int dir_x_input, int dir_y_input)

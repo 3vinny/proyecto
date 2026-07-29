@@ -49,12 +49,14 @@ typedef struct {
 typedef struct {
     SDL_Texture *texturaTexto;
     SDL_Texture *texturaTexto2;
+    SDL_Texture *texturaTexto3;
     SDL_Texture *texturaHP;
     SDL_Texture *texturaBalas;
     SDL_Texture *texturaNivel;
     char texto_Balas[64];
     char texto_HP[64];
     char texto_cronometro[64];
+    char texto_Mision[20];
     char texto_Nivel[64];
 } Interfaz;
 
@@ -91,6 +93,8 @@ typedef struct {
     int bocina;
     int disparo;
     float cooldown_disparo;
+    float cooldown_agua;
+    float cooldown_choque;
     int contador_balas;
     
     //hitbox
@@ -124,6 +128,7 @@ typedef struct {
     bool sirena;
     bool es_patrulla;
     bool es_camion;
+    int contador_camiones;
     bool es_bote;
     bool es_torreta;
     bool indicador;
@@ -152,6 +157,7 @@ typedef struct {
     bool enemigo5; //torreta (V)
     
     int casa; // c y C (0,1,-1=destruida)
+    int movediza; // 0, 1=salvable, 2=hundido
     bool agua; // A
     bool meta; // F
     bool obstaculo; // N
@@ -172,6 +178,7 @@ typedef struct {
     Mix_Chunk *vozinha;
     Mix_Chunk *sirena1;
     Mix_Chunk *bala;
+    Mix_Chunk *sel_menu;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     
@@ -191,6 +198,7 @@ typedef struct {
     // meta y finalizacion
     int vueltas;
     bool llego_meta;
+    int contador_camiones;
     
     // texto, cronometro y bocina
     
@@ -220,11 +228,11 @@ typedef struct {
 bool SDL_Inicia(Game *game);  // eventos.c
 bool cargarMedia(Game *game); // assets.c
 
+void game_Menu(Game *game); // menu.c
 void game_Limpieza(Game *game, int exitStatus); // eventos.c
+void game_Input(Game *game);   // eventos.c
 void game_Main(Game *game, int exitStatus);     // juego.c
 void interfaz_Inicia(Game *game);               // interfaz.c
-
-void game_Input(Game *game);   // eventos.c
 void carga_Tiles(Game *game);  // cargas.c
 void ajusta_Tiles(Game *game); // cargas.c
 void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c

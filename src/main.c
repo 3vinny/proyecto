@@ -106,8 +106,10 @@ int main(int argc, char **argv)
    }
 
    carga_Tiles(&game);
-   
-   game_Main(&game, EXIT_SUCCESS);
+   game_Menu(&game);
+   if (!game.quit) {
+      game_Main(&game, EXIT_SUCCESS);
+   }
    game_Limpieza(&game, EXIT_SUCCESS);
 
    return 0;

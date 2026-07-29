@@ -19,7 +19,7 @@ void game_Render(Game *game)
     if (game->nivel_actual == 2 || game->nivel_actual == 4) {
         origen_fondo = (SDL_Rect){ 112, 0, tam, tam };
     } else if (game->nivel_actual == 3) {
-        origen_fondo = (SDL_Rect){ 144, 192, tam, tam };
+        origen_fondo = (SDL_Rect){ 448, 112, tam, tam };
     } else {
         origen_fondo = (SDL_Rect){ 224, 192, tam, tam };
     }
@@ -125,6 +125,10 @@ void game_Render(Game *game)
                 case 'a':
                     origen.x = 384; origen.y = 112;
                     break;
+                case 'S':
+                case 's':
+                    origen.x = 112; origen.y = 32;
+                    break;
                 case 'B':
                     origen.x = 384; origen.y = 112;
                     break;
@@ -168,7 +172,7 @@ void game_Render(Game *game)
 
     // TEXT
     SDL_QueryTexture(game->interfaz.texturaTexto, NULL, NULL, &wText, &hText);
-    SDL_Rect textoRec = { 0, 0, wText/2, hText/2 }; // posicion texto, ancho y alto
+    SDL_Rect textoRec = { 0, 0, wText/4, hText/4 }; // posicion texto, ancho y alto
     SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto, NULL, &textoRec);
 
     // TEXTO CRONOMETRO
@@ -187,6 +191,8 @@ void game_Render(Game *game)
     sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
     // NIVEL
     sprintf(game->interfaz.texto_Nivel, "Nivel: %01d", game->nivel_actual);
+    // CAMIONES RESTANTES (NIVELES 2 Y 4)
+    snprintf(game->interfaz.texto_Mision, sizeof(game->interfaz.texto_Mision), "Camiones: %01d", game->contador_camiones);
     
     render_Cronometro(game);
     render_hp(game);
@@ -429,7 +435,7 @@ void render_Cronometro(Game *game)
     if (game->interfaz.texturaTexto2 != NULL)
     {
         SDL_QueryTexture(game->interfaz.texturaTexto2, NULL, NULL, &wText, &hText);
-        SDL_Rect textoRec2 = { 0, game->pantalla.win_h - 100, (int)wText/2, (int)hText/2 };
+        SDL_Rect textoRec2 = { game->pantalla.win_w - wText/2, game->pantalla.win_h - 30, (int)wText/2, (int)hText/2 };
         SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto2, NULL, &textoRec2);
     }
 }
@@ -488,20 +494,35 @@ void render_nivel(Game *game)
         SDL_DestroyTexture(game->interfaz.texturaNivel);
         game->interfaz.texturaNivel = NULL;
     }
+
+    if (game->interfaz.texturaTexto3 != NULL) {
+        SDL_DestroyTexture(game->interfaz.texturaTexto3);
+        game->interfaz.texturaTexto3 = NULL;
+    }
     
     SDL_Color colorBlanco = {255,255,255,255};
     SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_Nivel, colorBlanco);
-    
-    if (surfaceTemporal != NULL)
-    {
-    game->interfaz.texturaNivel = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
-    SDL_FreeSurface(surfaceTemporal);
+    SDL_Surface *surfaceTexto3 = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_Mision, colorBlanco);
+
+    if (surfaceTemporal != NULL) {
+        game->interfaz.texturaNivel = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTemporal);
+        SDL_FreeSurface(surfaceTemporal);
+    }
+
+    if (surfaceTexto3 != NULL) {
+        game->interfaz.texturaTexto3 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto3);
+        SDL_FreeSurface(surfaceTexto3);
     }
     
-    if (game->interfaz.texturaNivel != NULL)
-    {
-    SDL_QueryTexture(game->interfaz.texturaNivel, NULL, NULL, &wText, &hText);
-    SDL_Rect textoRec = { game->pantalla.win_w - wText, 0, wText/2, hText/2 };
-    SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaNivel, NULL, &textoRec);
+    if (game->interfaz.texturaNivel != NULL) {
+        SDL_QueryTexture(game->interfaz.texturaNivel, NULL, NULL, &wText, &hText);
+        SDL_Rect textoRec = { game->pantalla.win_w - wText, 0, wText/2, hText/2 };
+        SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaNivel, NULL, &textoRec);
+    }
+
+    if (game->interfaz.texturaTexto3 != NULL) {
+        SDL_QueryTexture(game->interfaz.texturaTexto3, NULL, NULL, &wText, &hText);
+        SDL_Rect textoRec2 = { game->pantalla.win_w - wText, hText, wText/2, hText/2 };
+        SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto3, NULL, &textoRec2);
     }
 }

@@ -47,6 +47,8 @@ void ajusta_Tiles(Game *game)
                 game->enemigos[contador_enemigos].hp = HP_CAMION;
                 game->enemigos[contador_enemigos].activo = true;
                 game->enemigos[contador_enemigos].es_camion = true;
+                game->contador_camiones++;
+                printf("Camiones: %d\n", game->contador_camiones);
                 contador_enemigos++;
             }
             // enemigo bote (este debera moverse circular solo donde A/a)
@@ -126,6 +128,12 @@ A: agua
                 game->tiles[i][j].agua = true;
             }
             
+            if (linea_actual == 's'){
+                game->tiles[i][j].movediza = 1;
+            } else if (linea_actual == 'S'){
+                game->tiles[i][j].movediza = 2;
+            }
+            
             if (linea_actual == 'B') game->tiles[i][j].enemigo4 = true;
             if (linea_actual == 'V') game->tiles[i][j].enemigo5 = true;
             
@@ -159,7 +167,7 @@ A: agua
                 {
                     game->tiles[i][j].tipo = '+';
                 }
-                else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A')) 
+                else if (j>0 && (game->tiles[i-1][j].tipo == '.') && (game->tiles[i+1][j].tipo == '=') || (game->tiles[i+1][j].tipo == '=') || (game->tiles[i-1][j].tipo == 'A') || (game->tiles[i+1][j].tipo == 'A') || (game->tiles[i-1][j].tipo == 'a')) 
                 {
                     game->tiles[i][j].tipo = '-';
                 }

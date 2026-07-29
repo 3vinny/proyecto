@@ -53,7 +53,7 @@ bool SDL_Inicia(Game *game)
 
    // Carga de fuente ttf
    // ./data/hitbox.txt
-   game->fuente = TTF_OpenFont("./assets/ttf/helvetica.ttf", 30);
+   game->fuente = TTF_OpenFont("./assets/ttf/champagnebold.ttf", 35);
    if (!(game->fuente))
    {
       printf("Error al cargar fuente .ttf: %s\n", TTF_GetError());
@@ -93,6 +93,7 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->texturaImg);
    SDL_DestroyTexture(game->texturaPista);
    SDL_DestroyTexture(game->texturaCaja);
+   SDL_DestroyTexture(game->texturaCajaBalas);
    SDL_DestroyTexture(game->texturaMeta);
    SDL_DestroyTexture(game->texturaAceite);
    SDL_DestroyTexture(game->texturaDireccion);
@@ -107,6 +108,8 @@ void game_Limpieza(Game *game, int exitStatus)
    Mix_FreeChunk(game->vozinha);
    Mix_FreeChunk(game->sirena1);
    Mix_FreeChunk(game->bala);
+   Mix_FreeChunk(game->sel_menu);
+
    Mix_CloseAudio();
    
    Mix_Quit();

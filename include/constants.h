@@ -20,7 +20,7 @@
 #define PI 3.1415926535
 
 // -- jugador --
-#define HP_INICIAL 10
+#define HP_INICIAL 15
 #define HP_MAX 20
 #define MAX_JUGADORES 2
 #define COOLDOWN_DISPARO_JUGADOR 0.3f
@@ -31,8 +31,8 @@
 #define max_enemigos 50
 #define VELOCIDAD_ENEMIGO1 70.0f
 #define VELOCIDAD_PERSECUCION 80.0f
-#define HP_ENEMIGOS 15
-#define HP_BOTE 15
+#define HP_ENEMIGOS 8
+#define HP_BOTE 6
 #define VELOCIDAD_ENEMIGO3 50.0f
 #define VELOCIDAD_BOTE 25.0f
 
@@ -44,10 +44,10 @@
 #define RADIO_PERDIDO 600.0f
 
 // enemigo 3 camion gas
-#define EMPUJE_CAMION 90.0f
+#define EMPUJE_CAMION 80.0f
 #define HP_CAMION 4
 // explosion camion gas
-#define RADIO_EXPLOSION 80.0f
+#define RADIO_EXPLOSION 85.0f
 #define DURACION_EXPLOSION 0.6f
 #define DANO_EXPLOSION 3
 #define MAX_EXPLOSIONES 10
