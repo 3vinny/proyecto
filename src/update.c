@@ -997,11 +997,11 @@ void funcion_meta(Game *game) //cambiar a int
     // archivo
     char formato[100];
     char ruta[32];
-    char nombre[12] = "test";
+    char nombre[12] = "inasho";
     
     // formateo
     snprintf(ruta, sizeof(ruta), "./data/score/score_%d.txt", game->nivel_actual);
-    snprintf(formato, sizeof(formato), "Niv %d | T (%s) | Jug [%s] | HP %d | Lap%d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas);
+    snprintf(formato, sizeof(formato), "Niv %d | T (%s) | Jug [%s] | HP %d | Lap%d | Balas %d", game->nivel_actual, game->interfaz.texto_cronometro, nombre, game->jugador.hp, game->vueltas, game->jugador.contador_balas);
     
     FILE *archivo_score = fopen(ruta, "a");
     if (!archivo_score){

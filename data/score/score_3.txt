@@ -6,3 +6,4 @@ Niv 3 | T (Tiempo: 02:04:68) | Jug [test] | HP 15 | Lap2
 Niv 3 | T (Tiempo: 02:04:68) | Jug [test] | HP 15 | Lap3
 Niv 3 | T (Tiempo: 01:01:47) | Jug [test] | HP 11 | Lap3
 Niv 3 | T (Tiempo: 03:23:23) | Jug [test] | HP 4 | Lap2
+Niv 3 | T (Tiempo: 01:27:07) | Jug [test] | HP 9 | Lap2
