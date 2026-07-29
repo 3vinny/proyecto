@@ -263,12 +263,17 @@ void game_Update(Game *game)
                 }
                 game->enemigos[i].x += game->enemigos[i].dir_x * paso_enm;
                 game->enemigos[i].y += game->enemigos[i].dir_y * paso_enm;
-    
+
+                int margen_camion = 0;
+                if (game->enemigos[i].es_camion) {
+                    margen_camion = 4;
+                }
+
                 SDL_Rect rect_enm1 = {
-                    (int)(game->enemigos[i].x),
-                    (int)(game->enemigos[i].y),
-                    game->enemigos[i].lado,
-                    game->enemigos[i].lado
+                    (int)(game->enemigos[i].x) + margen_camion,
+                    (int)(game->enemigos[i].y) + margen_camion,
+                    game->enemigos[i].lado - (2*margen_camion),
+                    game->enemigos[i].lado - (2*margen_camion)
                 };
                 
                 int chocar = chequea_tiles(game, &rect_enm1, 1) || rect_enm1.x >= game->pantalla.nivel_w - game->enemigos[i].lado || rect_enm1.x <= 0;
@@ -572,7 +577,7 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 };
                 
                     if (SDL_HasIntersection(player_rect, &tempmeta)) {
-                        if (es_enemigo) return 1;
+                        if (es_enemigo) return 1; // enemigo choca con meta
                         
                         Uint32 tiempo_actual = SDL_GetTicks();
                         Uint32 cooldown_meta = 20000; // 20 segundos
@@ -583,8 +588,6 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                                 funcion_meta(game);
                             }
                         }
-                        
-                       
                     }
             }
 
@@ -830,7 +833,7 @@ void bote_dispara(Game *game, int numero_enemigo)
 
     if (dist <= RADIO_PERDIDO) 
     {
-        if (game->enemigos[numero_enemigo].cooldown_disparo <= 0.0f && dist > 0.0f) 
+        if (!game->enemigos[numero_enemigo].es_camion && game->enemigos[numero_enemigo].cooldown_disparo <= 0.0f && dist > 0.0f) 
         {
             for (int p = 0; p<MAX_PROYECTILES; p++) 
             {
@@ -987,7 +990,7 @@ void construir_rects(Game *game)
 void funcion_meta(Game *game) //cambiar a int
 {
     // aca ira lo que tengo arriba respecto a la meta la gracia de esto es la escritura archivo
-    printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d", game->interfaz.texto_cronometro, game->vueltas);
+    printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d\n", game->interfaz.texto_cronometro, game->vueltas);
     funcion_misiones(game);
     game->vueltas++;
     
@@ -1008,16 +1011,75 @@ void funcion_meta(Game *game) //cambiar a int
     
     fprintf(archivo_score, "%s\n", formato);
     fclose(archivo_score);
-    game->quit = true;
+    
+    siguiente_Nivel(game);
 }
 
 int funcion_misiones(Game *game)
 {
-    printf("Funcion misiones\n");
-    if (game->nivel_actual == 2){
-        printf("misiones niv 2\n");
-    }
+    printf("Funcion misiones nivel %d\n", game->nivel_actual);
+
+    // caso misiones true
     return 1;
+}
+
+void siguiente_Nivel(Game *game)
+{
+    Uint32 tiempo_transicion = SDL_GetTicks();
+    Uint32 cooldown = 5000; // 5s a ms
+    bool en_transicion = true;
+
+    while (en_transicion && !game->quit) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                game->quit = false;
+                en_transicion = false;
+            }
+        }
+
+        // comprobacion tiempo: actual - inicial
+        Uint32 tiempo_actual = SDL_GetTicks();
+        if (tiempo_actual - tiempo_transicion >= cooldown) {
+            en_transicion = false;
+        }
+
+        SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
+        SDL_RenderClear(game->pantalla.renderer);
+
+        if (game->texturaImg != NULL){
+            SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
+        }
+        SDL_RenderPresent(game->pantalla.renderer);
+        SDL_Delay(16);
+    }
+
+    if (!game->quit) {
+        int siguiente = game->nivel_actual + 1;
+        if (siguiente > 3) {
+            siguiente = 1;
+        }
+        game->jugador.up = 0;
+        game->jugador.down = 0;
+        game->jugador.left = 0;
+        game->jugador.right = 0;
+        game->jugador.freno = 0;
+        game->jugador.disparo = 0;
+
+        // funcion que carga y limpia tiles nivel
+        carga_Nivel(game, siguiente);
+
+        SDL_Event limpia_queue;
+        while (SDL_PollEvent(&limpia_queue)) {
+
+        }
+
+        // reinicio cronometro
+        game->tiempo_inicio = SDL_GetTicks();
+        game->ultimo_tiempo_meta = SDL_GetTicks();
+        game->vueltas = 1;
+        game->llego_meta = false;
+    }
 }
 
 float calcula_direccion(int dir_x_input, int dir_y_input)

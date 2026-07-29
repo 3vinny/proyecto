@@ -228,15 +228,16 @@ typedef struct {
 bool SDL_Inicia(Game *game);  // eventos.c
 bool cargarMedia(Game *game); // assets.c
 
+void game_Main(Game *game, int exitStatus); // main.c
 void game_Menu(Game *game); // menu.c
 void game_Limpieza(Game *game, int exitStatus); // eventos.c
 void game_Input(Game *game);   // eventos.c
-void game_Main(Game *game, int exitStatus);     // juego.c
-void interfaz_Inicia(Game *game);               // interfaz.c
+void interfaz_Inicia(Game *game); // interfaz.c
 void carga_Tiles(Game *game);  // cargas.c
 void ajusta_Tiles(Game *game); // cargas.c
 void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c
 void game_Update(Game *game);  // update.c
+void siguiente_Nivel(Game *game); // update.c
 void game_Render(Game *game);  // render.c
 
 #endif

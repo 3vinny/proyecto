@@ -15,7 +15,7 @@ int main(int argc, char **argv)
       .quit = false,
       .tiempo_inicio = 0,
       .ultimo_pitido = 0,
-      .nivel_actual = 1,     // partimos desde nivel 1
+      .nivel_actual = 2,     // partimos desde nivel 1
       
       .pantalla = {
          .ventana = NULL,
@@ -113,4 +113,29 @@ int main(int argc, char **argv)
    game_Limpieza(&game, EXIT_SUCCESS);
 
    return 0;
+}
+
+// conecta todas las funciones en una (podria cambiarlo a main.c)
+// juego.c
+void game_Main(Game *game, int exitStatus)
+{
+    interfaz_Inicia(game);
+    
+    game->tiempo_inicio = SDL_GetTicks();
+    Uint32 tiempo_anterior = SDL_GetTicks();
+    
+    while (!game->quit)
+    {
+        // delta time
+        Uint32 tiempo_actual = SDL_GetTicks();
+        game->delta_time = (tiempo_actual - tiempo_anterior) / 1000.0f;
+        tiempo_anterior = tiempo_actual;
+                
+        // funciones juego
+        game_Input(game);
+        game_Update(game);
+        game_Render(game);
+        
+        SDL_Delay(16); //60FPS
+    }
 }

@@ -30,3 +30,7 @@ Niv 2 | T (Tiempo: 00:47:80) | Jug [test] | HP 8 | Lap2
 Niv 2 | T (Tiempo: 01:01:58) | Jug [test] | HP 1 | Lap2
 Niv 2 | T (Tiempo: 00:05:34) | Jug [test] | HP 12 | Lap2
 Niv 2 | T (Tiempo: 01:01:87) | Jug [test] | HP 4 | Lap2
+Niv 2 | T (Tiempo: 00:59:63) | Jug [test] | HP 11 | Lap2
+Niv 2 | T (Tiempo: 01:01:44) | Jug [test] | HP 11 | Lap2
+Niv 2 | T (Tiempo: 00:54:56) | Jug [test] | HP 7 | Lap2
+Niv 2 | T (Tiempo: 00:57:23) | Jug [test] | HP 7 | Lap2

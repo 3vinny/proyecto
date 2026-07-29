@@ -4,7 +4,7 @@ AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAA1--------------------------------------------------------------2AAAAAAAA
-AAAAAAAA|5F=P============M=========G=========================M=======6iIAAAAAAAA
+AAAAAAAA|5F==============M=========G================P========M=======6iIAAAAAAAA
 AAAAAAAA|i5++++++++++++++++++++++++++++++++++++++++++++++++++++++++++6iIAAAAAAAA
 AAAAAAAA|iIsssssssssss...............................................|iIAAAAAAAA
 AAAAAAAA|iIsSSSSSSSSSs...............................................|iIAAAAAAAA
@@ -18,10 +18,10 @@ AAAAAAAA|iIssssssssssssssssssssssss..................................|iIAAAAAAAA
 AAAABAAA|i7-----------------------2..................................|iIAAAAAAAA
 AAAAAAAA|7=====X=====M========M==6I..................................|iIAAAAAAAA
 AAAAAAAA3+++++++++++++++++++++++6iI..................................|iIAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA|iI..................................|iIAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA|iI.........AAA......................|iIAAAAAAAA
-AAAAABAAAAAAABAAAAAAAAAAAAABAAAA|iI.........ABA......................|iIAAAAAAAA
-AAAAAAAAAAAAAAAAAABAAAAAAAAAAABA|iI.........AAA......................|iIAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA|iI.......AAAAAAA....................|iIAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA|iI.......AAAAAAA....................|iIAAAAAAAA
+AAAAABAAAAAAABAAAAAAAAAAAAABAAAA|iI.......AAABAAA....................|iIAAAAAAAA
+AAAAAAAAAAAAAAAAAABAAAAAAAAAAABA|iI.......AAAAAAA....................|iIAAAAAAAA
 AAAAAAAAAAAAAABAAAAAAAAAAABAAAAA|iI..................................|iIAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA|iI..................................|iIAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA|iI..................................|iIAAAAAAAA
