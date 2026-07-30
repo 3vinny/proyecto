@@ -1,13 +1,3 @@
-Niv 1-T (00:05:85)-Jug [usuario]-HP 10-Lap2
-Niv 1-T (00:05:85)-Jug [usuario]-HP 10-Lap3
-Niv 1-T (01:05:50)-Jug [test]-HP 16-Lap2
-Niv 1-T (01:05:50)-Jug [test]-HP 16-Lap3
-Niv 1-T (01:02:96)-Jug [test]-HP 12-Lap2
-Niv 1-T (01:02:96)-Jug [test]-HP 12-Lap3
-Niv 1-T (01:05:16)-Jug [test]-HP 7-Lap2
-Niv 1-T (01:05:16)-Jug [test]-HP 7-Lap3
-Niv 1-T (01:10:66)-Jug [test]-HP 10-Lap2
-Niv 1-T (01:10:66)-Jug [test]-HP 10-Lap3
 Niv 1 | T (Tiempo: 01:03:92) | Jug [test] | HP 9 | Lap2
 Niv 1 | T (Tiempo: 01:03:92) | Jug [test] | HP 9 | Lap3
 Niv 1 | T (Tiempo: 01:13:67) | Jug [test] | HP 1 | Lap2
@@ -43,3 +33,13 @@ Niv 1 | T (Tiempo: 01:09:62) | Jug [test] | HP 12 | Lap2
 Niv 1 | T (Tiempo: 01:03:67) | Jug [test] | HP 11 | Lap2
 Niv 1 | T (Tiempo: 00:43:79) | Jug [test] | HP 5 | Lap2
 Niv 1 | T (Tiempo: 01:07:58) | Jug [test] | HP 7 | Lap2
+Niv 1 | T (Tiempo: 01:01:72) | Jug [inasho] | HP 14 | Lap2 | Balas 75
+Niv 1 | T (Tiempo: 00:57:84) | Jug [inasho] | HP 10 | Lap1 | Balas 80
+Niv 1 | T (Tiempo: 01:07:04) | Jug [inasho] | HP 4 | Lap1 | Balas 80
+Niv 1 | T (Tiempo: 01:00:72) | Jug [inasho] | HP 13 | Lap1 | Balas 74
+Niv 1 | T (Tiempo: 01:10:10) | Jug [inasho] | HP 4 | Lap1 | Balas 79
+Niv 1 | T (Tiempo: 01:01:15) | Jug [inasho] | HP 2 | Lap1 | Balas 68
+Niv 1 | T (Tiempo: 00:58:86) | Jug [inasho] | HP 9 | Lap1 | Balas 70
+Niv 1 | T (Tiempo: 00:40:67) | Jug [inasho] | HP 5 | Lap1 | Balas 70
+Niv 1 | T (Tiempo: 00:41:99) | Jug [inasho] | HP 3 | Lap1 | Balas 70
+Niv 1 | T (Tiempo: 01:06:38) | Jug [inasho] | HP 3 | Lap1 | Balas 80

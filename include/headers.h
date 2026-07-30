@@ -232,7 +232,6 @@ void game_Main(Game *game, int exitStatus); // main.c
 void game_Menu(Game *game); // menu.c
 void game_Limpieza(Game *game, int exitStatus); // eventos.c
 void game_Input(Game *game);   // eventos.c
-void interfaz_Inicia(Game *game); // interfaz.c
 void carga_Tiles(Game *game);  // cargas.c
 void ajusta_Tiles(Game *game); // cargas.c
 void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c

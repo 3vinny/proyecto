@@ -35,3 +35,5 @@ Niv 2 | T (Tiempo: 01:01:44) | Jug [test] | HP 11 | Lap2
 Niv 2 | T (Tiempo: 00:54:56) | Jug [test] | HP 7 | Lap2
 Niv 2 | T (Tiempo: 00:57:23) | Jug [test] | HP 7 | Lap2
 Niv 2 | T (Tiempo: 00:53:73) | Jug [test] | HP 6 | Lap2
+Niv 2 | T (Tiempo: 01:00:75) | Jug [inasho] | HP 8 | Lap1 | Balas 64
+Niv 2 | T (Tiempo: 00:53:17) | Jug [inasho] | HP 5 | Lap1 | Balas 89

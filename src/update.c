@@ -376,7 +376,7 @@ void game_Update(Game *game)
         }
     }
 
-    // inicio reloj del cooldown
+    // inicio resta cooldown por tiempo (delta_time)
     if (game->jugador.cooldown_agua > 0.0f) {
         game->jugador.cooldown_agua -= game->delta_time;
     }
@@ -992,7 +992,7 @@ void funcion_meta(Game *game) //cambiar a int
     // aca ira lo que tengo arriba respecto a la meta la gracia de esto es la escritura archivo
     printf("Felicidades has llegado a la meta en %s!! Vuelta Num %d\n", game->interfaz.texto_cronometro, game->vueltas);
     funcion_misiones(game);
-    game->vueltas++;
+    
     
     // archivo
     char formato[100];
@@ -1008,32 +1008,51 @@ void funcion_meta(Game *game) //cambiar a int
         printf("Error: No se pudo abrir el archivo %s\n", ruta);
         return;
     }
-    
+    game->vueltas++;
+
     fprintf(archivo_score, "%s\n", formato);
     fclose(archivo_score);
-    
     siguiente_Nivel(game);
 }
 
 int funcion_misiones(Game *game)
 {
     printf("Funcion misiones nivel %d\n", game->nivel_actual);
-
-    // caso misiones true
+    // caso misiones true : requisitos para avanzar de nivel
+    // nivel 2 = 3 camiones
+    // nivel 3 = todos los camiones
+    // nivel 4 = sobrevivir
     return 1;
 }
 
 void siguiente_Nivel(Game *game)
 {
     Uint32 tiempo_transicion = SDL_GetTicks();
-    Uint32 cooldown = 5000; // 5s a ms
+    Uint32 cooldown = 6000; // 6seg a ms
     bool en_transicion = true;
+
+    // RESUMEN - STATS
+    char texto_stats[100];
+    snprintf(texto_stats, sizeof(texto_stats), "HP: %d | Balas: %d | Camiones restantes: %d", game->jugador.hp, game->jugador.contador_balas, game->contador_camiones);
+
+    SDL_Color blanco = {255,255,255,255};
+    SDL_Surface *s_stats = TTF_RenderText_Solid(game->fuente, texto_stats, blanco);
+    SDL_Texture *t_stats = NULL;
+    int sta_w = 0;
+    int sta_h = 0;
+
+    if (s_stats != NULL) {
+        t_stats = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_stats);
+        sta_w = s_stats->w;
+        sta_h = s_stats->h;
+        SDL_FreeSurface(s_stats);
+    }
 
     while (en_transicion && !game->quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                game->quit = false;
+                game->quit = true;
                 en_transicion = false;
             }
         }
@@ -1050,9 +1069,29 @@ void siguiente_Nivel(Game *game)
         if (game->texturaImg != NULL){
             SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
         }
+
+        // caja texto stats o resumen
+        if (t_stats != NULL){
+            SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(game->pantalla.renderer, 0,0,0,200);
+            SDL_Rect fondo_tex = {5, 5, game->pantalla.win_w - 10, game->pantalla.win_h - 10};
+            SDL_RenderFillRect(game->pantalla.renderer, &fondo_tex);
+
+            SDL_Rect r_stats = {
+                (int)(game->pantalla.win_w - sta_w)/2,
+                (int)(game->pantalla.win_h - sta_h)/2,
+                sta_w/2,
+                sta_h/2
+            };
+            SDL_RenderCopy(game->pantalla.renderer, t_stats, NULL, &r_stats);
+        }
+
+        
         SDL_RenderPresent(game->pantalla.renderer);
         SDL_Delay(16);
     }
+
+    if (t_stats != NULL) SDL_DestroyTexture(t_stats);
 
     if (!game->quit) {
         int siguiente = game->nivel_actual + 1;
@@ -1065,13 +1104,16 @@ void siguiente_Nivel(Game *game)
         game->jugador.right = 0;
         game->jugador.freno = 0;
         game->jugador.disparo = 0;
+        game->jugador.velocidad_actual = 0.0f;
+        game->jugador.dir_x = 0;
+        game->jugador.dir_y = 0;
 
         // funcion que carga y limpia tiles nivel
         carga_Nivel(game, siguiente);
 
         SDL_Event limpia_queue;
         while (SDL_PollEvent(&limpia_queue)) {
-
+            // reseteo cola/queue eventos
         }
 
         // reinicio cronometro

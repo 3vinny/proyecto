@@ -169,35 +169,6 @@ void game_Render(Game *game)
             }
         }
     }
-
-    // TEXT
-    SDL_QueryTexture(game->interfaz.texturaTexto, NULL, NULL, &wText, &hText);
-    SDL_Rect textoRec = { 0, 0, wText/4, hText/4 }; // posicion texto, ancho y alto
-    SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto, NULL, &textoRec);
-
-    // TEXTO CRONOMETRO
-    int tiempo_actual = SDL_GetTicks();
-    int transcurrido = tiempo_actual - game->tiempo_inicio;
-   
-    int minutos = (transcurrido / 60000); // ms a min
-    int segundos = (transcurrido / 1000)%60;
-    int centesimas = (transcurrido % 1000)/10;
-    
-    // CRONOMETRO
-    snprintf(game->interfaz.texto_cronometro, sizeof(game->interfaz.texto_cronometro), "Tiempo: %02d:%02d:%02d", minutos, segundos, centesimas);
-    // HP
-    sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
-    // BALAS
-    sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
-    // NIVEL
-    sprintf(game->interfaz.texto_Nivel, "Nivel: %01d", game->nivel_actual);
-    // CAMIONES RESTANTES (NIVELES 2 Y 4)
-    snprintf(game->interfaz.texto_Mision, sizeof(game->interfaz.texto_Mision), "Camiones: %01d", game->contador_camiones);
-    
-    render_Cronometro(game);
-    render_hp(game);
-    render_contbalas(game);
-    render_nivel(game);
     
     // RECTANGULO (interactivo objeto2 txt) destruible!!!!!!
     SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
@@ -410,7 +381,57 @@ void game_Render(Game *game)
             SDL_RenderCopy(game->pantalla.renderer, game->texturaExplosion[frame], NULL, &rect_explosion);
         }
     }
+
+    /*          --- TEXTOS/INTERFAZ ----      */
+    // texto que dice teclas awsd
+    SDL_Color colorTexto = { 0, 0, 0, 255 }; //Blanco y 255 de opacidad
     
+    SDL_Surface *surfaceTexto1 = TTF_RenderText_Solid(game->fuente, "Usa AWSD, Flechas o el pad del mando para moverte. H para bocina y J para disparar", colorTexto);
+    if (surfaceTexto1 != NULL) {
+        game->interfaz.texturaTexto = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto1);
+        SDL_FreeSurface(surfaceTexto1);
+    }
+    SDL_QueryTexture(game->interfaz.texturaTexto, NULL, NULL, &wText, &hText);
+    SDL_Rect textoRec = { 0, 0, wText/4, hText/4 }; // posicion texto, ancho y alto
+    SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto, NULL, &textoRec);
+
+    // TEXTO CRONOMETRO
+    int tiempo_actual = SDL_GetTicks();
+    int transcurrido = tiempo_actual - game->tiempo_inicio;
+   
+    int minutos = (transcurrido / 60000); // ms a min
+    int segundos = (transcurrido / 1000)%60;
+    int centesimas = (transcurrido % 1000)/10;
+    
+    // CRONOMETRO
+    snprintf(game->interfaz.texto_cronometro, sizeof(game->interfaz.texto_cronometro), "Tiempo: %02d:%02d:%02d", minutos, segundos, centesimas);
+    // HP
+    sprintf(game->interfaz.texto_HP, "HP: %02d", game->jugador.hp);
+    // BALAS
+    sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
+    // NIVEL
+    sprintf(game->interfaz.texto_Nivel, "Nivel: %01d", game->nivel_actual);
+    // CAMIONES RESTANTES (NIVELES 2 Y 4)
+    snprintf(game->interfaz.texto_Mision, sizeof(game->interfaz.texto_Mision), "Camiones: %01d", game->contador_camiones);
+    // renderiza interfaz
+    render_Cronometro(game);
+    render_hp(game);
+    render_contbalas(game);
+    render_nivel(game);
+
+    // VELOCIMETRO (PASAR A FUNCION)
+    // FALTA DESTRUIR LA TEXTURA Y PASARLA A GLOBAL
+    char texto_Velocidad[32];
+    SDL_Color colorBlanco = {255,255,255,255};
+    snprintf(texto_Velocidad, sizeof(texto_Velocidad), "Velocidad: %.2f", game->jugador.velocidad_actual);
+    SDL_Surface *s_velocidad = TTF_RenderText_Solid(game->fuente, texto_Velocidad, colorBlanco);
+    SDL_Texture *t_velocidad = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_velocidad);
+    SDL_FreeSurface(s_velocidad);
+
+    SDL_QueryTexture(t_velocidad, NULL, NULL, &wText, &hText);
+    SDL_Rect textoRec3 = { 0, game->pantalla.win_h - 50, (int)wText/2, (int)hText/2 };
+    SDL_RenderCopy(game->pantalla.renderer, t_velocidad, NULL, &textoRec3);
+
     SDL_RenderPresent(game->pantalla.renderer);
 }
 

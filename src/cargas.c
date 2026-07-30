@@ -152,7 +152,7 @@ A: agua
         
             char linea_actual = linea[j];
 
-            // 32 tabla ascii=caracter vacio
+            // 32 tabla ascii.com.ar =caracter vacio
             if (linea_actual < 32) {
                 break; //corta bucle para evitar basura
             }
