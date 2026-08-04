@@ -1,9 +1,12 @@
 #include "headers.h"
 // rango range: -32768 to 32767 | zona muerta es el valor maximo
-int zona_muerta = 20100;
 
 void game_Input(Game *game)
 {
+    int tiempo_actual = SDL_GetTicks();
+    int cooldown = 200;
+    int zona_muerta = 20100;
+
     SDL_Event evento;
     while (SDL_PollEvent(&evento)) 
     {
@@ -77,11 +80,14 @@ void game_Input(Game *game)
                 {
                     game->jugador.left = 1; 
                     game->jugador.right = 0;
-                } else if (evento.caxis.value > zona_muerta)
+                } 
+                else if (evento.caxis.value > zona_muerta)
                 {
                     game->jugador.right = 1; 
                     game->jugador.left = 0;
-                } else {
+                } 
+                else 
+                {
                     game->jugador.left = 0;
                     game->jugador.left = 0;
                 }
@@ -89,13 +95,18 @@ void game_Input(Game *game)
           
             if (evento.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
             {
-                if (evento.caxis.value < -zona_muerta) {
+                if (evento.caxis.value < -zona_muerta) 
+                {
                     game->jugador.up = 1; 
                     game->jugador.down = 0;
-                } else if (evento.caxis.value > zona_muerta) {
+                } 
+                else if (evento.caxis.value > zona_muerta) 
+                {
                     game->jugador.down = 1; 
                     game->jugador.up = 0;
-                } else {
+                } 
+                else
+                {
                     game->jugador.up = 0; 
                     game->jugador.down = 0;
                 }
@@ -123,14 +134,13 @@ void game_Input(Game *game)
                     break;
 
                 case SDLK_h:
-                    int tiempo_actual = SDL_GetTicks();
-                    int cooldown = 200;
                     if (tiempo_actual - game->ultimo_tiempo_vozinha >= cooldown)
                     {
                         if (game->jugador.bocina == 0)
                         {
                             printf("vozinha bip bipppppppppppppppppppppppp\n");
-                            if (game->vozinha != NULL){
+                            if (game->vozinha != NULL)
+                            {
                                 Mix_PlayChannel(-1, game->vozinha, 0);
                             }
                         }
@@ -143,7 +153,9 @@ void game_Input(Game *game)
                     if (game->pantalla.Fullscreen)
                     {
                         SDL_SetWindowFullscreen(game->pantalla.ventana, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    } else {
+                    } 
+                    else
+                    {
                         SDL_SetWindowFullscreen(game->pantalla.ventana, 0);
                     }
                     break;
@@ -157,7 +169,8 @@ void game_Input(Game *game)
 
         if(evento.type == SDL_KEYUP)
         {
-            switch(evento.key.keysym.sym){
+            switch(evento.key.keysym.sym)
+            {
                 case SDLK_UP: case SDLK_w: game->jugador.up = 0; break;
                 case SDLK_DOWN: case SDLK_s: game->jugador.down = 0; break;
                 case SDLK_LEFT: case SDLK_a: game->jugador.left = 0; break;

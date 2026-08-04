@@ -1,7 +1,7 @@
-// Configuracion
-#include "SDL.h"
+// Configuracion Inicial SDL
 #include "headers.h"
 
+// Devuelve true si hay error"
 bool SDL_Inicia(Game *game)
 {
    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER))
@@ -102,6 +102,7 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->texturaEnemigo3);
    SDL_DestroyTexture(game->texturaEnemigo4);
    SDL_DestroyTexture(game->texturaEnemigo5);
+   SDL_DestroyTexture(game->texturaVignette);
    SDL_DestroyTexture(game->jugador.textura);
    SDL_DestroyWindow(game->pantalla.ventana);
 

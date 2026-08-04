@@ -116,16 +116,29 @@ bool cargarMedia(Game *game)
     }
 
     game->sel_menu = Mix_LoadWAV("./assets/sfx/menu.wav");
-    if (game->sel_menu == NULL) {
+    if (game->sel_menu == NULL)
+    {
         printf("error con seleccion del menu : %s\n", Mix_GetError());
     }
 
+    // iluminacion nivel 3
+    game->texturaVignette = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/vignette.png");
+    if (game->texturaVignette == NULL)
+    {
+        printf("Error al iniciar textura iluminacion: %s\n", IMG_GetError());
+        return true;
+    }
+    SDL_SetTextureBlendMode(game->texturaVignette, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(game->texturaVignette, 128);
+
     // explosiones
     char ruta_explosion[64];
-    for (int i=0; i<FRAMES_EXPLOSION; i++) {
+    for (int i=0; i<FRAMES_EXPLOSION; i++) 
+    {
         snprintf(ruta_explosion, sizeof(ruta_explosion), "./assets/sprites/explosion%d.png", i+1);
         game->texturaExplosion[i] = IMG_LoadTexture(game->pantalla.renderer, ruta_explosion);
-        if (game->texturaExplosion[i] == NULL){
+        if (game->texturaExplosion[i] == NULL)
+        {
             printf("Error al cargar frame %d explosion: %s\n", i, IMG_GetError());
         }
     }

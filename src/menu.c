@@ -20,7 +20,8 @@ void game_Menu(Game *game)
     SDL_Surface *surf_config = TTF_RenderText_Solid(game->fuente, "Presiona Espacio para Config", gris);
     SDL_Texture *textura_config = SDL_CreateTextureFromSurface(game->pantalla.renderer, surf_config);
 
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<3; i++)
+    {
         // texto gris
         SDL_Surface *surface_inactiva = TTF_RenderText_Solid(game->fuente, etiquetas[i], gris);
         texturas_inactivas[i] = SDL_CreateTextureFromSurface(game->pantalla.renderer, surface_inactiva);
@@ -41,7 +42,8 @@ void game_Menu(Game *game)
     // arreglo de rectangulos /botones
     SDL_Rect botones[3];
     
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<3; i++)
+    {
         botones[i].x = x_actual;
         botones[i].y = y_pos;
         botones[i].w = texto_w[i];
@@ -52,15 +54,19 @@ void game_Menu(Game *game)
     bool en_menu = true;
     int opc_seleccionada = 0; //0 jugar 1 ranking 2 salir
 
-    while (en_menu && !game->quit) {
+    while (en_menu && !game->quit)
+    {
         SDL_Event evento;
-        while (SDL_PollEvent(&evento)) {
-            if (evento.type == SDL_QUIT) {
+        while (SDL_PollEvent(&evento))
+        {
+            if (evento.type == SDL_QUIT)
+            {
                 game->quit = true;
                 en_menu = false;
             }
 
-            if (evento.type == SDL_KEYDOWN) {
+            if (evento.type == SDL_KEYDOWN)
+            {
                 switch(evento.key.keysym.sym)
                 {
                     case SDLK_UP:
@@ -77,14 +83,19 @@ void game_Menu(Game *game)
                         game->quit = true;
                         break;
                     case SDLK_RETURN:
-                        if (opc_seleccionada == 0) {
+                        if (opc_seleccionada == 0)
+                        {
                             Mix_PlayChannel(-1, game->sel_menu, 0);
                             en_menu = false;
-                        } else if (opc_seleccionada == 1) {
+                        } 
+                        else if (opc_seleccionada == 1)
+                        {
                             Mix_PlayChannel(-1, game->sel_menu, 0);
                             SDL_Log("Ranking desde keyboard\n\n");
                             panel_ranking(game);
-                        } else if (opc_seleccionada == 2){
+                        } 
+                        else if (opc_seleccionada == 2)
+                        {
                             Mix_PlayChannel(-1, game->sel_menu, 0);
                             game->quit = true;
                             en_menu = false;
@@ -101,11 +112,14 @@ void game_Menu(Game *game)
             }
 
             // evento de hovear con el mouse
-            if (evento.type == SDL_MOUSEMOTION) {
+            if (evento.type == SDL_MOUSEMOTION)
+            {
                 int mouse_x = evento.motion.x;
                 int mouse_y = evento.motion.y;
-                for (int i=0; i<3; i++) {
-                    if (mouse_rect(mouse_x, mouse_y, &botones[i])) {
+                for (int i=0; i<3; i++)
+                {
+                    if (mouse_rect(mouse_x, mouse_y, &botones[i]))
+                    {
                         opc_seleccionada = i;
                     }
                 }
@@ -117,14 +131,19 @@ void game_Menu(Game *game)
                 int mouse_x = evento.button.x;
                 int mouse_y = evento.button.y;
 
-                if (mouse_rect(mouse_x,mouse_y, &botones[0])) {
+                if (mouse_rect(mouse_x,mouse_y, &botones[0]))
+                {
                     Mix_PlayChannel(-1, game->sel_menu, 0);
                     en_menu = false;
-                } else if (mouse_rect(mouse_x, mouse_y, &botones[1])) {
+                } 
+                else if (mouse_rect(mouse_x, mouse_y, &botones[1]))
+                {
                     SDL_Log("Ranking desde keyboard\n\n");
                     Mix_PlayChannel(-1, game->sel_menu, 0);
                     panel_ranking(game);
-                } else if (mouse_rect(mouse_x, mouse_y, &botones[2])) {
+                } 
+                else if (mouse_rect(mouse_x, mouse_y, &botones[2]))
+                {
                     Mix_PlayChannel(-1, game->sel_menu, 0);
                     game->quit = true;
                     en_menu = false;
@@ -134,14 +153,17 @@ void game_Menu(Game *game)
 
         SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
         SDL_RenderClear(game->pantalla.renderer);
-
         SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
 
         // renderizar texto gris o negro
-        for (int i=0; i<3; i++) {
-            if (i == opc_seleccionada) {
+        for (int i=0; i<3; i++)
+        {
+            if (i == opc_seleccionada)
+            {
                 SDL_RenderCopy(game->pantalla.renderer, texturas_activas[i], NULL, &botones[i]);
-            } else {
+            } 
+            else
+            {
                 SDL_RenderCopy(game->pantalla.renderer, texturas_inactivas[i], NULL, &botones[i]);
             }
         }
@@ -159,7 +181,8 @@ void game_Menu(Game *game)
         SDL_Delay(16);
     }
 
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<3; i++)
+    {
         SDL_DestroyTexture(texturas_activas[i]);
         SDL_DestroyTexture(texturas_inactivas[i]);
     }
@@ -169,9 +192,12 @@ bool mouse_rect(int mouse_x, int mouse_y, SDL_Rect *rect)
 {
     bool en_x = mouse_x >= rect->x && mouse_x <= rect->x + rect->w;
     bool en_y = mouse_y >= rect->y && mouse_y <= rect->y + rect->h;
-    if (en_x && en_y) {
+    if (en_x && en_y)
+    {
         return true;
-    } else {
+    } 
+    else
+    {
         return false;
     }
 }
@@ -187,20 +213,15 @@ void panel_ranking(Game *game)
 
     bool visible = true;
 
-    while(visible && !game->quit) {
-        // para formateo con snprintf
-        char ruta_archivo[64];
-        char texto_titulo[64];
-        snprintf(ruta_archivo, sizeof(ruta_archivo), "./data/score/score_%d.txt", selecciona_niv);
-        snprintf(texto_titulo, sizeof(texto_titulo), "--- RANKING ULTIMOS %d NIVEL %d ---", lineas_deseadas, selecciona_niv);
-
-        SDL_Surface *s_titulo = TTF_RenderText_Solid(game->fuente, texto_titulo, gris);
+    while(visible && !game->quit)
+    {
+        SDL_Surface *s_titulo = TTF_RenderText_Solid(game->fuente, "LOS MEJORES 10", gris);
         SDL_Texture *t_titulo = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_titulo);
         int t_w = s_titulo->w;
         int t_h = s_titulo->h;
         SDL_FreeSurface(s_titulo);
 
-        SDL_Surface *s_subtitulo = TTF_RenderText_Solid(game->fuente, "Enter o click: salir | Flechas: selecc. nivel", gris);
+        SDL_Surface *s_subtitulo = TTF_RenderText_Solid(game->fuente, "Enter o click: salir", gris);
         SDL_Texture *t_subtitulo = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_subtitulo);
         SDL_FreeSurface(s_subtitulo);
 
@@ -209,18 +230,21 @@ void panel_ranking(Game *game)
         int punt_h[10];
 
         SDL_Texture *t_puntajes[lineas_deseadas];
-        FILE *archivo = fopen(ruta_archivo, "r");
+        FILE *archivo = fopen("./data/score.txt", "r");
         int total_lineas = 0;
         int total_pjes = 0;
 
-        if (archivo) {
+        if (archivo)
+        {
             int saltar = 0;
 
-            while (fgets(linea, sizeof(linea), archivo)){
+            while (fgets(linea, sizeof(linea), archivo))
+            {
                 total_lineas++; // cuenta cuantos scores hay
             }
 
-            if (total_lineas > 10) {
+            if (total_lineas > 10)
+            {
                 saltar = total_lineas-10;
             }
 
@@ -230,16 +254,20 @@ void panel_ranking(Game *game)
             int j = 0;
             while (total_pjes < lineas_deseadas && fgets(linea, sizeof(linea), archivo))
             {
-                if (j >= saltar) {
-                    for (int i=0; linea[i]; i++) {
-                        if (linea[i] == '\r' || linea[i] == '\n') {
+                if (j >= saltar)
+                {
+                    for (int i=0; linea[i]; i++)
+                    {
+                        if (linea[i] == '\r' || linea[i] == '\n')
+                        {
                             linea[i] = '\0';
                             break;
                         }
                     }
 
                     SDL_Surface *s = TTF_RenderText_Solid(game->fuente, linea, negro);
-                    if (s) {
+                    if (s)
+                    {
                         t_puntajes[total_pjes] = SDL_CreateTextureFromSurface(game->pantalla.renderer, s);
                         punt_w[total_pjes] = s->w;
                         punt_h[total_pjes] = s->h;
@@ -252,7 +280,8 @@ void panel_ranking(Game *game)
             fclose(archivo);
         }
 
-        if (total_pjes == 0) {
+        if (total_pjes == 0)
+        {
             strcpy(linea, "Aun no hay puntajes.");
             SDL_Surface *s = TTF_RenderText_Solid(game->fuente, linea, negro);
             t_puntajes[0] = SDL_CreateTextureFromSurface(game->pantalla.renderer, s);
@@ -263,35 +292,24 @@ void panel_ranking(Game *game)
         }
 
         SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_QUIT) {
+        while (SDL_PollEvent(&ev))
+        {
+            if (ev.type == SDL_QUIT)
+            {
                 game->quit = true;
                 visible = false;
             }
-            if (ev.type == SDL_MOUSEBUTTONDOWN && ev.button.button == SDL_BUTTON_LEFT) {
+
+            if (ev.type == SDL_MOUSEBUTTONDOWN && ev.button.button == SDL_BUTTON_LEFT)
+            {
                 visible = false;
             }
-            if (ev.type == SDL_KEYDOWN) {
-                if (ev.key.keysym.sym == SDLK_ESCAPE || ev.key.keysym.sym == SDLK_RETURN) {
+
+            if (ev.type == SDL_KEYDOWN)
+            {
+                if (ev.key.keysym.sym == SDLK_ESCAPE || ev.key.keysym.sym == SDLK_RETURN)
+                {
                     visible = false;
-                }
-                // seleccion de nivel ranking
-                if (ev.key.keysym.sym == SDLK_RIGHT || ev.key.keysym.sym == SDLK_DOWN) {
-                    if (selecciona_niv < 4) {
-                        selecciona_niv++;
-                    } else {
-                        selecciona_niv = 1;
-                    }
-                    Mix_PlayChannel(-1, game->sel_menu, 0);
-                }
-                if (ev.key.keysym.sym == SDLK_LEFT || ev.key.keysym.sym == SDLK_UP) {
-                    if (selecciona_niv > 1) {
-                        selecciona_niv --;
-                        
-                    } else {
-                        selecciona_niv = 4;
-                    } 
-                    Mix_PlayChannel(-1, game->sel_menu, 0);
                 }
             }
         }
@@ -299,7 +317,8 @@ void panel_ranking(Game *game)
         // fondo bg
         SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
         SDL_RenderClear(game->pantalla.renderer);
-        if (game->texturaImg) {
+        if (game->texturaImg)
+        {
             SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
         }
 
@@ -321,14 +340,15 @@ void panel_ranking(Game *game)
         SDL_Rect r_subtitulo = {
             (game->pantalla.win_w - t_w)/2,
             (game->pantalla.win_h - t_h) - 30,
-            (int)(game->pantalla.win_w)*0.7,
+            t_w,
             t_h
         };
         SDL_RenderCopy(game->pantalla.renderer, t_subtitulo, NULL, &r_subtitulo);
 
         // Dibuja lista puntajes
         int y = 100;
-        for (int i=0; i<total_pjes; i++) {
+        for (int i=0; i<total_pjes; i++)
+        {
             SDL_Rect r_linea = {
                 (int)(game->pantalla.win_w) / 6,
                 y,
@@ -340,11 +360,11 @@ void panel_ranking(Game *game)
         }
 
         SDL_RenderPresent(game->pantalla.renderer);
-
         SDL_DestroyTexture(t_titulo);
         SDL_DestroyTexture(t_subtitulo);
         
-        for (int i=0; i<total_pjes; i++) {
+        for (int i=0; i<total_pjes; i++)
+        {
             SDL_DestroyTexture(t_puntajes[i]);
         }
         SDL_Delay(16);
@@ -359,7 +379,8 @@ void panel_config(Game *game)
 
     char *opciones[2] = {"Fullscreen: OFF", "Volumen: 100%"};
 
-    while(visible && !game->quit) {
+    while(visible && !game->quit)
+    {
         SDL_Surface *s_titulo = TTF_RenderText_Solid(game->fuente, "Config / Opciones", gris);
         SDL_Texture *t_titulo = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_titulo);
         int t_w = s_titulo->w;
@@ -369,8 +390,10 @@ void panel_config(Game *game)
         SDL_Texture *t_textos[2];
         int opc_w[2];
         int opc_h[2];
+        int seleccion = 0;
 
-        for (int i=0; i<2; i++){
+        for (int i=0; i<2; i++)
+        {
             SDL_Surface *s_opciones = TTF_RenderText_Solid(game->fuente, opciones[i], blanco);
             t_textos[i] = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_opciones);
             opc_w[i] = s_opciones->w;
@@ -379,19 +402,24 @@ void panel_config(Game *game)
         }
 
         SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_QUIT) {
+        while (SDL_PollEvent(&ev))
+        {
+            if (ev.type == SDL_QUIT)
+            {
                 game->quit = true;
                 visible = false;
             }
 
-            if (ev.type == SDL_KEYDOWN) {
-                if (ev.key.keysym.sym == SDLK_SPACE || ev.key.keysym.sym == SDLK_RETURN || ev.key.keysym.sym == SDLK_ESCAPE){
+            if (ev.type == SDL_KEYDOWN)
+            {
+                if (ev.key.keysym.sym == SDLK_SPACE || ev.key.keysym.sym == SDLK_RETURN || ev.key.keysym.sym == SDLK_ESCAPE)
+                {
                     visible = false;
                 }
             }
 
-            if (ev.type == SDL_MOUSEBUTTONDOWN || ev.button.button == SDL_BUTTON_LEFT) {
+            if (ev.type == SDL_MOUSEBUTTONDOWN || ev.button.button == SDL_BUTTON_LEFT)
+            {
                 visible = false;
             }
         }
@@ -401,7 +429,8 @@ void panel_config(Game *game)
         SDL_RenderClear(game->pantalla.renderer);
 
         // fondo bg
-        if (game->texturaImg) {
+        if (game->texturaImg)
+        {
             SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
         }
 
@@ -421,7 +450,8 @@ void panel_config(Game *game)
         SDL_RenderCopy(game->pantalla.renderer, t_titulo, NULL, &r_titulo);
 
         int y = 120;
-        for (int i=0; i<2; i++) {
+        for (int i=0; i<2; i++)
+        {
             SDL_Rect r_opc = {
                 (int)(game->pantalla.win_w - opc_w[i])/2,
                 y,
@@ -437,7 +467,8 @@ void panel_config(Game *game)
 
         // limpia
         SDL_DestroyTexture(t_titulo);
-        for (int i=0; i<2; i++){
+        for (int i=0; i<2; i++)
+        {
             SDL_DestroyTexture(t_textos[i]);
         }
         SDL_Delay(16);

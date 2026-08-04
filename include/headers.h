@@ -1,6 +1,5 @@
 #ifndef HEADERS_H
 #define HEADERS_H
-
 // --- Header central proyecto ---***
 
 // --- Includes ---
@@ -13,6 +12,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 
@@ -53,13 +53,15 @@ typedef struct {
     SDL_Texture *texturaHP;
     SDL_Texture *texturaBalas;
     SDL_Texture *texturaNivel;
+    SDL_Texture *t_velocidad;
     char texto_Balas[64];
     char texto_HP[64];
     char texto_cronometro[64];
-    char texto_Mision[20];
+    char texto_Mision[100];
     char texto_Nivel[64];
 } Interfaz;
 
+// --- EXPLOSIONES ---
 typedef struct {
     float x;
     float y;
@@ -96,6 +98,7 @@ typedef struct {
     float cooldown_agua;
     float cooldown_choque;
     int contador_balas;
+    bool minimapa_activo;
     
     //hitbox
     int x_colision;
@@ -148,6 +151,7 @@ typedef struct {
     bool activo_posJ; //P y p
     bool objeto2; //X (caja con +1HP)
     bool objeto3; //Z (caja con balas)
+    bool objetominimapa; // W (POWERUP MINIMAPA) WIP!!!!
     char tipo; //- | 1 2 3 4
     
     bool enemigo1; // auto policia (E)
@@ -166,6 +170,22 @@ typedef struct {
     bool aceite; // M
     int direccion; // D y d
 } Tile;
+
+// --- RANKING: PANEL
+typedef struct {
+    int tiempo;
+    int cuenta_camiones;
+    int cuenta_enemigos;
+    int puntaje;
+} Ranking;
+
+// --- RANKING
+typedef struct {
+    char nombre[20];
+    int puntaje;
+    int tiempo;
+    int nivel;
+} EntradaRanking;
 
 // --- GAME GENERAL ---
 typedef struct {
@@ -194,14 +214,18 @@ typedef struct {
     SDL_Texture *texturaAceite; // aceite (M)
     SDL_Texture *texturaMeta; // finish (F)
     SDL_Texture *texturaDireccion; // direccion (D) y (d)
+    SDL_Texture *texturaMinimapa; // minimapa (W)
+
+    // iluminacion nivel 3
+    SDL_Texture *texturaVignette;
     
     // meta y finalizacion
     int vueltas;
+    int puntaje;
     bool llego_meta;
     int contador_camiones;
     
     // texto, cronometro y bocina
-    
     Uint32 tiempo_inicio;
     Uint32 ultimo_pitido;
     Uint32 ultimo_tiempo_vozinha;
@@ -211,6 +235,7 @@ typedef struct {
     Pantalla pantalla;
     Personaje jugador;
     Interfaz interfaz;
+    Ranking ranking;
 
     // explosiones y arreglos
     SDL_Texture *texturaExplosion[FRAMES_EXPLOSION];
@@ -238,5 +263,6 @@ void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c
 void game_Update(Game *game);  // update.c
 void siguiente_Nivel(Game *game); // update.c
 void game_Render(Game *game);  // render.c
+void render_minimapa(Game *game); // render.c
 
 #endif

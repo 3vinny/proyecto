@@ -6,6 +6,9 @@
 #define FLAGS_IMAGEN IMG_INIT_PNG
 #define FLAGS_AUDIO MIX_INIT_MP3
 
+// -- ranking --
+#define MAX_RANKING 10
+
 // -- resolucion --
 #define w_inicial 1200
 #define h_inicial 900
@@ -18,6 +21,7 @@
 #define tam 32
 #define ZOOM 2
 #define PI 3.1415926535
+#define MAX_NIVELES 3
 
 // -- jugador --
 #define HP_INICIAL 15
