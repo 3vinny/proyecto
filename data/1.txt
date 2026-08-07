@@ -3,7 +3,7 @@ Solo debes llegar a la meta. Hay 7 camiones de gas. Cuidado con las torretas!
 .................34..T.NAN.C............................C....TAAAAAAAAAAAAAAAAAA
 .C...TC..M..T....T...TCCCNC.C.C..........1F-----------------2AAABAAAAAAABAAAAAAA
 ..c1-----------------------------------2.|F====E==E===E====6IAAAAAAAAAAAAAAAAAAA
-..C|5====M==G====G=========M=========P=I.3F+++++++++++++++6iIAAABAAAAABAAAABAAAA
+..C|5====M==G====G====W====M=========P=I.3F+++++++++++++++6iIAAABAAAAABAAAABAAAA
 ..T|i++++++++++++++++++X+++++++++++6iiiI..................|iIAAAAAAAAAAAAAAAAAAA
 .N.|IN.V..TC.T.CaaaaaaaaaCCCCCCCCC.3iiiI..................|i7--------2AAAAAAAAAA
 ...|IN...T.C...CAAAAABAAAC1-2CC..CC.|iiIT.T...............|7==Z==E==6I##########

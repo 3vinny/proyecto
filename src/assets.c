@@ -89,6 +89,13 @@ bool cargarMedia(Game *game)
         printf("Error al iniciar textura caja(s): %s\n", IMG_GetError());
         return true;
     }
+
+    game->texturaMinimapa = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/box_mapa.png");
+    if (!game->texturaMinimapa)
+    {
+        printf("Error al iniciar textura caja(s) minimapa: %s\n", IMG_GetError());
+        return true;
+    }
     
     game->texturaAceite = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/oil.png");
     if (!game->texturaAceite)
@@ -114,12 +121,38 @@ bool cargarMedia(Game *game)
     {
         printf("error con disparo_1.wav : %s\n", Mix_GetError());
     }
+    
+    game->explosion = Mix_LoadWAV("./assets/sfx/explosion.wav");
+    if (game->explosion == NULL)
+    {
+        printf("error con explosion.wav : %s\n", Mix_GetError());
+    }
+    
+    game->powerup = Mix_LoadWAV("./assets/sfx/powerup.wav");
+    if (game->powerup == NULL)
+    {
+        printf("error con powerup.wav : %s\n", Mix_GetError());
+    }
 
     game->sel_menu = Mix_LoadWAV("./assets/sfx/menu.wav");
     if (game->sel_menu == NULL)
     {
         printf("error con seleccion del menu : %s\n", Mix_GetError());
     }
+
+    game->audio.endgame = Mix_LoadWAV("./assets/music/endgame.mp3");
+    if (game->audio.endgame == NULL)
+    {
+        printf("error con endgame : %s\n", Mix_GetError());
+    }
+
+    game->audio.fail = Mix_LoadWAV("./assets/music/fail.mp3");
+    if (game->audio.fail == NULL)
+    {
+        printf("error con endgame(FAIL) : %s\n", Mix_GetError());
+    }
+
+    // falta audio.fondo con las cancioneS
 
     // iluminacion nivel 3
     game->texturaVignette = IMG_LoadTexture(game->pantalla.renderer, "./assets/sprites/vignette.png");

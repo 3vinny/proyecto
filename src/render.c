@@ -108,6 +108,7 @@ void game_Render(Game *game)
                     break;
                 case '=':
                 case 'P':
+                case 'W':
                     origen.x = 304; origen.y = 112;
                     break;
                // lineas verticales
@@ -230,6 +231,26 @@ void game_Render(Game *game)
                 }
             }
             
+            if (game->tiles[i][j].objetominimapa)
+            {
+                SDL_Rect Rectang_W = {
+                    game->tiles[i][j].x_tiles - game->pantalla.camara.x,
+                    game->tiles[i][j].y_tiles - game->pantalla.camara.y,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+
+                if (game->texturaMinimapa != NULL)
+                {
+                    SDL_RenderCopy(game->pantalla.renderer, game->texturaMinimapa, NULL, &Rectang_W);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 255, 255, 200);
+                    SDL_RenderFillRect(game->pantalla.renderer, &Rectang_W);
+                }
+            }
+
             if (game->tiles[i][j].meta)
             {
                 SDL_Rect Rectang_Meta = {
@@ -445,9 +466,12 @@ void game_Render(Game *game)
     sprintf(game->interfaz.texto_Balas, "Balas restantes: %02d", game->jugador.contador_balas);
     // NIVEL
     sprintf(game->interfaz.texto_Nivel, "Nivel: %01d", game->nivel_actual);
+    // camiones
+    snprintf(game->interfaz.texto_Camiones, sizeof(game->interfaz.texto_Camiones), "Camiones: %d", game->contador_camiones);
     
     // renderiza interfaz
     render_Cronometro(game);
+    render_Minimapa(game);
     render_hp(game);
     render_contbalas(game);
     render_nivel(game);
@@ -565,10 +589,17 @@ void render_nivel(Game *game)
         SDL_DestroyTexture(game->interfaz.texturaTexto3);
         game->interfaz.texturaTexto3 = NULL;
     }
+
+    if (game->interfaz.texturaCamiones != NULL)
+    {
+        SDL_DestroyTexture(game->interfaz.texturaCamiones);
+        game->interfaz.texturaCamiones = NULL;
+    }
     
     SDL_Color colorBlanco = {255,255,255,255};
     SDL_Surface *surfaceTemporal = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_Nivel, colorBlanco);
     SDL_Surface *surfaceTexto3 = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_Mision, colorBlanco);
+    SDL_Surface *surfaceTextoCamiones = TTF_RenderText_Solid(game->fuente, game->interfaz.texto_Camiones, colorBlanco);
 
     if (surfaceTemporal != NULL)
     {
@@ -581,12 +612,25 @@ void render_nivel(Game *game)
         game->interfaz.texturaTexto3 = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTexto3);
         SDL_FreeSurface(surfaceTexto3);
     }
+
+    if (surfaceTextoCamiones != NULL)
+    {
+        game->interfaz.texturaCamiones = SDL_CreateTextureFromSurface(game->pantalla.renderer, surfaceTextoCamiones);
+        SDL_FreeSurface(surfaceTextoCamiones);
+    }
     
     if (game->interfaz.texturaNivel != NULL)
     {
         SDL_QueryTexture(game->interfaz.texturaNivel, NULL, NULL, &wText, &hText);
         SDL_Rect textoRec = { game->pantalla.win_w - (wText/2) - 10, 10, wText/2, hText/2 };
         SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaNivel, NULL, &textoRec);
+    }
+
+    if (game->interfaz.texturaCamiones != NULL && game->nivel_actual != 1)
+    {
+        SDL_QueryTexture(game->interfaz.texturaCamiones, NULL, NULL, &wText, &hText);
+        SDL_Rect textoC = { game->pantalla.win_w - (wText/2) - 10, 40, wText/2, hText/2 };
+        SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaCamiones, NULL, &textoC);
     }
 
     if (game->interfaz.texturaTexto3 != NULL)
@@ -606,5 +650,86 @@ void render_nivel(Game *game)
 
         SDL_Rect textoRec2 = { 5, 25, (wText/4), (hText/4) };
         SDL_RenderCopy(game->pantalla.renderer, game->interfaz.texturaTexto3, NULL, &textoRec2);
+    }
+}
+
+void render_Minimapa(Game *game)
+{
+    if (!game->jugador.minimapa_activo) return;
+    
+    int escala = 2; // 2x2 px
+    int ancho_mapa = tile_cols * escala;
+    int alto_mapa = tile_filas * escala;
+
+    int mapa_x = game->pantalla.win_w - ancho_mapa - 20;
+    int mapa_y = 60;
+
+    // caja gris transparente
+    SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 160);
+    SDL_Rect fondo_minimapa = {
+        mapa_x - 5,
+        mapa_y - 5,
+        ancho_mapa + 10,
+        alto_mapa + 10
+    };
+    SDL_RenderFillRect(game->pantalla.renderer, &fondo_minimapa);
+
+    // renderizado mapa
+    for (int i=0; i<tile_filas; i++)
+    {
+        for (int j=0; j<tile_cols; j++)
+        {
+            char t = game->tiles[i][j].tipo;
+            SDL_Rect pixel = {
+                mapa_x + (j*escala),
+                mapa_y + (i*escala),
+                escala,
+                escala
+            };
+            // solo si es cemento o curva
+            if (t == '1' || t == '2' || t == '3' || t == '4' || t == '5' || t == '6' || t == '7' || t == '8' || t == '-' || t == '+' || t == '=' || t == '|' || t == 'I' || t == 'i')
+            {
+                SDL_SetRenderDrawColor(game->pantalla.renderer, 150, 150, 150, 255);
+                SDL_RenderFillRect(game->pantalla.renderer, &pixel);
+            }
+            else if (t == 'F')
+            {
+                SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 255, 0, 255);
+                SDL_RenderFillRect(game->pantalla.renderer, &pixel);
+            }
+        }
+    }
+
+    // dibujar rectnagulo jugador en el mapa
+    int x = (int)(game->jugador.x / tam);
+    int y = (int)(game->jugador.y / tam);
+
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 255, 0, 255);
+    SDL_Rect pixel_jugador = {
+        mapa_x + (x*escala) - 1,
+        mapa_y + (y*escala) - 1,
+        escala * 2,
+        escala * 2
+    };
+    SDL_RenderFillRect(game->pantalla.renderer, &pixel_jugador);
+
+    // dibuja camiones de gas en el mapa
+    SDL_SetRenderDrawColor(game->pantalla.renderer, 255, 0, 0, 255);
+    for (int i=0; i<max_enemigos; i++)
+    {
+        if (game->enemigos[i].activo && game->enemigos[i].es_camion)
+        {
+            int ex = (int)(game->enemigos[i].x / tam);
+            int ey = (int)(game->enemigos[i].y / tam);
+
+            SDL_Rect pixel_camion = {
+                mapa_x + (ex*escala) - 1,
+                mapa_y + (ey*escala) - 1,
+                2 * escala,
+                2 * escala
+            };
+            SDL_RenderFillRect(game->pantalla.renderer, &pixel_camion);
+        }
     }
 }

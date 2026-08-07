@@ -1,2 +1,0 @@
-- Sobrevive
-- Tiempo limite: 2 minutos

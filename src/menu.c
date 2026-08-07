@@ -7,6 +7,25 @@ void panel_config(Game *game);
 
 void game_Menu(Game *game)
 {
+    // --- MUSICA MENU ---
+    if (game->audio.fondo != NULL)
+    {
+        Mix_HaltMusic();
+        Mix_FreeMusic(game->audio.fondo);
+        game->audio.fondo = NULL;
+    }
+
+    game->audio.fondo = Mix_LoadMUS("./assets/music/menu.mp3");
+    if (game->audio.fondo != NULL)
+    {
+        Mix_PlayMusic(game->audio.fondo, -1);
+    }
+    else
+    {
+        printf("Advertencia: No se encontró musica menu\n");
+    }
+
+    // colores y menu -------
     SDL_Color gris = {150,150,150,255}; //gris
     SDL_Color negro = {0,0,0,255}; //negro
     SDL_Color plata = {192,192,192,255}; //plateado
@@ -63,6 +82,53 @@ void game_Menu(Game *game)
             {
                 game->quit = true;
                 en_menu = false;
+            }
+
+            if (evento.type == SDL_CONTROLLERBUTTONDOWN)
+            {
+                printf("Se detecto presion mando: \n");
+                switch(evento.cbutton.button)
+                {
+                    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+                    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+                        opc_seleccionada--;
+                        if (opc_seleccionada < 0) opc_seleccionada = 2;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+                    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+                        opc_seleccionada++;
+                        if (opc_seleccionada > 2) opc_seleccionada = 0;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_B:
+                        game->quit = true;
+                        break;
+                    case SDL_CONTROLLER_BUTTON_X:
+                        SDL_Log("Menu config\n\n");
+                        Mix_PlayChannel(-1, game->sel_menu, 0);
+                        panel_config(game);
+                        break;
+                    case SDL_CONTROLLER_BUTTON_A:
+                        if (opc_seleccionada == 0)
+                        {
+                            Mix_PlayChannel(-1, game->sel_menu, 0);
+                            en_menu = false;
+                        } 
+                        else if (opc_seleccionada == 1)
+                        {
+                            Mix_PlayChannel(-1, game->sel_menu, 0);
+                            SDL_Log("Ranking desde keyboard\n\n");
+                            panel_ranking(game);
+                        } 
+                        else if (opc_seleccionada == 2)
+                        {
+                            Mix_PlayChannel(-1, game->sel_menu, 0);
+                            game->quit = true;
+                            en_menu = false;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
 
             if (evento.type == SDL_KEYDOWN)
@@ -153,6 +219,7 @@ void game_Menu(Game *game)
 
         SDL_SetRenderDrawColor(game->pantalla.renderer, 0, 0, 0, 255);
         SDL_RenderClear(game->pantalla.renderer);
+        game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg_logo.png");
         SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
 
         // renderizar texto gris o negro
@@ -312,6 +379,11 @@ void panel_ranking(Game *game)
                     visible = false;
                 }
             }
+
+            if (ev.type == SDL_CONTROLLERBUTTONDOWN)
+            {
+                visible = false;
+            }
         }
 
         // fondo bg
@@ -319,6 +391,7 @@ void panel_ranking(Game *game)
         SDL_RenderClear(game->pantalla.renderer);
         if (game->texturaImg)
         {
+            game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg.png");
             SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
         }
 
@@ -431,6 +504,7 @@ void panel_config(Game *game)
         // fondo bg
         if (game->texturaImg)
         {
+            game->texturaImg = IMG_LoadTexture(game->pantalla.renderer, "./assets/bg/bg_logo.png");
             SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
         }
 

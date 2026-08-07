@@ -103,6 +103,36 @@ void carga_Tiles(Game *game)
     char linea[LIMITE_LINEA]; // arreglo grande
     snprintf(ruta_archivo, sizeof(ruta_archivo), "./data/%d.txt", game->nivel_actual);
     
+    // -- MUSICA DE FONDO RESET Y CARGAA---
+    if (game->audio.fondo != NULL)
+    {
+        Mix_HaltMusic();
+        Mix_FreeMusic(game->audio.fondo);
+        game->audio.fondo = NULL;
+    }
+    
+    //formateo ruta musica por nivel
+    char ruta_musica[64];
+    snprintf(ruta_musica, sizeof(ruta_musica), "./assets/music/nivel%d.mp3", game->nivel_actual);
+    game->audio.fondo = Mix_LoadMUS(ruta_musica);
+
+    printf("Intentando hacer sonar desde %s\n", ruta_musica);
+    if (game->audio.fondo != NULL)
+    {
+        if(Mix_PlayMusic(game->audio.fondo, -1) == -1)
+        {
+            printf("ERROR: se cargo archivo pero no reproduce %s\n", Mix_GetError());
+        }
+        else
+        {
+            printf("Exito: musica nivel %d reproduciendose \n", game->nivel_actual);
+        }
+    }
+    else
+    {
+        printf("warning::: No se encontro musica para nivel %d : %s\n", game->nivel_actual, Mix_GetError());
+    }
+
     FILE *archivo = fopen(ruta_archivo, "r");
     if (!archivo)
     {
@@ -143,6 +173,7 @@ void carga_Tiles(Game *game)
             game->tiles[i][j].activo_posJ = false;
             game->tiles[i][j].objeto2 = false;
             game->tiles[i][j].objeto3 = false;
+            game->tiles[i][j].objetominimapa = false;
             game->tiles[i][j].agua = false;
             game->tiles[i][j].meta = false;
             game->tiles[i][j].casa = false;
@@ -182,6 +213,7 @@ void carga_Tiles(Game *game)
             game->tiles[i][j].activo_posJ = (linea_actual == 'P');
             game->tiles[i][j].objeto2 = (linea_actual == 'X'); // caja
             game->tiles[i][j].objeto3 = (linea_actual == 'Z');
+            game->tiles[i][j].objetominimapa = (linea_actual == 'W');
         
             if (linea_actual == 'A' || linea_actual == 'B')
             {
@@ -215,7 +247,7 @@ void carga_Tiles(Game *game)
                 game->tiles[i][j].direccion = -1;
             }
         
-            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'Z' || linea_actual == 'M' || linea_actual == 'G' || linea_actual == 'F')
+            if (linea_actual == 'P' || linea_actual == 'E' || linea_actual == 'X' || linea_actual == 'Z' || linea_actual == 'E' || linea_actual == 'M' || linea_actual == 'G' || linea_actual == 'F')
             {
                 if (j>0 && (game->tiles[i-1][j].tipo == '-' || game->tiles[i-1][j].tipo == '1' || game->tiles[i-1][j].tipo == '3'))
                 {
@@ -282,6 +314,7 @@ void carga_Nivel(Game *game, int nuevo_nivel)
 
     // reinicio jugador
     game->jugador.velocidad_actual = 0.0f;
+    game->jugador.minimapa_activo = false;
     game->jugador.dir_x = 0;
     game->jugador.dir_y = 0;
     game->jugador.colisionando = 0;
@@ -345,7 +378,7 @@ void carga_Nivel(Game *game, int nuevo_nivel)
         game->interfaz.texturaTexto3 = NULL;
     }
     
-    // reset camara
+    // reset CAMARA ---
     game->pantalla.camara.x = (int)game->jugador.x + (game->jugador.lado / 2) - (game->pantalla.win_w / 2);
     game->pantalla.camara.y = (int)game->jugador.y + (game->jugador.lado / 2) - (game->pantalla.win_h / 2);
 
@@ -359,6 +392,6 @@ void carga_Nivel(Game *game, int nuevo_nivel)
     {
         game->pantalla.camara.y > game->pantalla.nivel_h - game->pantalla.camara.h;
     }
-    
+
     printf("Nivel %d cargado. pos inicial jug %.1f, %.1f", nuevo_nivel, game->jugador.x, game->jugador.y);
 }

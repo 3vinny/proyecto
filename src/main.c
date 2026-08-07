@@ -31,8 +31,7 @@ int main(int argc, char **argv)
       exit(1);
    }
 
-   // tiles->menu->main->limpia al salir
-   carga_Tiles(&game);
+   // menu->main->limpia al salir
    game_Menu(&game);
    if (!game.quit) 
    {
@@ -58,7 +57,7 @@ void inicializa_game(Game *game)
       .quit = false,
       .tiempo_inicio = 0,
       .ultimo_pitido = 0,
-      .nivel_actual = 2,     // partimos desde nivel 1
+      .nivel_actual = 3,     // partimos desde nivel 1
       
       .pantalla = {
          .ventana = NULL,
@@ -107,7 +106,8 @@ void inicializa_game(Game *game)
          .tiempo = 0,
          .puntaje = 0,
          .cuenta_camiones = 0,
-         .cuenta_enemigos = 0
+         .cuenta_enemigos = 0,
+         .cuenta_camiones_extra = 0
       },
       
       .enemigos = {
@@ -135,6 +135,7 @@ void inicializa_game(Game *game)
 
 void muestra_tutorial(Game *game)
 {
+   Mix_HaltMusic();
    SDL_Surface *s_tutorial = IMG_Load("./assets/bg/tutorial.png");
    if (!s_tutorial)
    {
@@ -176,6 +177,7 @@ void muestra_tutorial(Game *game)
 void game_Main(Game *game, int exitStatus)
 {  
    muestra_tutorial(game);
+   carga_Nivel(game, game->nivel_actual);
    
    // empieza a contar el cronometro 
    game->tiempo_inicio = SDL_GetTicks();
@@ -188,7 +190,7 @@ void game_Main(Game *game, int exitStatus)
       game->delta_time = (tiempo_actual - tiempo_anterior) / 1000.0f;
       tiempo_anterior = tiempo_actual;
                
-      // funciones juego
+      // funciones juego: input, manejo, render
       game_Input(game);
       game_Update(game);
       game_Render(game);

@@ -1,10 +1,10 @@
+ttt 3552 98 3
+deberiaser1 3233 67 3
+ssassdsadsa 2800 5 2
+Memorienelagua 2400 49 1
+Milesdavis 1900 12 2
+gamepad 1850 36 2
 Ariel 1800 17 1
 1234567890123456789 1800 24 1
-Aaaaaaaa 1800 13 1
+SDL2 1800 13 1
 aaa 1800 12 1
-aaa 1800 14 1
-Pepe 1500 11 1
-jajajaaaaaaaaaaaaaa 1500 38 1
-Colocolo 900 11 2
-sadkadkad 600 32 3
-Ete sech 600 9 2

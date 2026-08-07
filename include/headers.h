@@ -1,7 +1,7 @@
 #ifndef HEADERS_H
 #define HEADERS_H
-// --- Header central proyecto ---***
 
+// --- Header central proyecto ---***
 // --- Includes ---
 #include "constants.h"
 #include <SDL2/SDL.h>
@@ -53,12 +53,14 @@ typedef struct {
     SDL_Texture *texturaHP;
     SDL_Texture *texturaBalas;
     SDL_Texture *texturaNivel;
+    SDL_Texture *texturaCamiones;
     SDL_Texture *t_velocidad;
     char texto_Balas[64];
     char texto_HP[64];
     char texto_cronometro[64];
     char texto_Mision[100];
     char texto_Nivel[64];
+    char texto_Camiones[15];
 } Interfaz;
 
 // --- EXPLOSIONES ---
@@ -68,6 +70,13 @@ typedef struct {
     float tiempo;
     bool activa;
 } Explosion;
+
+// --- MUSICA (MP3) ---
+typedef struct {
+    Mix_Chunk *endgame;
+    Mix_Chunk *fail;
+    Mix_Music *fondo;
+} Audio;
 
 // --- JUGADOR/PERSONAJE ---
 typedef struct {
@@ -108,9 +117,6 @@ typedef struct {
     SDL_Rect rect;
     SDL_Rect rect_colision;
     Proyectil proyectiles[MAX_PROYECTILES];
-    // arreglo balas personaje
-    // colocar cantidad almacena cantidad de balas
-    // poner otro objeto que recargue
 } Personaje;
 
 // --- ENEMIGOS ---
@@ -135,9 +141,8 @@ typedef struct {
     bool es_bote;
     bool es_torreta;
     bool indicador;
-    //bool es_peaton;
+
     Proyectil proyectiles[MAX_PROYECTILES];
-    //colocar arreglo de balas aqui
 } Enemigo;
 
 // --- TILES ---
@@ -155,7 +160,7 @@ typedef struct {
     char tipo; //- | 1 2 3 4
     
     bool enemigo1; // auto policia (E)
-    bool enemigo2; // peaton (W)
+    bool enemigo2; // peaton (K)
     bool enemigo3; // camion gas (G)
     bool enemigo4; // Bote (B)
     bool enemigo5; //torreta (V)
@@ -171,15 +176,16 @@ typedef struct {
     int direccion; // D y d
 } Tile;
 
-// --- RANKING: PANEL
+// --- RANKING panel --
 typedef struct {
     int tiempo;
     int cuenta_camiones;
     int cuenta_enemigos;
     int puntaje;
+    int cuenta_camiones_extra;
 } Ranking;
 
-// --- RANKING
+// --- RANKING: ENTRADA --
 typedef struct {
     char nombre[20];
     int puntaje;
@@ -198,13 +204,14 @@ typedef struct {
     Mix_Chunk *vozinha;
     Mix_Chunk *sirena1;
     Mix_Chunk *bala;
+    Mix_Chunk *explosion;
+    Mix_Chunk *powerup;
     Mix_Chunk *sel_menu;
     SDL_Texture *texturaImg;
     SDL_Texture *texturaPista;
     
     SDL_Texture *texturaEnemigo; // patrulla (E)
     SDL_Texture *indicadorEnemigo; // patrulla (E)
-    
     SDL_Texture *texturaEnemigo2; //peaton (W)
     SDL_Texture *texturaEnemigo3; // gas (G)
     SDL_Texture *texturaEnemigo4; // bote (B)
@@ -236,6 +243,7 @@ typedef struct {
     Personaje jugador;
     Interfaz interfaz;
     Ranking ranking;
+    Audio audio;
 
     // explosiones y arreglos
     SDL_Texture *texturaExplosion[FRAMES_EXPLOSION];
@@ -263,6 +271,6 @@ void carga_Nivel(Game *game, int nuevo_nivel); // cargas.c
 void game_Update(Game *game);  // update.c
 void siguiente_Nivel(Game *game); // update.c
 void game_Render(Game *game);  // render.c
-void render_minimapa(Game *game); // render.c
+void render_Minimapa(Game *game); // render.c
 
 #endif

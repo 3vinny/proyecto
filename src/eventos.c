@@ -5,7 +5,7 @@ void game_Input(Game *game)
 {
     int tiempo_actual = SDL_GetTicks();
     int cooldown = 200;
-    int zona_muerta = 20100;
+    int zona_muerta = 12000;
 
     SDL_Event evento;
     while (SDL_PollEvent(&evento)) 
@@ -31,6 +31,9 @@ void game_Input(Game *game)
                     break;
                 case SDL_CONTROLLER_BUTTON_B:
                     game->jugador.freno = 1;
+                    break;
+                case SDL_CONTROLLER_BUTTON_A:
+                    game->jugador.disparo = 1;
                     break;
                 default:
                     game->jugador.up = 0;
@@ -61,6 +64,9 @@ void game_Input(Game *game)
                 case SDL_CONTROLLER_BUTTON_B:
                     game->jugador.freno = 0;
                     break;
+                case SDL_CONTROLLER_BUTTON_A:
+                    game->jugador.disparo = 0;
+                    break;
                 default: 
                     game->jugador.up = 0;
                     game->jugador.down = 0;
@@ -78,18 +84,15 @@ void game_Input(Game *game)
             {
                 if (evento.caxis.value < -zona_muerta) 
                 {
-                    game->jugador.left = 1; 
-                    game->jugador.right = 0;
+                    game->jugador.left = 1; game->jugador.right = 0;
                 } 
                 else if (evento.caxis.value > zona_muerta)
                 {
-                    game->jugador.right = 1; 
-                    game->jugador.left = 0;
+                    game->jugador.right = 1; game->jugador.left = 0;
                 } 
                 else 
                 {
-                    game->jugador.left = 0;
-                    game->jugador.left = 0;
+                    game->jugador.left = 0; game->jugador.right = 0;
                 }
             }
           
@@ -97,13 +100,11 @@ void game_Input(Game *game)
             {
                 if (evento.caxis.value < -zona_muerta) 
                 {
-                    game->jugador.up = 1; 
-                    game->jugador.down = 0;
+                    game->jugador.up = 1; game->jugador.down = 0;
                 } 
                 else if (evento.caxis.value > zona_muerta) 
                 {
-                    game->jugador.down = 1; 
-                    game->jugador.up = 0;
+                    game->jugador.down = 1; game->jugador.up = 0;
                 } 
                 else
                 {
@@ -111,8 +112,32 @@ void game_Input(Game *game)
                     game->jugador.down = 0;
                 }
             }
+            else if (evento.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+            {
+                // gatillo R2 = DISPARO
+                if (evento.caxis.value > zona_muerta)
+                {
+                    game->jugador.disparo = 1;
+                }
+                else
+                {
+                    game->jugador.disparo = 0;
+                }
+            }
+            else if (evento.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+            {
+                // gatillo L2 = FRENO
+                if (evento.caxis.value > zona_muerta)
+                {
+                    game->jugador.freno = 1;
+                }
+                else
+                {
+                    game->jugador.freno = 0;
+                }
+            }
         }
-
+        
         if(evento.type == SDL_KEYDOWN)
         {
             switch(evento.key.keysym.sym)

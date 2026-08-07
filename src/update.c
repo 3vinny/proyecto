@@ -34,6 +34,7 @@ void jugador_muere(Game *game);
 void panel_nombre(Game *game, char *nombre, size_t max_caracteres);
 void calcula_puntaje(Game *game, bool completado);
 void guarda_puntaje(Game *game, const char *nombre, int puntaje, int nivel, int tiempo);
+void endgame(Game *game, bool victoria);
 
 void game_Update(Game *game)
 {
@@ -550,8 +551,22 @@ void actualiza_proyectiles(Game *game, Proyectil *proyectiles, bool es_enemigo)
                         if (game->enemigos[i].es_camion == true)
                         {
                             SDL_Log("BOOM!!!!\n");
+                            if (game->explosion != NULL)
+                            {
+                                Mix_PlayChannel(-1, game->explosion, 0);
+                            }
                             game->contador_camiones--;
+                            game->ranking.cuenta_camiones++; //cuenta de kills para pje
+
+                            if (game->contador_camiones < 0)
+                            {
+                                game->ranking.cuenta_camiones_extra++;
+                            }
                             crea_explosion(game, game->enemigos[i].x, game->enemigos[i].y);
+                        }
+                        else
+                        {
+                            game->ranking.cuenta_enemigos++; //cuenta kills de enemigos para puntaje
                         }
                         game->enemigos[i].activo = false;
                         printf("Enemigo n%d debería desaparecer\n", i);
@@ -581,6 +596,22 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 
                 // comprueba si chocaste con cualquier tile
                 if (SDL_HasIntersection(player_rect, &temp4))
+                {
+                    return 1;
+                }
+            }
+
+            if (game->tiles[i][j].direccion == 1 || game->tiles[i][j].direccion == -1)
+            {
+                SDL_Rect tempdir = {
+                    .x = game->tiles[i][j].x_tiles,
+                    .y = game->tiles[i][j].y_tiles,
+                    .w = game->tiles[i][j].w_tiles,
+                    .h = game->tiles[i][j].h_tiles
+                };
+                
+                // comprueba si chocaste con cualquier tile
+                if (SDL_HasIntersection(player_rect, &tempdir))
                 {
                     return 1;
                 }
@@ -713,9 +744,14 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                 {
                     if (es_enemigo) return 1; // enemigo choca con meta
                     
+                    if (game->contador_camiones > 0 && game->nivel_actual != 1)
+                    {
+                        printf("Aun te faltan %d camiones!\n", game->contador_camiones);
+                        return 1;
+                    }
+
                     Uint32 tiempo_actual = SDL_GetTicks();
                     Uint32 cooldown_meta = 20000; // 20 segundos
-                    
                     if (tiempo_actual - game->ultimo_tiempo_meta >= cooldown_meta)
                     {
                         game->llego_meta = true;
@@ -774,11 +810,37 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         if (game->jugador.hp <= HP_MAX)
                         {
                             game->jugador.hp += 1;
+                            if (game->powerup != NULL)
+                            {
+                                Mix_PlayChannel(-1, game->powerup, 0);
+                            }
                         }
                     }
                 }
             }
             
+            if (game->tiles[i][j].objetominimapa)
+            {
+                SDL_Rect tempW = {
+                    game->tiles[i][j].x_tiles,
+                    game->tiles[i][j].y_tiles,
+                    game->tiles[i][j].w_tiles,
+                    game->tiles[i][j].h_tiles
+                };
+                if (SDL_HasIntersection(player_rect, &tempW))
+                {
+                    if (es_enemigo) return 1;
+                    
+                    game->tiles[i][j].objetominimapa = false;
+                    game->jugador.minimapa_activo = true;
+                    SDL_Log("Minimapa activado!!!!!!!!!!!!!!!");
+                    if (game->powerup != NULL)
+                    {
+                        Mix_PlayChannel(-1, game->powerup, 0);
+                    }
+                }
+            }
+
             if (game->tiles[i][j].objeto3)
             {
                 SDL_Rect temp6 = {
@@ -801,6 +863,10 @@ int chequea_tiles(Game *game, SDL_Rect *player_rect, int es_enemigo)
                         SDL_Log("caja de 5 balas destruida!!");
                         game->jugador.velocidad_actual *= 1.2f;
                         game->jugador.contador_balas += 5;
+                        if (game->powerup != NULL)
+                        {
+                            Mix_PlayChannel(-1, game->powerup, 0);
+                        }
                     }
                 }
             }
@@ -1175,11 +1241,42 @@ void funcion_meta(Game *game) //cambiar a int
     {
         int tiempo_transcurrido = SDL_GetTicks() - game->tiempo_inicio;
         game->ranking.tiempo = tiempo_transcurrido / 1000;
-
+        // puntaje
+        calcula_puntaje(game, true);
         char nombre[20];
         panel_nombre(game, nombre, sizeof(nombre));
-        calcula_puntaje(game, true);
+    
         guarda_puntaje(game, nombre, game->ranking.puntaje, game->nivel_actual, game->ranking.tiempo);
+        endgame(game, true);
+
+        game_Menu(game);
+        if (!game->quit)
+        {
+            game->nivel_actual = 1;
+            game->vueltas = 1;
+            game->jugador.hp = HP_INICIAL;
+            game->jugador.contador_balas = MAX_PROYECTILES;
+            
+            game->jugador.velocidad_actual = 0.0f;
+            game->jugador.dir_x = 0;
+            game->jugador.dir_y = 0;
+            game->jugador.up = 0; game->jugador.down = 0;
+            game->jugador.left = 0; game->jugador.right = 0;
+            game->jugador.disparo = 0; game->jugador.freno = 0;
+            
+            game->ranking.cuenta_camiones = 0;
+            game->ranking.cuenta_enemigos = 0;
+            game->ranking.puntaje = 0;
+            game->ranking.cuenta_camiones_extra = 0;
+            
+            carga_Nivel(game, game->nivel_actual);
+            
+            SDL_Event limpia_queue;
+            while (SDL_PollEvent(&limpia_queue)) { }
+            
+            game->tiempo_inicio = SDL_GetTicks();
+            game->ultimo_tiempo_meta = SDL_GetTicks();
+        }
     }
     else
     {
@@ -1203,12 +1300,12 @@ void jugador_muere(Game *game)
 
     // calcula puntaje y pide nombre si se muere jugador
     calcula_puntaje(game, false);
-
     char nombre[20];
     panel_nombre(game, nombre, sizeof(nombre));
     guarda_puntaje(game, nombre, game->ranking.puntaje, game->nivel_actual, game->ranking.tiempo);
 
-    // redirecciona menu al morir
+    // redirecciona ranking y menu al morir
+    endgame(game, false);
     game_Menu(game);
     if (!game->quit)
     {
@@ -1230,6 +1327,7 @@ void jugador_muere(Game *game)
         game->ranking.cuenta_camiones = 0;
         game->ranking.cuenta_enemigos = 0;
         game->ranking.puntaje = 0;
+        game->ranking.cuenta_camiones_extra = 0;
         carga_Nivel(game, game->nivel_actual);
         
         // vacia entrada, input y cola eventos
@@ -1370,11 +1468,25 @@ void panel_nombre(Game *game, char *nombre, size_t max_caracteres)
 void calcula_puntaje(Game *game, bool completado) 
 {
     // puntaje por bajas
-    int puntaje = (300*game->contador_camiones) + (50*game->ranking.cuenta_enemigos);
+    int puntaje = (300 * game->ranking.cuenta_camiones) + (50*game->ranking.cuenta_enemigos);
+    
+    // bono por camiones extra
+    puntaje += (500 * game->ranking.cuenta_camiones_extra);
 
+    // bono por mando conectado :)
+    if (game->mando) puntaje += 150;
+
+    // bono por llegar al ultimo nivel
+    if (game->nivel_actual >= MAX_NIVELES)
+    {
+        puntaje += (150*game->nivel_actual);
+    }
+    
+    // bono por completar nivel
     if (completado)
     {
         puntaje += 100 + (1000 - game->ranking.tiempo);
+        printf("%d tiempo:\n", game->ranking.tiempo);
     }
 
     // si se tarda como 15 minutos
@@ -1483,7 +1595,7 @@ void siguiente_Nivel(Game *game)
 
     // TEXTO RESUMEN - STATS DURANTE TRANSICION/COOLDOWN
     char texto_stats[120];
-    snprintf(texto_stats, sizeof(texto_stats), "Nivel: %d | HP: %d | Balas: %d | Camiones: %d", game->nivel_actual, game->jugador.hp, game->jugador.contador_balas, game->contador_camiones);
+    snprintf(texto_stats, sizeof(texto_stats), "Nivel: %d | HP: %d | Balas: %d | Camiones: %d", game->nivel_actual, game->jugador.hp, game->jugador.contador_balas, game->contador_camiones+game->ranking.cuenta_camiones_extra);
 
     SDL_Color blanco = {255,255,255,255};
     SDL_Surface *s_stats = TTF_RenderText_Solid(game->fuente, texto_stats, blanco);
@@ -1663,5 +1775,121 @@ void actualiza_explosiones(Game *game)
         {
             game->explosiones[i].activa = false;
         }
+    }
+}
+
+void endgame(Game *game, bool victoria)
+{
+    Mix_HaltMusic(); //saca la musica de fondo
+    bool espera = true;
+    SDL_Event evento;
+
+    SDL_Color colorTexto = {255,255,255,255};
+    SDL_Color colorTitulo;
+    char texto_titulo[64];
+
+    if (victoria)
+    {
+        colorTitulo = (SDL_Color){0,255,0,255};
+        strcpy(texto_titulo, "NIVEL COMPLETADO!");
+    }
+    else
+    {
+        colorTitulo = (SDL_Color){255,50,50,255};
+        strcpy(texto_titulo, "GAME OVER");
+    }
+
+    // resultados: pje y tiempo
+    char texto_puntaje[64];
+    snprintf(texto_puntaje, sizeof(texto_puntaje), "Puntaje final: $%d", game->ranking.puntaje);
+
+    int minutos = game->ranking.tiempo / 60;
+    int segundos = game->ranking.tiempo % 60;
+    char texto_tiempo[64];
+    snprintf(texto_tiempo, sizeof(texto_tiempo), "Tiempo: %02d:%02d", minutos, segundos);
+
+    // reproduce audios victoria / game over
+    if (game->audio.endgame != NULL && victoria == true)
+    {
+        SDL_Log("Audio endgame");
+        Mix_PlayChannel(-1, game->audio.endgame, 0);
+    }
+    else if (game->audio.fail != NULL && victoria == false)
+    {
+        SDL_Log("Audio fail");
+        Mix_PlayChannel(-1, game->audio.fail, 0);
+    }
+
+    // limpieza eventos
+    while(SDL_PollEvent(&evento)) { }
+
+    while (espera && !game->quit)
+    {
+        while(SDL_PollEvent(&evento))
+        {
+            if (evento.type == SDL_QUIT)
+            {
+                game->quit = true;
+                espera = false;
+            }
+            else if (evento.type == SDL_KEYDOWN || evento.type == SDL_MOUSEBUTTONDOWN || evento.type == SDL_CONTROLLERBUTTONDOWN)
+            {
+                espera = false;
+            }
+        }
+
+        SDL_SetRenderDrawColor(game->pantalla.renderer, 0,0,0,255);
+        SDL_RenderClear(game->pantalla.renderer);
+        if (game->texturaImg != NULL)
+        {
+            SDL_RenderCopy(game->pantalla.renderer, game->texturaImg, NULL, NULL);
+        }
+
+        // caja gris transparente
+        SDL_SetRenderDrawBlendMode(game->pantalla.renderer, SDL_BLENDMODE_BLEND);
+        SDL_Rect rect_fondo = {
+            game->pantalla.win_w / 4, 
+            game->pantalla.win_h / 4,
+            game->pantalla.win_w / 2,
+            game->pantalla.win_h / 2
+        };
+        SDL_SetRenderDrawColor(game->pantalla.renderer, 30, 30, 30, 200);
+        SDL_RenderFillRect(game->pantalla.renderer, &rect_fondo);
+
+        // renderizar texto
+        SDL_Surface *s_titulo = TTF_RenderText_Solid(game->fuente, texto_titulo, colorTitulo);
+        if (s_titulo)
+        {
+            SDL_Texture *t_titulo = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_titulo);
+            SDL_Rect r_titulo = {
+                rect_fondo.x + (rect_fondo.w - s_titulo->w)/2, 
+                rect_fondo.y + 40, 
+                s_titulo->w, 
+                s_titulo->h
+            };
+            SDL_RenderCopy(game->pantalla.renderer, t_titulo, NULL, &r_titulo);
+            SDL_FreeSurface(s_titulo); SDL_DestroyTexture(t_titulo);
+        }
+
+        // puntajes
+        SDL_Surface *s_pts = TTF_RenderText_Solid(game->fuente, texto_puntaje, colorTexto);
+        if (s_pts) {
+            SDL_Texture *t_pts = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_pts);
+            SDL_Rect r_pts = { rect_fondo.x + (rect_fondo.w - s_pts->w)/2, rect_fondo.y + 120, s_pts->w, s_pts->h };
+            SDL_RenderCopy(game->pantalla.renderer, t_pts, NULL, &r_pts);
+            SDL_FreeSurface(s_pts); SDL_DestroyTexture(t_pts);
+        }
+
+        // tiempo
+        SDL_Surface *s_tmp = TTF_RenderText_Solid(game->fuente, texto_tiempo, colorTexto);
+        if (s_tmp) {
+            SDL_Texture *t_tmp = SDL_CreateTextureFromSurface(game->pantalla.renderer, s_tmp);
+            SDL_Rect r_tmp = { rect_fondo.x + (rect_fondo.w - s_tmp->w)/2, rect_fondo.y + 180, s_tmp->w, s_tmp->h };
+            SDL_RenderCopy(game->pantalla.renderer, t_tmp, NULL, &r_tmp);
+            SDL_FreeSurface(s_tmp); SDL_DestroyTexture(t_tmp);
+        }
+
+        SDL_RenderPresent(game->pantalla.renderer);
+        SDL_Delay(16);
     }
 }

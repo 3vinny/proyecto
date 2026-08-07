@@ -90,6 +90,8 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->interfaz.texturaHP);
    SDL_DestroyTexture(game->interfaz.texturaBalas);
    SDL_DestroyTexture(game->interfaz.texturaNivel);
+   SDL_DestroyTexture(game->interfaz.texturaCamiones);
+
    SDL_DestroyTexture(game->texturaImg);
    SDL_DestroyTexture(game->texturaPista);
    SDL_DestroyTexture(game->texturaCaja);
@@ -102,6 +104,7 @@ void game_Limpieza(Game *game, int exitStatus)
    SDL_DestroyTexture(game->texturaEnemigo3);
    SDL_DestroyTexture(game->texturaEnemigo4);
    SDL_DestroyTexture(game->texturaEnemigo5);
+   SDL_DestroyTexture(game->texturaMinimapa);
    SDL_DestroyTexture(game->texturaVignette);
    SDL_DestroyTexture(game->jugador.textura);
    SDL_DestroyWindow(game->pantalla.ventana);
@@ -110,6 +113,14 @@ void game_Limpieza(Game *game, int exitStatus)
    Mix_FreeChunk(game->sirena1);
    Mix_FreeChunk(game->bala);
    Mix_FreeChunk(game->sel_menu);
+   Mix_FreeChunk(game->audio.endgame);
+   Mix_FreeChunk(game->audio.fail);
+   Mix_FreeChunk(game->explosion);
+   Mix_FreeChunk(game->powerup);
+
+   if (game->audio.fondo != NULL) {
+        Mix_FreeMusic(game->audio.fondo);
+   }
 
    Mix_CloseAudio();
    
